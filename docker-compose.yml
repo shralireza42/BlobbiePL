@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blobbie
+    ports:
+      - "5432:5432"
+    volumes:
+      - blobbie_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/blobbie?schema=public
+      NEXT_PUBLIC_CHAIN_ID: "97"
+      NEXT_PUBLIC_ENABLE_MOCK_MODE: "true"
+      NEXT_PUBLIC_ENABLE_TICKET_PURCHASE: "true"
+      NEXT_PUBLIC_MOCK_BLOBBIE_PRICE_USD: "0.0025"
+      JWT_SECRET: change-me-in-production
+      ADMIN_WALLET_ADDRESS: ""
+    ports:
+      - "3000:3000"
+    command: sh -c "npx prisma migrate deploy && npm run start"
+
+volumes:
+  blobbie_db:

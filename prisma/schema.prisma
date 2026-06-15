@@ -1,0 +1,354 @@
+// Blobbie Playground — Prisma schema
+// Daily Rewards Draw + Airdrop Hub backend models.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Core identity
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  wallet        String   @unique
+  ensName       String?
+  ipHash        String?
+  deviceHash    String?
+  firstSeenAt   DateTime @default(now())
+  lastSeenAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  entries        DrawEntry[]
+  airdropUser    AirdropUser?
+  pointsLedger   AirdropPointsLedger[]
+  completions    AirdropCompletion[]
+  fraudFlags     FraudFlag[]
+  activities     ActivityLog[]
+
+  @@index([wallet])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Daily Rewards Draw
+// ---------------------------------------------------------------------------
+
+enum RoundStatus {
+  OPEN
+  CLOSING_SOON
+  FILLED
+  AWAITING_DRAW
+  COMPLETED
+}
+
+model DrawRound {
+  id               String      @id @default(cuid())
+  roundNumber      Int         @unique
+  status           RoundStatus @default(OPEN)
+  capacity         Int         @default(300)
+  uniqueUsers      Int         @default(0)
+  totalTickets     Int         @default(0)
+  supplementTickets Int        @default(0)
+  startTime        DateTime    @default(now())
+  endTime          DateTime
+  drawnAt          DateTime?
+  vrfRequestId     String?
+  randomSeed       String?
+  txHash           String?
+  mockMode         Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  entries DrawEntry[]
+  winners DrawWinner[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DrawEntry {
+  id         String    @id @default(cuid())
+  round      DrawRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId    String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  wallet     String
+  ticketCount Int      @default(0)
+  blobbieSpent String  @default("0") // wei-string of $BLOBBIE
+  usdValue   Float     @default(0)
+  txHash     String?
+  mockMode   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  @@unique([roundId, userId])
+  @@index([wallet])
+  @@index([roundId])
+  @@index([createdAt])
+}
+
+enum ClaimStatus {
+  UNCLAIMED
+  CLAIMED
+  EXPIRED
+}
+
+model DrawWinner {
+  id          String      @id @default(cuid())
+  round       DrawRound   @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId     String
+  wallet      String
+  rank        Int
+  tier        String // "first" | "top10" | "top150"
+  usdAmount   Float
+  blobbieAmount String    @default("0")
+  claimStatus ClaimStatus @default(UNCLAIMED)
+  claimTxHash String?
+  claimedAt   DateTime?
+  createdAt   DateTime    @default(now())
+
+  @@unique([roundId, wallet]) // one wallet cannot win multiple prizes in same round
+  @@unique([roundId, rank])
+  @@index([wallet])
+  @@index([roundId])
+}
+
+// ---------------------------------------------------------------------------
+// Airdrop Hub
+// ---------------------------------------------------------------------------
+
+enum AirdropEligibility {
+  NOT_CONNECTED
+  ELIGIBLE
+  PENDING_REVIEW
+  FLAGGED
+  APPROVED
+}
+
+enum TaskType {
+  ONE_TIME
+  DAILY
+  MANUAL // requires admin verification (social, etc.)
+}
+
+enum TaskStatus {
+  ACTIVE
+  COMING_SOON
+  DISABLED
+}
+
+model AirdropCampaign {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  active      Boolean  @default(true)
+  startAt     DateTime @default(now())
+  endAt       DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks       AirdropTask[]
+  users       AirdropUser[]
+  completions AirdropCompletion[]
+  ledger      AirdropPointsLedger[]
+
+  @@index([slug])
+  @@index([createdAt])
+}
+
+model AirdropTask {
+  id          String     @id @default(cuid())
+  campaign    AirdropCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId  String
+  key         String // unique action key, e.g. "connect_wallet"
+  title       String
+  description String
+  points      Int        @default(0)
+  type        TaskType   @default(ONE_TIME)
+  status      TaskStatus @default(ACTIVE)
+  requiresAdmin Boolean  @default(false)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  completions AirdropCompletion[]
+
+  @@unique([campaignId, key])
+  @@index([campaignId])
+}
+
+model AirdropUser {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String   @unique
+  campaign     AirdropCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId   String
+  wallet       String
+  totalPoints  Int      @default(0)
+  rank         Int?
+  eligibility  AirdropEligibility @default(ELIGIBLE)
+  reviewNotes  String?
+  lastDailyAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reviews AirdropReview[]
+
+  @@unique([campaignId, wallet])
+  @@index([wallet])
+  @@index([campaignId])
+  @@index([totalPoints])
+  @@index([createdAt])
+}
+
+model AirdropCompletion {
+  id          String   @id @default(cuid())
+  campaign    AirdropCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId  String
+  task        AirdropTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  wallet      String
+  pointsAwarded Int    @default(0)
+  // For ONE_TIME tasks this is null (one row). For DAILY tasks it is the UTC day bucket.
+  dayBucket   String?
+  approved    Boolean  @default(true) // MANUAL tasks start false
+  createdAt   DateTime @default(now())
+
+  @@unique([taskId, userId, dayBucket])
+  @@index([wallet])
+  @@index([campaignId])
+  @@index([createdAt])
+}
+
+enum LedgerReason {
+  TASK_COMPLETION
+  DAILY_RETURN
+  DRAW_PARTICIPATION
+  ADMIN_ADJUSTMENT
+  PENALTY
+}
+
+model AirdropPointsLedger {
+  id          String   @id @default(cuid())
+  campaign    AirdropCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId  String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  wallet      String
+  delta       Int
+  balanceAfter Int
+  reason      LedgerReason
+  refType     String?
+  refId       String?
+  createdAt   DateTime @default(now())
+
+  @@index([wallet])
+  @@index([campaignId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  FLAGGED
+  PENDING
+}
+
+model AirdropReview {
+  id           String   @id @default(cuid())
+  airdropUser  AirdropUser @relation(fields: [airdropUserId], references: [id], onDelete: Cascade)
+  airdropUserId String
+  wallet       String
+  decision     ReviewDecision @default(PENDING)
+  notes        String?
+  reviewedBy   String // admin wallet
+  createdAt    DateTime @default(now())
+
+  @@index([wallet])
+  @@index([createdAt])
+}
+
+enum FraudReason {
+  MULTI_ACCOUNT
+  IP_CLUSTER
+  DEVICE_CLUSTER
+  ABNORMAL_ACTIVITY
+  MANUAL_FLAG
+}
+
+model FraudFlag {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  wallet    String
+  reason    FraudReason
+  details   String?
+  resolved  Boolean  @default(false)
+  flaggedBy String // admin wallet or "system"
+  createdAt DateTime @default(now())
+
+  @@index([wallet])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Activity + audit
+// ---------------------------------------------------------------------------
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+  wallet    String?
+  type      String
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([wallet])
+  @@index([createdAt])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  adminWallet String
+  action    String
+  target    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([adminWallet])
+  @@index([createdAt])
+}
+
+model AppConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([key])
+}
+
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  bucket    String
+  identifier String
+  windowStart DateTime
+  count     Int      @default(1)
+
+  @@unique([bucket, identifier, windowStart])
+  @@index([windowStart])
+}
