@@ -41,7 +41,7 @@ type Profile = {
 };
 
 const ELIGIBILITY_STYLES: Record<string, string> = {
-  NOT_CONNECTED: "border-white/15 bg-white/5 text-slate-400",
+  NOT_CONNECTED: "border-cream/15 bg-cream/5 text-cream-dim",
   ELIGIBLE: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
   PENDING_REVIEW: "border-amber-400/30 bg-amber-400/10 text-amber-300",
   FLAGGED: "border-rose-400/30 bg-rose-400/10 text-rose-300",
@@ -77,8 +77,8 @@ export function AirdropConsole() {
 
       {!profile.connected ? (
         <div className="card flex flex-col items-center gap-4 p-10 text-center">
-          <h3 className="text-xl font-bold text-white">Connect to start earning</h3>
-          <p className="max-w-md text-sm text-slate-400">
+          <h3 className="text-xl font-bold text-cream">Connect to start earning</h3>
+          <p className="max-w-md text-sm text-cream-dim">
             Connect and verify your wallet to track Airdrop Points and complete
             beta tasks.
           </p>
@@ -121,8 +121,8 @@ export function AirdropConsole() {
 
       <div className="card flex flex-wrap items-center justify-between gap-3 p-6">
         <div>
-          <h3 className="font-bold text-white">Boost your points</h3>
-          <p className="text-sm text-slate-400">
+          <h3 className="font-bold text-cream">Boost your points</h3>
+          <p className="text-sm text-cream-dim">
             Joining the Daily Rewards Draw earns Airdrop Points automatically.
           </p>
         </div>
@@ -146,7 +146,7 @@ function StatCard({
   return (
     <div className={`card p-4 ${highlight ? "border-neon-purple/30" : ""}`}>
       <p className="stat-label">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+      <p className="mt-1 text-2xl font-bold text-cream">{value}</p>
     </div>
   );
 }
@@ -160,7 +160,7 @@ function TaskList({
 }) {
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Tasks</h3>
+      <h3 className="text-lg font-bold text-cream">Tasks</h3>
       <div className="mt-4 space-y-3">
         {tasks.map((task) => (
           <TaskRow key={task.key} task={task} onChange={onChange} />
@@ -189,27 +189,27 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-xl border border-cream/10 bg-cream/5 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <p className="font-medium text-white">{task.title}</p>
+          <p className="font-medium text-cream">{task.title}</p>
           {task.type === "DAILY" && (
             <span className="chip border-neon-blue/30 bg-neon-blue/10 text-neon-blue">
               Daily
             </span>
           )}
           {task.requiresAdmin && task.status === "ACTIVE" && (
-            <span className="chip border-white/15 bg-white/5 text-slate-400">
+            <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
               Manual
             </span>
           )}
           {task.status === "COMING_SOON" && (
-            <span className="chip border-white/15 bg-white/5 text-slate-400">
+            <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
               Coming Soon
             </span>
           )}
         </div>
-        <p className="mt-0.5 text-sm text-slate-400">{task.description}</p>
+        <p className="mt-0.5 text-sm text-cream-dim">{task.description}</p>
         {msg && <p className="mt-1 text-xs text-neon-cyan">{msg}</p>}
       </div>
       <div className="flex items-center gap-3">
@@ -248,21 +248,21 @@ function Leaderboard() {
 
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Leaderboard</h3>
+      <h3 className="text-lg font-bold text-cream">Leaderboard</h3>
       {rows.length === 0 ? (
-        <p className="mt-3 text-sm text-slate-400">
+        <p className="mt-3 text-sm text-cream-dim">
           No ranked participants yet. Be the first to earn points.
         </p>
       ) : (
-        <div className="mt-4 divide-y divide-white/5">
+        <div className="mt-4 divide-y divide-cream/5">
           {rows.slice(0, 10).map((row, i) => (
             <div
               key={row.wallet}
               className="flex items-center justify-between py-2 text-sm"
             >
               <span className="flex items-center gap-3">
-                <span className="w-6 text-slate-500">#{i + 1}</span>
-                <span className="font-mono text-slate-300">
+                <span className="w-6 text-cream-dim">#{i + 1}</span>
+                <span className="font-mono text-cream-soft">
                   {shortenAddress(row.wallet, 5)}
                 </span>
               </span>

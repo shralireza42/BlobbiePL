@@ -10,10 +10,10 @@ const RULES = [
 export function DrawRules() {
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Rules & Fairness</h3>
+      <h3 className="text-lg font-bold text-cream">Rules & Fairness</h3>
       <ul className="mt-4 space-y-3">
         {RULES.map((rule) => (
-          <li key={rule} className="flex gap-3 text-sm text-slate-300">
+          <li key={rule} className="flex gap-3 text-sm text-cream-soft">
             <span className="mt-0.5 text-neon-cyan">✓</span>
             <span>{rule}</span>
           </li>

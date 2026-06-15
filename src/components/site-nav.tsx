@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { href: ROUTES.playground, label: "Playground" },
   { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
   { href: ROUTES.airdrop, label: "Airdrop Hub" },
-  { href: ROUTES.dashboard, label: "Dashboard" },
 ];
 
 export function SiteNav() {
@@ -19,30 +18,43 @@ export function SiteNav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-bg/70 backdrop-blur-xl">
-      <nav className="container-px flex h-16 items-center justify-between">
-        <div className="flex items-center gap-8">
-          <Logo />
-          <div className="hidden items-center gap-1 md:flex">
-            {NAV_LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active
-                      ? "bg-white/10 text-white"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
+    <header className="sticky top-0 z-40 border-b border-cream/10 bg-bg/80 backdrop-blur-xl">
+      <nav className="container-px flex h-[72px] items-center justify-between gap-4">
+        {/* Left: logo */}
+        <Logo />
+
+        {/* Center: primary nav */}
+        <div className="hidden items-center gap-1 md:flex">
+          {NAV_LINKS.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-pill px-4 py-2 text-sm font-bold not-italic transition ${
+                  active
+                    ? "bg-cream/10 text-cream"
+                    : "text-cream-dim hover:text-cream"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
+
+        {/* Right: Dashboard + wallet */}
         <div className="flex items-center gap-2">
+          <Link
+            href={ROUTES.dashboard}
+            className={`hidden rounded-pill px-4 py-2 text-sm font-bold not-italic transition sm:inline-flex ${
+              pathname === ROUTES.dashboard
+                ? "bg-cream/10 text-cream"
+                : "text-cream-dim hover:text-cream"
+            }`}
+          >
+            Dashboard
+          </Link>
           <WalletButton />
           <button
             className="btn-ghost px-3 py-2 md:hidden"
@@ -53,19 +65,22 @@ export function SiteNav() {
           </button>
         </div>
       </nav>
+
       {open && (
-        <div className="border-t border-white/10 bg-bg-soft md:hidden">
+        <div className="border-t border-cream/10 bg-bg-soft md:hidden">
           <div className="container-px flex flex-col py-2">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm text-slate-200 hover:bg-white/10"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {[...NAV_LINKS, { href: ROUTES.dashboard, label: "Dashboard" }].map(
+              (link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm not-italic text-cream-soft hover:bg-cream/5"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
           </div>
         </div>
       )}

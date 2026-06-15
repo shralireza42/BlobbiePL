@@ -10,12 +10,12 @@ import { WalletButton } from "@/components/wallet-button";
 import { Skeleton } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
 
+// Free Entries, Jackpot and Staking are surfaced only on the Playground page.
 const COMING_SOON = [
-  { label: "Mini-Games", href: ROUTES.dash },
+  { label: "Blobbie Dash", href: ROUTES.dash },
+  { label: "Blobbie Blast", href: ROUTES.blast },
+  { label: "Blobbie Stack", href: ROUTES.stack },
   { label: "Referrals", href: ROUTES.referrals },
-  { label: "Staking", href: ROUTES.staking },
-  { label: "Jackpot", href: ROUTES.jackpot },
-  { label: "NFTs", href: ROUTES.nfts },
 ];
 
 export function DashboardClient() {
@@ -43,8 +43,8 @@ export function DashboardClient() {
   if (!isConnected || !session.authenticated) {
     return (
       <div className="card flex flex-col items-center gap-4 p-10 text-center">
-        <h3 className="text-xl font-bold text-white">Connect your wallet</h3>
-        <p className="max-w-md text-sm text-slate-400">
+        <h3 className="text-xl font-bold text-cream">Connect your wallet</h3>
+        <p className="max-w-md text-sm text-cream-dim">
           Sign in to view your $BLOBBIE balance, Daily Rewards Draw tickets and
           Airdrop Points in one place.
         </p>
@@ -91,7 +91,7 @@ export function DashboardClient() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="card p-6 lg:col-span-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white">Quick Actions</h3>
+            <h3 className="text-lg font-bold text-cream">Quick Actions</h3>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <ActionLink
@@ -118,14 +118,14 @@ export function DashboardClient() {
         </div>
 
         <div className="card p-6">
-          <h3 className="text-lg font-bold text-white">Airdrop Status</h3>
-          <p className="mt-2 text-sm text-slate-400">
+          <h3 className="text-lg font-bold text-cream">Airdrop Status</h3>
+          <p className="mt-2 text-sm text-cream-dim">
             Eligibility:{" "}
-            <span className="font-medium text-white">
+            <span className="font-medium text-cream">
               {airdrop.data?.profile.eligibility ?? "—"}
             </span>
           </p>
-          <p className="mt-4 text-xs text-slate-500">
+          <p className="mt-4 text-xs text-cream-dim">
             Final rewards are admin-reviewed and anti-sybil checked. Points are
             calculated server-side.
           </p>
@@ -133,16 +133,16 @@ export function DashboardClient() {
       </div>
 
       <div className="card p-6">
-        <h3 className="text-lg font-bold text-white">Coming Soon</h3>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <h3 className="text-lg font-bold text-cream">Coming Soon</h3>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {COMING_SOON.map((c) => (
             <Link
               key={c.label}
               href={c.href}
-              className="rounded-xl border border-white/10 bg-white/5 p-4 text-center text-sm text-slate-300 opacity-70 transition hover:opacity-100"
+              className="rounded-2xl border border-cream/10 bg-cream/5 p-4 text-center text-sm not-italic text-cream-dim opacity-80 transition hover:opacity-100 hover:text-cream"
             >
               {c.label}
-              <span className="mt-1 block text-[10px] uppercase tracking-wider text-slate-500">
+              <span className="mt-1 block text-[10px] uppercase tracking-wider text-cream-dim">
                 Soon
               </span>
             </Link>
@@ -169,10 +169,10 @@ function Card({
   return (
     <div className={`card p-4 ${highlight ? "border-neon-purple/30" : ""}`}>
       <p className="stat-label">{label}</p>
-      <p className={`mt-1 text-xl font-bold text-white ${mono ? "font-mono" : ""}`}>
+      <p className={`mt-1 text-xl font-bold text-cream ${mono ? "font-mono" : ""}`}>
         {value}
       </p>
-      {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-cream-dim">{hint}</p>}
     </div>
   );
 }
@@ -189,10 +189,10 @@ function ActionLink({
   return (
     <Link
       href={href}
-      className="group rounded-xl border border-white/10 bg-white/5 p-4 transition hover:border-neon-cyan/40"
+      className="group rounded-xl border border-cream/10 bg-cream/5 p-4 transition hover:border-neon-cyan/40"
     >
-      <p className="font-medium text-white">{title}</p>
-      <p className="mt-0.5 text-sm text-slate-400">{desc}</p>
+      <p className="font-medium text-cream">{title}</p>
+      <p className="mt-0.5 text-sm text-cream-dim">{desc}</p>
       <span className="mt-2 inline-block text-sm text-neon-cyan opacity-0 transition group-hover:opacity-100">
         Open →
       </span>

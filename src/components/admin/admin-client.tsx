@@ -120,8 +120,8 @@ export function AdminClient() {
 function Gate({ title, body }: { title: string; body: string }) {
   return (
     <div className="card flex flex-col items-center gap-4 p-10 text-center">
-      <h3 className="text-xl font-bold text-white">{title}</h3>
-      <p className="max-w-md text-sm text-slate-400">{body}</p>
+      <h3 className="text-xl font-bold text-cream">{title}</h3>
+      <p className="max-w-md text-sm text-cream-dim">{body}</p>
       <WalletButton />
     </div>
   );
@@ -139,7 +139,7 @@ function Stat({
   return (
     <div className={`card p-4 ${highlight && value > 0 ? "border-rose-400/40" : ""}`}>
       <p className="stat-label">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+      <p className="mt-1 text-2xl font-bold text-cream">{value}</p>
     </div>
   );
 }
@@ -178,8 +178,8 @@ function ConfigPanel({
 
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Configuration</h3>
-      <p className="mt-1 text-xs text-slate-500">
+      <h3 className="text-lg font-bold text-cream">Configuration</h3>
+      <p className="mt-1 text-xs text-cream-dim">
         These values persist to the database (AppConfig). Public client config is
         driven by NEXT_PUBLIC_* env vars at build/deploy time.
       </p>
@@ -213,7 +213,7 @@ function ConfigPanel({
         <button className="btn-accent" onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save Configuration"}
         </button>
-        {msg && <span className="text-xs text-slate-400">{msg}</span>}
+        {msg && <span className="text-xs text-cream-dim">{msg}</span>}
       </div>
     </div>
   );
@@ -222,7 +222,7 @@ function ConfigPanel({
 function ExportPanel() {
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Export CSV</h3>
+      <h3 className="text-lg font-bold text-cream">Export CSV</h3>
       <div className="mt-4 flex flex-wrap gap-3">
         {(["users", "airdrop", "draw"] as const).map((kind) => (
           <a
@@ -258,12 +258,12 @@ function PendingCompletions({
           {items.map((c) => (
             <div
               key={c.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 p-3 text-sm"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-cream/10 bg-cream/5 p-3 text-sm"
             >
-              <span className="font-mono text-slate-300">
+              <span className="font-mono text-cream-soft">
                 {shortenAddress(c.wallet, 5)}
               </span>
-              <span className="text-slate-400">
+              <span className="text-cream-dim">
                 {c.task.title} (+{c.task.points})
               </span>
               <div className="flex gap-2">
@@ -412,14 +412,14 @@ function Section({
 }) {
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">{title}</h3>
+      <h3 className="text-lg font-bold text-cream">{title}</h3>
       <div className="mt-4">{children}</div>
     </div>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-slate-400">{children}</p>;
+  return <p className="text-sm text-cream-dim">{children}</p>;
 }
 
 function Table({
@@ -430,9 +430,9 @@ function Table({
   rows: React.ReactNode[][];
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
+    <div className="overflow-x-auto rounded-xl border border-cream/10">
       <table className="w-full text-sm">
-        <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-slate-400">
+        <thead className="bg-cream/5 text-left text-xs uppercase tracking-wider text-cream-dim">
           <tr>
             {headers.map((h) => (
               <th key={h} className="px-4 py-3">
@@ -441,11 +441,11 @@ function Table({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-cream/5">
           {rows.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-slate-300">
+                <td key={j} className="px-4 py-3 text-cream-soft">
                   {cell}
                 </td>
               ))}
@@ -470,16 +470,16 @@ function Toggle({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+      className="flex items-center justify-between rounded-xl border border-cream/10 bg-cream/5 px-4 py-3"
     >
-      <span className="text-sm text-slate-200">{label}</span>
+      <span className="text-sm text-cream">{label}</span>
       <span
         className={`relative h-6 w-11 rounded-full transition ${
-          checked ? "bg-neon-cyan" : "bg-white/15"
+          checked ? "bg-accent-lime" : "bg-cream/20"
         }`}
       >
         <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-ink transition-all ${
             checked ? "left-[22px]" : "left-0.5"
           }`}
         />
@@ -501,7 +501,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-xs uppercase tracking-wider text-slate-400">
+      <span className="text-xs uppercase tracking-wider text-cream-dim">
         {label}
       </span>
       <input

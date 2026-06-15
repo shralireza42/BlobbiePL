@@ -18,14 +18,14 @@ export function ComingSoon({
         <div className="card relative w-full max-w-xl overflow-hidden p-10 text-center">
           <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-gradient-to-br from-neon-purple/20 to-neon-cyan/10 blur-3xl" />
           <div className="relative">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-3xl text-neon-cyan">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-cream/10 bg-cream/5 text-3xl text-neon-cyan">
               {glyph}
             </div>
             <div className="mt-5 flex justify-center">
               <ComingSoonBadge />
             </div>
-            <h1 className="mt-4 text-3xl font-extrabold text-white">{title}</h1>
-            <p className="mx-auto mt-3 max-w-md text-sm text-slate-400">
+            <h1 className="mt-4 text-3xl font-extrabold text-cream">{title}</h1>
+            <p className="mx-auto mt-3 max-w-md text-sm text-cream-dim">
               {description}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

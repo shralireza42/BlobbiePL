@@ -30,8 +30,8 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
           {isConnecting ? "Connecting…" : "Connect Wallet"}
         </button>
         {open && (
-          <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-white/10 bg-bg-elevated p-2 shadow-glow">
-            <p className="px-3 py-2 text-xs text-slate-400">Choose a wallet</p>
+          <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-cream/10 bg-bg-card p-2 shadow-glow">
+            <p className="px-3 py-2 text-xs text-cream-dim">Choose a wallet</p>
             {connectors.map((c) => (
               <button
                 key={c.uid}
@@ -39,12 +39,12 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
                   connect(c.id);
                   setOpen(false);
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-cream hover:bg-cream/10"
               >
                 {c.name}
               </button>
             ))}
-            <p className="px-3 pt-2 text-[10px] text-slate-500">
+            <p className="px-3 pt-2 text-[10px] text-cream-dim">
               MetaMask · Trust Wallet · WalletConnect
             </p>
           </div>
@@ -76,8 +76,8 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-white/10 bg-bg-elevated p-2 shadow-glow">
-          <p className="truncate px-3 py-2 text-xs text-slate-400">{address}</p>
+        <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-cream/10 bg-bg-card p-2 shadow-glow">
+          <p className="truncate px-3 py-2 text-xs text-cream-dim">{address}</p>
           {!session.authenticated && (
             <p className="px-3 py-1 text-[11px] text-amber-300">Sign message to verify</p>
           )}
@@ -86,7 +86,7 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
               signOut();
               setOpen(false);
             }}
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10"
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-cream hover:bg-cream/10"
           >
             Disconnect
           </button>

@@ -33,8 +33,17 @@ and a clean provider pattern that swaps between **mock** and **real** contracts.
 | `/airdrop` | **Active** | Airdrop Hub (points + tasks) |
 | `/dashboard` | Active | Unified user dashboard |
 | `/admin` | Protected | Admin console (wallet-gated) |
-| `/playground/dash` `/playground/blast` `/playground/stack` | Coming Soon | Mini-games |
-| `/referrals` `/free-entries` `/staking` `/jackpot` `/nfts` | Coming Soon | Future modules |
+| `/playground/dash` `/playground/blast` `/playground/stack` | Coming Soon | Mini-games (shown in the dedicated Games section) |
+| `/referrals` `/free-entries` `/staking` `/jackpot` | Coming Soon | Future modules (`free-entries`, `staking`, `jackpot` surface only on `/playground`) |
+
+### Design
+
+Dark brand theme matching itsblobbie.com / the Framer reference:
+
+- Background `#1c1d22`, primary text `#e8edda`, dark button text `#020202`.
+- **Dela Gothic One** for bold/heading text, **Bricolage Grotesque** (bold italic) for normal/body text (loaded via `next/font`).
+- Pill buttons (cream fill, dark text), logo + Dashboard button on the right of the header.
+- The three mini-games render in a dedicated **Games — Coming Soon** section using swappable preview images in [`public/games/`](./public/games) (`dash.svg`, `blast.svg`, `stack.svg`). Replace those files to update the artwork.
 
 ---
 

@@ -12,13 +12,36 @@ html {
 }
 
 body {
-  @apply bg-bg text-slate-200 antialiased;
-  background-image:
-    radial-gradient(circle at 15% -10%, rgba(99, 102, 241, 0.15), transparent 35%),
-    radial-gradient(circle at 85% 0%, rgba(34, 211, 238, 0.1), transparent 30%),
-    radial-gradient(circle at 50% 120%, rgba(168, 85, 247, 0.12), transparent 45%);
-  background-attachment: fixed;
+  /* Normal text: Bricolage Grotesque, Bold Italic, cream on charcoal */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-style: italic;
+  background-color: #1c1d22;
+  color: #e8edda;
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+}
+
+/* Bold / heading text: Dela Gothic One (upright) */
+h1,
+h2,
+h3,
+h4,
+h5,
+.font-display {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: #e8edda;
+}
+
+/* H6 = normal text style per brand spec */
+h6 {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-weight: 700;
 }
 
 @layer components {
@@ -26,52 +49,60 @@ body {
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
+  /* Brand display text (legacy .neon-text usages render as bright cream) */
+  .neon-text {
+    @apply bg-gradient-to-r from-cream via-accent-lime to-cream bg-clip-text text-transparent;
+  }
+
   .card {
-    @apply rounded-2xl border border-white/10 bg-bg-card/70 backdrop-blur-xl shadow-xl;
+    @apply rounded-3xl border border-cream/10 bg-bg-card shadow-card;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:border-neon-cyan/40 hover:shadow-neon-cyan;
+    @apply transition-all duration-300 hover:border-cream/25 hover:-translate-y-0.5;
   }
 
-  .neon-text {
-    @apply bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple bg-clip-text text-transparent;
-  }
-
+  /* Buttons: pill shape, cream fill, dark (#020202) text */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3 text-sm font-extrabold not-italic transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+    font-family: var(--font-sans);
   }
 
   .btn-primary {
-    @apply btn bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-neon hover:shadow-glow hover:brightness-110;
+    @apply btn bg-cream text-ink shadow-btn hover:brightness-105 hover:scale-[1.02];
   }
 
   .btn-accent {
-    @apply btn bg-gradient-to-r from-neon-cyan to-neon-blue text-bg shadow-neon-cyan hover:brightness-110;
+    @apply btn bg-accent-lime text-ink shadow-btn hover:brightness-105 hover:scale-[1.02];
   }
 
   .btn-ghost {
-    @apply btn border border-white/15 bg-white/5 text-slate-100 hover:border-neon-cyan/40 hover:bg-white/10;
+    @apply btn border-2 border-cream/30 bg-transparent text-cream hover:border-cream/70 hover:bg-cream/5;
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 rounded-pill border px-3 py-1 text-xs font-bold not-italic;
+    font-family: var(--font-sans);
   }
 
   .stat-label {
-    @apply text-xs uppercase tracking-wider text-slate-400;
+    @apply text-xs uppercase not-italic tracking-wider text-cream-dim;
+    font-family: var(--font-sans);
+    font-weight: 700;
   }
 
   .input {
-    @apply w-full rounded-xl border border-white/10 bg-bg-soft/80 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-neon-cyan/50 focus:ring-2 focus:ring-neon-cyan/20;
+    @apply w-full rounded-2xl border border-cream/15 bg-bg-soft px-4 py-3 text-sm not-italic text-cream outline-none transition focus:border-cream/50 focus:ring-2 focus:ring-cream/15;
+    font-family: var(--font-sans);
+    font-weight: 600;
   }
 
   .skeleton {
-    @apply relative overflow-hidden rounded-xl bg-white/5;
+    @apply relative overflow-hidden rounded-2xl bg-cream/5;
   }
   .skeleton::after {
     content: "";
-    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent;
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-cream/10 to-transparent;
     animation: shimmer 1.6s infinite;
   }
 }
@@ -90,6 +121,6 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.35);
+  background: rgba(232, 237, 218, 0.25);
   border-radius: 9999px;
 }

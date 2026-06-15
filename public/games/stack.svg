@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" role="img" aria-label="Blobbie Stack">
+  <defs>
+    <linearGradient id="stackbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26272e"/>
+      <stop offset="1" stop-color="#1c1d22"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#stackbg)"/>
+  <g>
+    <rect x="220" y="300" width="160" height="40" rx="8" fill="#e8edda"/>
+    <rect x="235" y="258" width="140" height="40" rx="8" fill="#c8f169"/>
+    <rect x="250" y="216" width="120" height="40" rx="8" fill="#7bd88f"/>
+    <rect x="240" y="174" width="110" height="40" rx="8" fill="#e8edda"/>
+  </g>
+  <g>
+    <rect x="265" y="120" width="60" height="48" rx="12" fill="#c8f169"/>
+    <circle cx="282" cy="142" r="6" fill="#020202"/>
+    <circle cx="308" cy="142" r="6" fill="#020202"/>
+    <path d="M280 154 q15 12 30 0" stroke="#020202" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="40" y="70" font-family="Arial Black, sans-serif" font-size="44" fill="#e8edda" font-weight="900">STACK</text>
+</svg>

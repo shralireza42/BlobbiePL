@@ -4,14 +4,14 @@ import { ROUTES } from "@/lib/routes";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 border-t border-white/10 bg-bg-soft/60">
+    <footer className="mt-20 border-t border-cream/10 bg-bg-soft">
       <div className="container-px grid gap-8 py-12 md:grid-cols-4">
         <div className="space-y-3">
           <Logo />
-          <p className="text-sm text-slate-400">
+          <h6 className="text-sm text-cream-dim">
             A Web3 reward ecosystem on BNB Chain powered by the $BLOBBIE BEP-20
             token.
-          </p>
+          </h6>
         </div>
         <FooterCol
           title="Playground"
@@ -26,24 +26,24 @@ export function SiteFooter() {
           title="Coming Soon"
           links={[
             { href: ROUTES.dash, label: "Blobbie Dash" },
-            { href: ROUTES.staking, label: "Staking" },
+            { href: ROUTES.blast, label: "Blobbie Blast" },
+            { href: ROUTES.stack, label: "Blobbie Stack" },
             { href: ROUTES.referrals, label: "Referrals" },
-            { href: ROUTES.nfts, label: "Blobbie NFTs" },
           ]}
         />
         <div className="space-y-3 text-sm">
-          <p className="font-semibold text-white">Network</p>
-          <p className="text-slate-400">Built on BNB Chain</p>
-          <p className="text-slate-400">BEP-20 · $BLOBBIE</p>
+          <p className="font-display not-italic text-cream">Network</p>
+          <h6 className="text-cream-dim">Built on BNB Chain</h6>
+          <h6 className="text-cream-dim">BEP-20 · $BLOBBIE</h6>
         </div>
       </div>
-      <div className="border-t border-white/10">
-        <div className="container-px flex flex-col gap-2 py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Blobbie. Playground Beta.</p>
-          <p className="max-w-xl">
+      <div className="border-t border-cream/10">
+        <div className="container-px flex flex-col gap-2 py-6 text-xs not-italic text-cream-dim sm:flex-row sm:items-center sm:justify-between">
+          <h6>© {new Date().getFullYear()} Blobbie. Playground Beta.</h6>
+          <h6 className="max-w-xl">
             Disclaimer: Participation involves risk. This is not financial advice
             and rewards are not guaranteed. Beta features may run in mock mode.
-          </p>
+          </h6>
         </div>
       </div>
     </footer>
@@ -59,11 +59,14 @@ function FooterCol({
 }) {
   return (
     <div className="space-y-3 text-sm">
-      <p className="font-semibold text-white">{title}</p>
+      <p className="font-display not-italic text-cream">{title}</p>
       <ul className="space-y-2">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="text-slate-400 transition hover:text-neon-cyan">
+            <Link
+              href={l.href}
+              className="not-italic text-cream-dim transition hover:text-cream"
+            >
               {l.label}
             </Link>
           </li>

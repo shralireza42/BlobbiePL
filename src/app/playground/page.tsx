@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/page-shell";
 import { PlaygroundCard } from "@/components/playground-card";
+import { GamesSection } from "@/components/games-section";
 import { SectionHeading } from "@/components/ui";
-import { PLAYGROUND_CARDS } from "@/lib/routes";
+import { ACTIVE_CARDS, PLAYGROUND_ONLY_CARDS } from "@/lib/routes";
 import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -12,9 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default function PlaygroundPage() {
-  const active = PLAYGROUND_CARDS.filter((c) => c.status === "active");
-  const comingSoon = PLAYGROUND_CARDS.filter((c) => c.status === "coming-soon");
-
   return (
     <PageShell>
       <section className="container-px py-12">
@@ -25,32 +23,35 @@ export default function PlaygroundPage() {
             subtitle="Start with the active modules. More games and features unlock soon."
           />
           {config.isMockMode && (
-            <span className="chip border-amber-400/30 bg-amber-400/10 text-amber-300">
+            <span className="chip border-accent-lime/40 bg-accent-lime/10 text-accent-lime">
               Beta Mock Mode
             </span>
           )}
         </div>
 
         <div className="mt-8">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
+          <h3 className="mb-4 text-sm font-display not-italic uppercase tracking-wider text-cream-dim">
             Active Now
           </h3>
           <div className="grid gap-5 sm:grid-cols-2">
-            {active.map((card) => (
+            {ACTIVE_CARDS.map((card) => (
               <PlaygroundCard key={card.href} card={card} />
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="mt-12">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
-            Coming Soon
-          </h3>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {comingSoon.map((card) => (
-              <PlaygroundCard key={card.href} card={card} />
-            ))}
-          </div>
+      {/* Games — dedicated coming soon section with swappable images */}
+      <GamesSection />
+
+      <section className="container-px py-12">
+        <h3 className="mb-4 text-sm font-display not-italic uppercase tracking-wider text-cream-dim">
+          More Coming Soon
+        </h3>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {PLAYGROUND_ONLY_CARDS.map((card) => (
+            <PlaygroundCard key={card.href} card={card} />
+          ))}
         </div>
       </section>
     </PageShell>

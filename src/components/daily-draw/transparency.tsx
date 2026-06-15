@@ -13,18 +13,18 @@ export function Transparency() {
   return (
     <div className="card p-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-white">Transparency</h3>
-        <span className="text-xs text-slate-400">
+        <h3 className="text-lg font-bold text-cream">Transparency</h3>
+        <span className="text-xs text-cream-dim">
           {config.isTestnet ? "BNB Testnet" : "BNB Chain"}
         </span>
       </div>
-      <div className="mt-4 divide-y divide-white/5">
+      <div className="mt-4 divide-y divide-cream/5">
         {rows.map((row) => (
           <div
             key={row.label}
             className="flex items-center justify-between gap-3 py-3"
           >
-            <span className="text-sm text-slate-400">{row.label}</span>
+            <span className="text-sm text-cream-dim">{row.label}</span>
             {row.address ? (
               <a
                 href={bscScanAddress(row.address)}
@@ -35,7 +35,7 @@ export function Transparency() {
                 {shortenAddress(row.address, 6)} ↗
               </a>
             ) : (
-              <span className="text-xs text-slate-500">Not configured yet</span>
+              <span className="text-xs text-cream-dim">Not configured yet</span>
             )}
           </div>
         ))}

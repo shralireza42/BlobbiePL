@@ -23,7 +23,7 @@ type Result = {
 const CLAIM_STYLES: Record<string, string> = {
   CLAIMED: "text-emerald-300",
   UNCLAIMED: "text-amber-300",
-  EXPIRED: "text-slate-500",
+  EXPIRED: "text-cream-dim",
 };
 
 export function Results() {
@@ -49,16 +49,16 @@ export function Results() {
       {results.map((r) => (
         <div key={r.round.roundNumber} className="card p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-lg font-bold text-cream">
               Round #{r.round.roundNumber} Results
             </h3>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-cream-dim">
               Showing top {r.winners.length}
             </span>
           </div>
-          <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-cream/10">
             <table className="w-full text-sm">
-              <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-slate-400">
+              <thead className="bg-cream/5 text-left text-xs uppercase tracking-wider text-cream-dim">
                 <tr>
                   <th className="px-4 py-3">Rank</th>
                   <th className="px-4 py-3">Wallet</th>
@@ -67,11 +67,11 @@ export function Results() {
                   <th className="px-4 py-3 text-right">Tx</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-cream/5">
                 {r.winners.map((w) => (
                   <tr key={`${r.round.roundNumber}-${w.rank}`}>
-                    <td className="px-4 py-3 font-medium text-white">#{w.rank}</td>
-                    <td className="px-4 py-3 font-mono text-slate-300">
+                    <td className="px-4 py-3 font-medium text-cream">#{w.rank}</td>
+                    <td className="px-4 py-3 font-mono text-cream-soft">
                       {shortenAddress(w.wallet, 5)}
                     </td>
                     <td className="px-4 py-3 text-neon-cyan">
@@ -91,7 +91,7 @@ export function Results() {
                           ↗
                         </a>
                       ) : (
-                        <span className="text-slate-600">—</span>
+                        <span className="text-cream-dim">—</span>
                       )}
                     </td>
                   </tr>

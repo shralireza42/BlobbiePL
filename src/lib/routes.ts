@@ -15,7 +15,6 @@ export const ROUTES = {
   freeEntries: "/free-entries",
   staking: "/staking",
   jackpot: "/jackpot",
-  nfts: "/nfts",
 } as const;
 
 export type PlaygroundCard = {
@@ -27,7 +26,8 @@ export type PlaygroundCard = {
   icon: string;
 };
 
-export const PLAYGROUND_CARDS: PlaygroundCard[] = [
+/** Active modules shown everywhere (homepage + playground). */
+export const ACTIVE_CARDS: PlaygroundCard[] = [
   {
     title: "Daily Rewards Draw",
     description:
@@ -46,30 +46,47 @@ export const PLAYGROUND_CARDS: PlaygroundCard[] = [
     accent: "purple",
     icon: "airdrop",
   },
+];
+
+export type GameCard = {
+  title: string;
+  description: string;
+  href: string;
+  /** Swappable preview image — change the file in /public/games to update. */
+  image: string;
+  accent: "lime" | "green" | "cream";
+};
+
+/** Mini-games — rendered in their own "Games — Coming Soon" section. */
+export const GAME_CARDS: GameCard[] = [
   {
     title: "Blobbie Dash",
-    description: "Endless neon runner mini-game.",
+    description: "Endless neon runner with on-chain scores.",
     href: ROUTES.dash,
-    status: "coming-soon",
-    accent: "blue",
-    icon: "dash",
+    image: "/games/dash.svg",
+    accent: "lime",
   },
   {
     title: "Blobbie Blast",
-    description: "Arcade blaster with on-chain scores.",
+    description: "Arcade blaster with seasonal leaderboards.",
     href: ROUTES.blast,
-    status: "coming-soon",
-    accent: "pink",
-    icon: "blast",
+    image: "/games/blast.svg",
+    accent: "green",
   },
   {
     title: "Blobbie Stack",
     description: "Stack blocks, stack rewards.",
     href: ROUTES.stack,
-    status: "coming-soon",
-    accent: "cyan",
-    icon: "stack",
+    image: "/games/stack.svg",
+    accent: "cream",
   },
+];
+
+/**
+ * Other Coming Soon modules. Per product spec, Free Daily Entries, Staking and
+ * Blobbie Vault Burst (Jackpot) are surfaced ONLY on the Playground page.
+ */
+export const PLAYGROUND_ONLY_CARDS: PlaygroundCard[] = [
   {
     title: "Referrals",
     description: "Invite friends, earn free entries.",
@@ -101,13 +118,5 @@ export const PLAYGROUND_CARDS: PlaygroundCard[] = [
     status: "coming-soon",
     accent: "pink",
     icon: "vault",
-  },
-  {
-    title: "Blobbie NFTs",
-    description: "Collectible Blobbie characters.",
-    href: ROUTES.nfts,
-    status: "coming-soon",
-    accent: "purple",
-    icon: "nft",
   },
 ];

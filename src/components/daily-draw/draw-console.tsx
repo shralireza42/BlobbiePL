@@ -45,7 +45,7 @@ const STATUS_STYLES: Record<string, string> = {
   CLOSING_SOON: "border-amber-400/30 bg-amber-400/10 text-amber-300",
   FILLED: "border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan",
   AWAITING_DRAW: "border-neon-purple/30 bg-neon-purple/10 text-neon-purple",
-  COMPLETED: "border-white/15 bg-white/5 text-slate-300",
+  COMPLETED: "border-cream/15 bg-cream/5 text-cream-soft",
 };
 
 export function DrawConsole() {
@@ -96,7 +96,7 @@ function RoundCard({ data }: { data: CurrentResponse }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="stat-label">Round</p>
-          <p className="text-2xl font-bold text-white">#{round.roundNumber}</p>
+          <p className="text-2xl font-bold text-cream">#{round.roundNumber}</p>
         </div>
         <span className={`chip ${STATUS_STYLES[round.status]}`}>
           {ROUND_STATUS_LABELS[round.status]}
@@ -106,21 +106,21 @@ function RoundCard({ data }: { data: CurrentResponse }) {
       <div className="mt-6">
         <div className="flex items-end justify-between">
           <p className="stat-label">Participants</p>
-          <p className="text-sm text-slate-300">
-            <span className="text-xl font-bold text-white">
+          <p className="text-sm text-cream-soft">
+            <span className="text-xl font-bold text-cream">
               {round.participants}
             </span>
             /{round.capacity}
           </p>
         </div>
-        <div className="mt-2 h-3 overflow-hidden rounded-full bg-white/5">
+        <div className="mt-2 h-3 overflow-hidden rounded-full bg-cream/5">
           <div
             className="h-full rounded-full bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple transition-all duration-700"
             style={{ width: `${pct}%` }}
           />
         </div>
         {round.supplementTickets > 0 && (
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-cream-dim">
             {round.supplementTickets} supplementary ticket-equivalents top up the
             pool. They are not eligible to win.
           </p>
@@ -134,16 +134,16 @@ function RoundCard({ data }: { data: CurrentResponse }) {
         <Metric label="Pool" value={formatUsd(round.poolUsd)} />
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 text-xs text-slate-400">
-        <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 text-xs text-cream-dim">
+        <div className="rounded-lg border border-cream/10 bg-cream/5 p-3">
           <p className="stat-label">Start</p>
-          <p className="mt-1 text-slate-200">
+          <p className="mt-1 text-cream">
             {new Date(round.startTime).toLocaleString()}
           </p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+        <div className="rounded-lg border border-cream/10 bg-cream/5 p-3">
           <p className="stat-label">End</p>
-          <p className="mt-1 text-slate-200">
+          <p className="mt-1 text-cream">
             {new Date(round.endTime).toLocaleString()}
           </p>
         </div>
@@ -162,9 +162,9 @@ function Metric({
   mono?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+    <div className="rounded-xl border border-cream/10 bg-cream/5 p-3">
       <p className="stat-label">{label}</p>
-      <p className={`mt-1 font-bold text-white ${mono ? "font-mono" : ""}`}>
+      <p className={`mt-1 font-bold text-cream ${mono ? "font-mono" : ""}`}>
         {value}
       </p>
     </div>
@@ -188,10 +188,10 @@ function WalletPanel({
 }) {
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Wallet</h3>
+      <h3 className="text-lg font-bold text-cream">Wallet</h3>
       {!isConnected ? (
         <div className="mt-4 space-y-3">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-cream-dim">
             Connect MetaMask, Trust Wallet or WalletConnect to join.
           </p>
           <WalletButton />
@@ -224,7 +224,7 @@ function WalletPanel({
                   "…"
                 )
               ) : (
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-cream-dim">
                   Token contract not configured yet
                 </span>
               )
@@ -239,8 +239,8 @@ function WalletPanel({
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-slate-400">{label}</span>
-      <span className="font-medium text-white">{value}</span>
+      <span className="text-cream-dim">{label}</span>
+      <span className="font-medium text-cream">{value}</span>
     </div>
   );
 }
@@ -315,14 +315,14 @@ function PurchasePanel({
 
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-bold text-white">Buy Tickets</h3>
+      <h3 className="text-lg font-bold text-cream">Buy Tickets</h3>
       {data.isMockMode && (
         <p className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 p-2 text-xs text-amber-300">
           Beta Mock Mode — purchases are simulated. No real transaction occurs.
         </p>
       )}
 
-      <label className="mt-4 block text-xs uppercase tracking-wider text-slate-400">
+      <label className="mt-4 block text-xs uppercase tracking-wider text-cream-dim">
         Ticket quantity
       </label>
       <div className="mt-2 flex items-center gap-2">
@@ -352,7 +352,7 @@ function PurchasePanel({
         </button>
       </div>
 
-      <div className="mt-4 space-y-2 rounded-xl border border-white/10 bg-white/5 p-4 text-sm">
+      <div className="mt-4 space-y-2 rounded-xl border border-cream/10 bg-cream/5 p-4 text-sm">
         <Row label="USD equivalent" value={formatUsd(quote?.usd ?? count)} />
         <Row
           label="Estimated $BLOBBIE"
@@ -383,7 +383,7 @@ function PurchasePanel({
               : "Approve & Buy Tickets"}
         </button>
         {!canBuy && (
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-cream-dim">
             Connect and verify your wallet on the correct network to buy.
           </p>
         )}

@@ -1,9 +1,26 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Dela_Gothic_One } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { config } from "@/lib/config";
 
 const siteUrl = config.siteUrl;
+
+// Normal / body text — Bricolage Grotesque (rendered bold italic via CSS)
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+// Bold / heading text — Dela Gothic One
+const delaGothic = Dela_Gothic_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -38,7 +55,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#05060f",
+  themeColor: "#1c1d22",
   width: "device-width",
   initialScale: 1,
 };
@@ -49,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${bricolage.variable} ${delaGothic.variable}`}>
       <body>
         <Providers>{children}</Providers>
       </body>

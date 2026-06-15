@@ -8,8 +8,8 @@ export default function NotFound() {
       <section className="container-px flex min-h-[60vh] items-center justify-center py-16">
         <div className="text-center">
           <p className="neon-text text-6xl font-extrabold">404</p>
-          <h1 className="mt-4 text-2xl font-bold text-white">Page not found</h1>
-          <p className="mt-2 text-sm text-slate-400">
+          <h1 className="mt-4 text-2xl font-bold text-cream">Page not found</h1>
+          <p className="mt-2 text-sm text-cream-dim">
             This Blobbie route does not exist yet.
           </p>
           <div className="mt-8 flex justify-center gap-3">
