@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-cream/10 bg-bg-soft">
       <div className="container-px grid gap-8 py-12 md:grid-cols-4">
         <div className="space-y-3">
-          <Logo />
+          <Logo tone="cream" />
           <h6 className="text-sm text-cream-dim">
             A Web3 reward ecosystem on BNB Chain powered by the $BLOBBIE BEP-20
             token.
@@ -20,6 +20,7 @@ export function SiteFooter() {
             { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
             { href: ROUTES.airdrop, label: "Airdrop Hub" },
             { href: ROUTES.dashboard, label: "Dashboard" },
+            { href: ROUTES.verify, label: "Verify Results" },
           ]}
         />
         <FooterCol

@@ -13,24 +13,30 @@ const config: Config = {
           elevated: "#2c2d35",
         },
         cream: {
-          DEFAULT: "#e8edda", // primary text + button fill
+          DEFAULT: "#e8edda", // primary body text on dark
           soft: "#d7dcc8",
           dim: "#a9ae9c",
         },
-        ink: "#020202", // text on bright buttons / dark text
-        // Accent kept subtle for highlights only
+        // Sticker UI surfaces (match itsblobbie / Framer reference)
+        paper: "#f8ffe8", // cream header bar / light surfaces
+        butter: "#fcfac2", // pale-yellow button fill
+        forest: {
+          DEFAULT: "#0f2c23", // deep green sections
+          soft: "#143a2e",
+        },
+        ink: "#0b0b0b", // text/border on light surfaces
         accent: {
-          lime: "#c8f169",
-          green: "#7bd88f",
+          lime: "#e2fea5", // accent / primary CTA fill
+          green: "#79cc9e",
         },
         // Back-compat aliases mapped onto the brand palette so legacy
-        // utility classes keep rendering on-brand (monochrome cream + lime).
+        // utility classes keep rendering on-brand (cream + lime).
         neon: {
           blue: "#e8edda",
-          cyan: "#c8f169",
-          purple: "#7bd88f",
-          violet: "#7bd88f",
-          pink: "#c8f169",
+          cyan: "#e2fea5",
+          purple: "#79cc9e",
+          violet: "#79cc9e",
+          pink: "#e2fea5",
         },
       },
       fontFamily: {
@@ -41,11 +47,14 @@ const config: Config = {
       },
       boxShadow: {
         soft: "0 10px 40px -12px rgba(0,0,0,0.6)",
-        btn: "0 6px 20px -6px rgba(232,237,218,0.35)",
+        // Hard "sticker" drop shadow used by buttons and the header bar
+        sticker: "3px 4px 0 0 rgba(11,11,11,0.9)",
+        "sticker-sm": "2px 3px 0 0 rgba(11,11,11,0.9)",
         card: "0 1px 0 0 rgba(232,237,218,0.06) inset, 0 20px 50px -25px rgba(0,0,0,0.8)",
         // legacy aliases
-        neon: "0 6px 20px -6px rgba(232,237,218,0.35)",
-        "neon-cyan": "0 6px 22px -6px rgba(200,241,105,0.4)",
+        btn: "3px 4px 0 0 rgba(11,11,11,0.9)",
+        neon: "3px 4px 0 0 rgba(11,11,11,0.9)",
+        "neon-cyan": "3px 4px 0 0 rgba(11,11,11,0.9)",
         glow: "0 20px 60px -20px rgba(0,0,0,0.8)",
       },
       borderRadius: {

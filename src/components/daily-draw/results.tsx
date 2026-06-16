@@ -26,7 +26,7 @@ const CLAIM_STYLES: Record<string, string> = {
   EXPIRED: "text-cream-dim",
 };
 
-export function Results() {
+export function Results({ limit }: { limit?: number }) {
   const { data, isLoading } = useQuery({
     queryKey: ["draw-results"],
     queryFn: () => getJson<{ results: Result[] }>("/api/draw/results"),
@@ -34,7 +34,8 @@ export function Results() {
 
   if (isLoading) return <Skeleton className="h-64 w-full" />;
 
-  const results = data?.results ?? [];
+  const all = data?.results ?? [];
+  const results = typeof limit === "number" ? all.slice(0, limit) : all;
   if (results.length === 0) {
     return (
       <EmptyState

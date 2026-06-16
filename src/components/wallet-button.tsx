@@ -55,7 +55,11 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
 
   if (wrongNetwork) {
     return (
-      <button className="btn bg-amber-500/90 text-bg" onClick={switchNetwork} disabled={isSwitching}>
+      <button
+        className="btn bg-amber-400 text-ink shadow-sticker hover:-translate-y-0.5"
+        onClick={switchNetwork}
+        disabled={isSwitching}
+      >
         {isSwitching ? "Switching…" : "Switch Network"}
       </button>
     );
@@ -64,13 +68,14 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
   return (
     <div className="relative">
       <button
-        className="btn-ghost"
+        className="inline-flex items-center gap-2 rounded-pill border-2 border-ink bg-paper px-4 py-2 text-sm font-extrabold not-italic text-ink shadow-sticker-sm transition hover:-translate-y-0.5"
+        style={{ fontFamily: "var(--font-display)" }}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400" />
+        <span className="h-2 w-2 rounded-full bg-emerald-500" />
         {shortenAddress(address)}
         {session.isAdmin && !compact && (
-          <span className="ml-1 rounded bg-neon-purple/30 px-1.5 py-0.5 text-[10px] text-neon-purple">
+          <span className="ml-1 rounded bg-ink px-1.5 py-0.5 text-[10px] text-paper">
             ADMIN
           </span>
         )}

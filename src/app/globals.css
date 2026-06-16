@@ -62,22 +62,29 @@ h6 {
     @apply transition-all duration-300 hover:border-cream/25 hover:-translate-y-0.5;
   }
 
-  /* Buttons: pill shape, cream fill, dark (#020202) text */
+  /* Buttons: pill "sticker" — pale fill, black text, black border, hard shadow */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3 text-sm font-extrabold not-italic transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
-    font-family: var(--font-sans);
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border-2 border-ink px-6 py-3 text-sm font-extrabold not-italic transition-all duration-150 active:translate-x-[2px] active:translate-y-[3px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50;
+    font-family: var(--font-display);
   }
 
   .btn-primary {
-    @apply btn bg-cream text-ink shadow-btn hover:brightness-105 hover:scale-[1.02];
+    @apply btn bg-butter text-ink shadow-sticker hover:-translate-y-0.5;
   }
 
   .btn-accent {
-    @apply btn bg-accent-lime text-ink shadow-btn hover:brightness-105 hover:scale-[1.02];
+    @apply btn bg-accent-lime text-ink shadow-sticker hover:-translate-y-0.5;
   }
 
+  /* Ghost on dark backgrounds: cream outline + cream text (no black) */
   .btn-ghost {
-    @apply btn border-2 border-cream/30 bg-transparent text-cream hover:border-cream/70 hover:bg-cream/5;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border-2 border-cream/40 bg-transparent px-6 py-3 text-sm font-extrabold not-italic text-cream transition-all duration-150 hover:border-cream hover:bg-cream/5 disabled:cursor-not-allowed disabled:opacity-50;
+    font-family: var(--font-display);
+  }
+
+  /* Ink button: black sticker with cream text (e.g. hamburger / icon buttons) */
+  .btn-ink {
+    @apply inline-flex items-center justify-center rounded-pill border-2 border-ink bg-ink text-paper transition-all duration-150 hover:brightness-110;
   }
 
   .chip {

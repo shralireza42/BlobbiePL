@@ -32,6 +32,7 @@ and a clean provider pattern that swaps between **mock** and **real** contracts.
 | `/daily-draw` | **Active** | Daily Rewards Draw (main product) |
 | `/airdrop` | **Active** | Airdrop Hub (points + tasks) |
 | `/dashboard` | Active | Unified user dashboard |
+| `/verify` | Active | Look up any round's participants, status & winners |
 | `/admin` | Protected | Admin console (wallet-gated) |
 | `/playground/dash` `/playground/blast` `/playground/stack` | Coming Soon | Mini-games (shown in the dedicated Games section) |
 | `/referrals` `/free-entries` `/staking` `/jackpot` | Coming Soon | Future modules (`free-entries`, `staking`, `jackpot` surface only on `/playground`) |
@@ -44,6 +45,9 @@ Dark brand theme matching itsblobbie.com / the Framer reference:
 - **Dela Gothic One** for bold/heading text, **Bricolage Grotesque** (bold italic) for normal/body text (loaded via `next/font`).
 - Pill buttons (cream fill, dark text), logo + Dashboard button on the right of the header.
 - The three mini-games render in a dedicated **Games — Coming Soon** section using swappable preview images in [`public/games/`](./public/games) (`dash.svg`, `blast.svg`, `stack.svg`). Replace those files to update the artwork.
+- **Logo:** the header/footer logo uses `public/logo.png` if present, otherwise falls back to the bundled `public/logo.svg`. Drop your official `LOGO.png` at `public/logo.png` — no code change required.
+- Header is a cream "sticker" bar (`#f8ffe8`) with black text/icons; buttons are pale‑yellow (`#fcfac2`) / lime (`#e2fea5`) pills with black text, black border and a hard drop shadow. Page background `#1c1d22`, body text `#e8edda`.
+- On the home page, **Daily Rewards Draw** and **Airdrop Hub** are full-height sections with transparent panels; only **Blobbie Vault Burst (Jackpot)** is shown as Coming Soon (transparent). The other Coming Soon modules live on the Daily Rewards Draw and Playground pages.
 
 ---
 
@@ -53,8 +57,8 @@ Dark brand theme matching itsblobbie.com / the Framer reference:
 # 1. Install dependencies (also runs prisma generate)
 npm install
 
-# 2. Configure environment
-cp .env.example .env
+# 2. Configure environment (env.example and .env.example are identical)
+cp env.example .env
 #   Fill DATABASE_URL, JWT_SECRET, ADMIN_WALLET_ADDRESS, WalletConnect id, etc.
 #   Leave contract addresses empty to run in Beta Mock Mode.
 

@@ -39,6 +39,7 @@ export function useWalletSession() {
     wallet: null,
     isAdmin: false,
   });
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,6 +52,8 @@ export function useWalletSession() {
       if (json.ok) setSession(json.data);
     } catch {
       /* noop */
+    } finally {
+      setSessionChecked(true);
     }
   }, []);
 
@@ -112,23 +115,24 @@ export function useWalletSession() {
     setSession({ authenticated: false, wallet: null, isAdmin: false });
   }, [disconnectAsync]);
 
-  // Auto sign-in once connected on the right network and not yet authenticated.
+  // Auto sign-in only AFTER we've confirmed there is no valid existing session.
+  // This prevents a signature prompt firing on every page navigation when the
+  // wallet is already verified (the httpOnly session cookie persists).
   useEffect(() => {
-    if (
-      isConnected &&
-      address &&
-      !wrongNetwork &&
-      !session.authenticated &&
-      !isSigningIn
-    ) {
-      const sameWallet =
-        session.wallet && session.wallet.toLowerCase() === address.toLowerCase();
-      if (!sameWallet) {
-        signIn();
-      }
-    }
+    if (!sessionChecked) return;
+    if (!isConnected || !address || wrongNetwork || isSigningIn) return;
+
+    const sameWallet =
+      session.authenticated &&
+      session.wallet &&
+      session.wallet.toLowerCase() === address.toLowerCase();
+
+    // Already verified for this wallet — do nothing on navigation.
+    if (sameWallet) return;
+
+    signIn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, wrongNetwork, session.authenticated]);
+  }, [sessionChecked, isConnected, address, wrongNetwork, session.authenticated, session.wallet]);
 
   return {
     address: address ?? null,

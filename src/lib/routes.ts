@@ -7,6 +7,7 @@ export const ROUTES = {
   airdrop: "/airdrop",
   dashboard: "/dashboard",
   admin: "/admin",
+  verify: "/verify",
   // Coming soon
   dash: "/playground/dash",
   blast: "/playground/blast",
@@ -82,41 +83,54 @@ export const GAME_CARDS: GameCard[] = [
   },
 ];
 
-/**
- * Other Coming Soon modules. Per product spec, Free Daily Entries, Staking and
- * Blobbie Vault Burst (Jackpot) are surfaced ONLY on the Playground page.
- */
+const REFERRALS_CARD: PlaygroundCard = {
+  title: "Referrals",
+  description: "Invite friends, earn free entries.",
+  href: ROUTES.referrals,
+  status: "coming-soon",
+  accent: "purple",
+  icon: "referral",
+};
+
+const FREE_ENTRIES_CARD: PlaygroundCard = {
+  title: "Free Daily Entries",
+  description: "Earn tickets through community tasks.",
+  href: ROUTES.freeEntries,
+  status: "coming-soon",
+  accent: "blue",
+  icon: "gift",
+};
+
+const STAKING_CARD: PlaygroundCard = {
+  title: "Staking",
+  description: "Stake $BLOBBIE for passive rewards.",
+  href: ROUTES.staking,
+  status: "coming-soon",
+  accent: "cyan",
+  icon: "stake",
+};
+
+/** Blobbie Vault Burst (Jackpot) — the only Coming Soon shown on the home page. */
+export const JACKPOT_CARD: PlaygroundCard = {
+  title: "Blobbie Vault Burst",
+  description: "A progressive jackpot vault funded partly by the Daily Rewards Draw.",
+  href: ROUTES.jackpot,
+  status: "coming-soon",
+  accent: "pink",
+  icon: "vault",
+};
+
+/** Coming Soon modules surfaced on the Daily Rewards Draw page (not Jackpot). */
+export const DRAW_COMING_SOON_CARDS: PlaygroundCard[] = [
+  REFERRALS_CARD,
+  FREE_ENTRIES_CARD,
+  STAKING_CARD,
+];
+
+/** Full Coming Soon set for the Playground hub. */
 export const PLAYGROUND_ONLY_CARDS: PlaygroundCard[] = [
-  {
-    title: "Referrals",
-    description: "Invite friends, earn free entries.",
-    href: ROUTES.referrals,
-    status: "coming-soon",
-    accent: "purple",
-    icon: "referral",
-  },
-  {
-    title: "Free Daily Entries",
-    description: "Earn tickets through community tasks.",
-    href: ROUTES.freeEntries,
-    status: "coming-soon",
-    accent: "blue",
-    icon: "gift",
-  },
-  {
-    title: "Staking",
-    description: "Stake $BLOBBIE for passive rewards.",
-    href: ROUTES.staking,
-    status: "coming-soon",
-    accent: "cyan",
-    icon: "stake",
-  },
-  {
-    title: "Blobbie Vault Burst",
-    description: "Progressive jackpot vault.",
-    href: ROUTES.jackpot,
-    status: "coming-soon",
-    accent: "pink",
-    icon: "vault",
-  },
+  REFERRALS_CARD,
+  FREE_ENTRIES_CARD,
+  STAKING_CARD,
+  JACKPOT_CARD,
 ];
