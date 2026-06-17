@@ -1,10 +1,12 @@
 import "server-only";
 import { prisma, hasDatabase } from "../prisma";
+import { levelFromPoints, mockLevelFromWallet } from "../levels";
 
 export type ChatMessageView = {
   id: string;
   wallet: string;
   body: string;
+  level: number;
   createdAt: number;
 };
 
@@ -19,6 +21,24 @@ const globalForChat = globalThis as unknown as {
 };
 const buffer = (globalForChat.chatBuffer ??= []);
 
+/** Resolve a wallet's current Blobbie level (points-based, mock fallback). */
+export async function resolveLevel(wallet: string): Promise<number> {
+  const lowered = wallet.toLowerCase();
+  if (hasDatabase) {
+    try {
+      const airdropUser = await prisma.airdropUser.findFirst({
+        where: { wallet: lowered },
+        orderBy: { totalPoints: "desc" },
+        select: { totalPoints: true },
+      });
+      return levelFromPoints(airdropUser?.totalPoints ?? 0);
+    } catch {
+      // fall through to mock
+    }
+  }
+  return mockLevelFromWallet(lowered);
+}
+
 export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
   if (hasDatabase) {
     try {
@@ -31,6 +51,7 @@ export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
           id: r.id,
           wallet: r.wallet,
           body: r.body,
+          level: r.level,
           createdAt: r.createdAt.getTime(),
         }))
         .reverse();
@@ -47,16 +68,18 @@ export async function addMessage(
 ): Promise<ChatMessageView> {
   const clean = sanitize(body);
   const lowered = wallet.toLowerCase();
+  const level = await resolveLevel(lowered);
 
   if (hasDatabase) {
     try {
       const row = await prisma.chatMessage.create({
-        data: { wallet: lowered, body: clean },
+        data: { wallet: lowered, body: clean, level },
       });
       return {
         id: row.id,
         wallet: row.wallet,
         body: row.body,
+        level: row.level,
         createdAt: row.createdAt.getTime(),
       };
     } catch {
@@ -68,6 +91,7 @@ export async function addMessage(
     id: `mem_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     wallet: lowered,
     body: clean,
+    level,
     createdAt: Date.now(),
   };
   buffer.push(msg);

@@ -348,6 +348,7 @@ model ChatMessage {
   id        String   @id @default(cuid())
   wallet    String
   body      String
+  level     Int      @default(0)
   createdAt DateTime @default(now())
 
   @@index([createdAt])

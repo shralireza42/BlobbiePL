@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useWalletSession } from "@/hooks/useWalletSession";
 import { getJson, postJson } from "@/lib/client-api";
 import { shortenAddress } from "@/lib/format";
+import { characterFor, LEVEL_TITLES } from "@/lib/levels";
 
 type ChatMessage = {
   id: string;
   wallet: string;
   body: string;
+  level: number;
   createdAt: number;
 };
 
@@ -133,16 +135,25 @@ function ChatBubble({ message, mine }: { message: ChatMessage; mine: boolean }) 
     hour: "2-digit",
     minute: "2-digit",
   });
+  const level = message.level ?? 0;
   return (
     <div className={`flex items-start gap-2.5 ${mine ? "flex-row-reverse" : ""}`}>
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cream/20 bg-paper">
+      <span
+        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cream/20 bg-paper"
+        title={`Level ${level} · ${LEVEL_TITLES[level] ?? ""}`}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.svg" alt="" className="h-full w-full object-cover" />
+        <img src={characterFor(level)} alt={`Level ${level}`} className="h-full w-full object-cover" />
       </span>
       <div className={`max-w-[78%] ${mine ? "text-right" : ""}`}>
-        <div className="flex items-center gap-2 text-[11px] not-italic text-cream-dim">
+        <div
+          className={`flex items-center gap-2 text-[11px] not-italic text-cream-dim ${mine ? "justify-end" : ""}`}
+        >
           <span className="font-mono">
             {mine ? "You" : shortenAddress(message.wallet, 4)}
+          </span>
+          <span className="rounded-full border border-accent-lime/40 bg-accent-lime/10 px-1.5 text-[10px] text-accent-lime">
+            Lv {level}
           </span>
           <span>·</span>
           <span>{time}</span>

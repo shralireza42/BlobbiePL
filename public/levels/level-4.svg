@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Blobbie Level 4">
+  <!-- Editable Blobbie level character. Swap freely. -->
+  <circle cx="60" cy="60" r="54" fill="#b79bff" stroke="#0b0b0b" stroke-width="6"/>
+  <g stroke="#0b0b0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 32 C40 32 30 48 30 64 C30 86 44 100 60 100 C76 100 90 86 90 64 C90 48 80 32 60 32 Z" fill="#f3c6a3"/>
+    <path d="M44 60 q8 -6 16 -2" fill="none"/>
+    <path d="M76 60 q-8 -6 -16 -2" fill="none"/>
+    <circle cx="50" cy="66" r="3.5" fill="#0b0b0b" stroke="none"/>
+    <circle cx="70" cy="66" r="3.5" fill="#0b0b0b" stroke="none"/>
+    <path d="M60 76 C50 76 43 80 41 86 C47 92 54 86 60 82 C66 86 73 92 79 86 C77 80 70 76 60 76 Z" fill="#9e3b2e"/>
+  </g>
+  <!-- cap -->
+  <g stroke="#0b0b0b" stroke-width="4" stroke-linejoin="round">
+    <path d="M30 44 a30 30 0 0 1 60 0 Z" fill="#1d6fb8"/>
+    <path d="M30 44 q-12 2 -16 8 l30 0 Z" fill="#1d6fb8"/>
+  </g>
+  <g><circle cx="97" cy="97" r="16" fill="#0b0b0b"/><text x="97" y="102" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="13" fill="#fff" font-weight="900">4</text></g>
+</svg>

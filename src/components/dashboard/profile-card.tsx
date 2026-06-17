@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getJson, postJson } from "@/lib/client-api";
 import { shortenAddress } from "@/lib/format";
+import { characterFor } from "@/lib/levels";
 
 type Profile = {
   wallet: string;
@@ -51,6 +53,13 @@ export function ProfileCard({ wallet }: { wallet: string }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Shared with LevelCard via the same query key (deduped by react-query).
+  const { data: level } = useQuery({
+    queryKey: ["level"],
+    queryFn: () => getJson<{ level: number; title: string }>("/api/level"),
+    refetchInterval: 30_000,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -150,6 +159,26 @@ export function ProfileCard({ wallet }: { wallet: string }) {
         <span className="text-xs not-italic text-cream-dim">
           {shortenAddress(wallet, 5)}
         </span>
+      </div>
+
+      {/* Name preview with the Blobbie level character beside it */}
+      <div className="mt-4 flex items-center gap-2 rounded-2xl border border-cream/10 bg-cream/5 px-3 py-2">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cream/20 bg-paper">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={characterFor(level?.level ?? 0)}
+            alt={`Level ${level?.level ?? 0}`}
+            className="h-full w-full object-cover"
+          />
+        </span>
+        <span className="font-display text-sm not-italic text-cream">
+          {name.trim() || shortenAddress(wallet, 4)}
+        </span>
+        {level && (
+          <span className="rounded-full border border-accent-lime/40 bg-accent-lime/10 px-2 text-[11px] not-italic text-accent-lime">
+            Lv {level.level}
+          </span>
+        )}
       </div>
 
       <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">

@@ -46,6 +46,7 @@ Dark brand theme matching itsblobbie.com / the Framer reference:
 - Pill buttons (cream fill, dark text), logo + Dashboard button on the right of the header.
 - The three mini-games render in a dedicated **Games — Coming Soon** section using swappable preview images in [`public/games/`](./public/games) (`dash.svg`, `blast.svg`, `stack.svg`). Replace those files to update the artwork.
 - **Logo:** the header/footer logo uses `public/logo.png` if present, otherwise falls back to the bundled `public/logo.svg`. Drop your official `LOGO.png` at `public/logo.png` — no code change required.
+- **Levels (0–10):** users level up by earning Airdrop Points; their Blobbie character shows on the dashboard and in the Global Chat. The 10 level characters are editable SVGs in [`public/levels/`](./public/levels) (`level-1.svg` … `level-10.svg`); level 0 uses the default logo. Thresholds/titles live in `src/lib/levels.ts`.
 - Header is a cream "sticker" bar (`#f8ffe8`) with black text/icons; buttons are pale‑yellow (`#fcfac2`) / lime (`#e2fea5`) pills with black text, black border and a hard drop shadow. Page background `#1c1d22`, body text `#e8edda`.
 - On the home page, **Daily Rewards Draw** and **Airdrop Hub** are full-height sections with transparent panels; only **Blobbie Vault Burst (Jackpot)** is shown as Coming Soon (transparent). The other Coming Soon modules live on the Daily Rewards Draw and Playground pages.
 
