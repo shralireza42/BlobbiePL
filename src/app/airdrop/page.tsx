@@ -23,7 +23,7 @@ export default function AirdropPage() {
             subtitle="Earn Airdrop Points for contributing to the beta. Points do not guarantee token rewards."
           />
           {config.isMockMode && (
-            <span className="chip border-amber-400/30 bg-amber-400/10 text-amber-300">
+            <span className="chip border-gold/30 bg-gold/10 text-gold">
               Beta Mock Mode
             </span>
           )}

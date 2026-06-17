@@ -19,7 +19,8 @@ const config: Config = {
         },
         // Sticker UI surfaces (match itsblobbie / Framer reference)
         paper: "#f8ffe8", // cream header bar / light surfaces
-        butter: "#fcfac2", // pale-yellow button fill
+        butter: "#fcd535", // primary button fill (BNB gold)
+        gold: "#fcd535", // brand yellow
         forest: {
           DEFAULT: "#0f2c23", // deep green sections
           soft: "#143a2e",

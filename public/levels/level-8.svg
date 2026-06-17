@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Blobbie Level 8">
   <!-- Editable Blobbie level character. Swap freely. -->
-  <circle cx="60" cy="60" r="54" fill="#f8d34e" stroke="#0b0b0b" stroke-width="6"/>
+  <circle cx="60" cy="60" r="54" fill="#fcd535" stroke="#0b0b0b" stroke-width="6"/>
   <g stroke="#0b0b0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
     <path d="M60 34 C40 34 30 50 30 66 C30 88 44 102 60 102 C76 102 90 88 90 66 C90 50 80 34 60 34 Z" fill="#f3c6a3"/>
     <path d="M44 62 q8 -6 16 -2" fill="none"/>

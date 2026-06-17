@@ -20,13 +20,18 @@ export function Logo({
   const [src, setSrc] = useState("/logo.png");
   // Inline color/size win over the global `.font-display` color rule.
   // $BLOBBIE: Dela Gothic One regular, 30px, full black (cream on dark footer).
+  const stroke = tone === "ink" ? "#000000" : "#e8edda";
   const wordmarkStyle = {
     fontFamily: "var(--font-display)",
-    fontWeight: 400 as const,
+    fontWeight: 700 as const,
     fontStyle: "normal" as const,
     fontSize: 30,
     lineHeight: 1,
     color: tone === "ink" ? "#000000" : "#e8edda",
+    // Dela Gothic One ships a single weight — thicken the glyphs for a real
+    // bold look using a same-color text stroke.
+    WebkitTextStroke: `1.1px ${stroke}`,
+    paintOrder: "stroke fill" as const,
   };
 
   return (

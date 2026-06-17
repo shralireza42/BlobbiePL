@@ -72,7 +72,7 @@ export function LevelCard() {
             />
           </div>
           {data.isMock && (
-            <p className="mt-2 text-[11px] not-italic text-amber-300">
+            <p className="mt-2 text-[11px] not-italic text-gold">
               Beta Mock Mode — level is simulated. Connect a database to track
               real Airdrop Points.
             </p>

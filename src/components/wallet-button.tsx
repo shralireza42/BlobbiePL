@@ -56,7 +56,7 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
   if (wrongNetwork) {
     return (
       <button
-        className="btn bg-amber-400 text-ink shadow-sticker hover:-translate-y-0.5"
+        className="btn bg-gold text-ink shadow-sticker hover:-translate-y-0.5"
         onClick={switchNetwork}
         disabled={isSwitching}
       >
@@ -84,7 +84,7 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
         <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-cream/10 bg-bg-card p-2 shadow-glow">
           <p className="truncate px-3 py-2 text-xs text-cream-dim">{address}</p>
           {!session.authenticated && (
-            <p className="px-3 py-1 text-[11px] text-amber-300">Sign message to verify</p>
+            <p className="px-3 py-1 text-[11px] text-gold">Sign message to verify</p>
           )}
           <button
             onClick={() => {

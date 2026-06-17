@@ -8,7 +8,6 @@ import { DrawRules } from "@/components/daily-draw/rules";
 import { Transparency } from "@/components/daily-draw/transparency";
 import { Results } from "@/components/daily-draw/results";
 import { GlobalChat } from "@/components/daily-draw/global-chat";
-import { GamesSection } from "@/components/games-section";
 import { PlaygroundCard } from "@/components/playground-card";
 import { AutoTask } from "@/hooks/useAutoTask";
 import { DRAW_COMING_SOON_CARDS, ROUTES } from "@/lib/routes";
@@ -76,10 +75,8 @@ export default function DailyDrawPage() {
         </div>
       </section>
 
-      {/* Other Coming Soon modules (Jackpot lives on the home page) */}
-      <GamesSection />
-
-      <section className="container-px pb-16">
+      {/* Other Coming Soon modules (Jackpot + mini-games live on the home page) */}
+      <section className="container-px pb-16 pt-4">
         <h3 className="mb-4 text-sm font-display not-italic uppercase tracking-wider text-cream-dim">
           More Coming Soon
         </h3>

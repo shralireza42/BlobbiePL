@@ -12,6 +12,6 @@
     <line x1="56" y1="60" x2="64" y2="60"/>
   </g>
   <!-- gold chain -->
-  <path d="M48 92 q12 8 24 0" fill="none" stroke="#f8d34e" stroke-width="3"/>
+  <path d="M48 92 q12 8 24 0" fill="none" stroke="#fcd535" stroke-width="3"/>
   <g><circle cx="97" cy="97" r="16" fill="#0b0b0b"/><text x="97" y="102" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="13" fill="#fff" font-weight="900">7</text></g>
 </svg>

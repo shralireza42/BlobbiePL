@@ -83,7 +83,7 @@ export function AdminClient() {
   return (
     <div className="space-y-8">
       {!data.hasDatabase && (
-        <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-3 text-sm text-amber-300">
+        <div className="rounded-lg border border-gold/20 bg-gold/5 p-3 text-sm text-gold">
           Database not configured. Set DATABASE_URL and run migrations to enable
           full admin data. Config + flags below still apply at the app level.
         </div>
@@ -326,7 +326,7 @@ function AirdropUsers({
                 Approve
               </button>
               <button
-                className="text-xs text-amber-300 hover:underline"
+                className="text-xs text-gold hover:underline"
                 onClick={() => review(u.wallet, "FLAGGED")}
               >
                 Flag

@@ -15,7 +15,7 @@
     <path d="M60 82 C50 82 43 86 41 92 C47 98 54 92 60 88 C66 92 73 98 79 92 C77 86 70 82 60 82 Z" fill="#9e3b2e"/>
   </g>
   <!-- crown -->
-  <g stroke="#0b0b0b" stroke-width="3.5" stroke-linejoin="round" fill="#f8d34e">
+  <g stroke="#0b0b0b" stroke-width="3.5" stroke-linejoin="round" fill="#fcd535">
     <path d="M38 40 L38 18 L50 30 L60 14 L70 30 L82 18 L82 40 Z"/>
     <circle cx="60" cy="14" r="3" fill="#ef6f6c"/>
   </g>

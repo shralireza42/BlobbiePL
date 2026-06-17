@@ -37,7 +37,7 @@ type RoundResponse = {
 
 const CLAIM_STYLES: Record<string, string> = {
   CLAIMED: "text-emerald-300",
-  UNCLAIMED: "text-amber-300",
+  UNCLAIMED: "text-gold",
   EXPIRED: "text-cream-dim",
 };
 

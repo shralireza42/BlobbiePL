@@ -42,7 +42,7 @@ type TxState =
 
 const STATUS_STYLES: Record<string, string> = {
   OPEN: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-  CLOSING_SOON: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+  CLOSING_SOON: "border-gold/30 bg-gold/10 text-gold",
   FILLED: "border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan",
   AWAITING_DRAW: "border-neon-purple/30 bg-neon-purple/10 text-neon-purple",
   COMPLETED: "border-cream/15 bg-cream/5 text-cream-soft",
@@ -166,8 +166,12 @@ function RoundCard({ data }: { data: CurrentResponse }) {
         </div>
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-cream/5">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-neon-cyan via-neon-blue to-neon-purple transition-all duration-700"
-            style={{ width: `${pct}%` }}
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${pct}%`,
+              backgroundImage:
+                "linear-gradient(90deg, #a8830a 0%, #fcd535 45%, #fff3b0 100%)",
+            }}
           />
         </div>
         {round.supplementTickets > 0 && (
@@ -249,7 +253,7 @@ function WalletPanel({
         </div>
       ) : wrongNetwork ? (
         <div className="mt-4 space-y-3">
-          <p className="text-sm text-amber-300">Wrong network detected.</p>
+          <p className="text-sm text-gold">Wrong network detected.</p>
           <WalletButton />
         </div>
       ) : (
@@ -261,7 +265,7 @@ function WalletPanel({
               authenticated ? (
                 <span className="text-emerald-300">Verified</span>
               ) : (
-                <span className="text-amber-300">Sign to verify</span>
+                <span className="text-gold">Sign to verify</span>
               )
             }
           />
@@ -368,7 +372,7 @@ function PurchasePanel({
     <div className="card p-6">
       <h3 className="text-lg font-bold text-cream">Buy Tickets</h3>
       {data.isMockMode && (
-        <p className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 p-2 text-xs text-amber-300">
+        <p className="mt-2 rounded-lg border border-gold/20 bg-gold/5 p-2 text-xs text-gold">
           Beta Mock Mode — purchases are simulated. No real transaction occurs.
         </p>
       )}
@@ -413,7 +417,7 @@ function PurchasePanel({
           label="Price source"
           value={
             quote?.isMockPrice ? (
-              <span className="text-amber-300">Mock price</span>
+              <span className="text-gold">Mock price</span>
             ) : (
               <span className="text-emerald-300">Oracle</span>
             )
@@ -423,7 +427,7 @@ function PurchasePanel({
 
       <div className="mt-4 space-y-2">
         <button
-          className="btn-accent w-full"
+          className="btn-primary w-full"
           disabled={purchaseDisabled}
           onClick={handleBuy}
         >
@@ -439,7 +443,7 @@ function PurchasePanel({
           </p>
         )}
         {!data.ticketPurchaseEnabled && (
-          <p className="text-xs text-amber-300">
+          <p className="text-xs text-gold">
             Ticket purchase is currently disabled by the admin.
           </p>
         )}

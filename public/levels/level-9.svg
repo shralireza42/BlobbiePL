@@ -13,7 +13,7 @@
   <g stroke="#0b0b0b" stroke-width="4" stroke-linejoin="round">
     <path d="M60 2 L40 42 L80 42 Z" fill="#5a3ea8"/>
     <path d="M36 42 L84 42 L84 48 L36 48 Z" fill="#5a3ea8"/>
-    <text x="60" y="30" text-anchor="middle" font-family="Arial" font-size="14" fill="#f8d34e">&</text>
+    <text x="60" y="30" text-anchor="middle" font-family="Arial" font-size="14" fill="#fcd535">&</text>
   </g>
   <g><circle cx="98" cy="101" r="16" fill="#0b0b0b"/><text x="98" y="106" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="13" fill="#fff" font-weight="900">9</text></g>
 </svg>

@@ -43,7 +43,7 @@ type Profile = {
 const ELIGIBILITY_STYLES: Record<string, string> = {
   NOT_CONNECTED: "border-cream/15 bg-cream/5 text-cream-dim",
   ELIGIBLE: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-  PENDING_REVIEW: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+  PENDING_REVIEW: "border-gold/30 bg-gold/10 text-gold",
   FLAGGED: "border-rose-400/30 bg-rose-400/10 text-rose-300",
   APPROVED: "border-neon-cyan/30 bg-neon-cyan/10 text-neon-cyan",
 };
@@ -71,7 +71,7 @@ export function AirdropConsole() {
   return (
     <div className="space-y-6">
       <Disclaimer>
-        <span className="font-semibold text-amber-300">Beta:</span>{" "}
+        <span className="font-semibold text-gold">Beta:</span>{" "}
         {data.disclaimer || AIRDROP_DISCLAIMER}
       </Disclaimer>
 
@@ -107,7 +107,7 @@ export function AirdropConsole() {
           </div>
 
           {profile.isMock && (
-            <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 p-2 text-xs text-amber-300">
+            <p className="rounded-lg border border-gold/20 bg-gold/5 p-2 text-xs text-gold">
               Beta Mock Mode — database not configured. Task progress is not
               persisted.
             </p>
@@ -221,7 +221,7 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
             ✓ Done
           </span>
         ) : task.pending ? (
-          <span className="chip border-amber-400/30 bg-amber-400/10 text-amber-300">
+          <span className="chip border-gold/30 bg-gold/10 text-gold">
             Pending
           </span>
         ) : (
