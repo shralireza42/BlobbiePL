@@ -29,8 +29,8 @@ export function ComingSoon({
               {description}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href={ROUTES.playground} className="btn-primary w-full sm:w-auto">
-                Back to Playground
+              <Link href={ROUTES.home} className="btn-primary w-full sm:w-auto">
+                Back to Home
               </Link>
               <Link href={ROUTES.dailyDraw} className="btn-ghost w-full sm:w-auto">
                 Daily Rewards Draw

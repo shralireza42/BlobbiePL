@@ -14,9 +14,8 @@ export function SiteFooter() {
           </h6>
         </div>
         <FooterCol
-          title="Playground"
+          title="Explore"
           links={[
-            { href: ROUTES.playground, label: "Hub" },
             { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
             { href: ROUTES.airdrop, label: "Airdrop Hub" },
             { href: ROUTES.dashboard, label: "Dashboard" },

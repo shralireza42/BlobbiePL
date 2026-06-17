@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
 import { ActiveBadge, ComingSoonBadge } from "@/components/ui";
+import { GamesSection } from "@/components/games-section";
 import { JACKPOT_CARD, ROUTES } from "@/lib/routes";
 import { config } from "@/lib/config";
 
@@ -11,7 +12,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-grid-glow" />
         <div className="container-px relative py-20 sm:py-28">
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-4xl text-center">
             <div className="mb-6 flex flex-wrap items-center justify-center gap-2">
               <span className="chip border-cream/20 bg-cream/5 text-cream">
                 Blobbie Playground Beta
@@ -25,29 +26,22 @@ export default function HomePage() {
                 </span>
               )}
             </div>
-            <h1 className="text-balance text-5xl leading-[0.95] sm:text-7xl">
-              ITS
-              <br />
-              <span className="neon-text">BLOBBIE</span>
+            <h1
+              className="whitespace-nowrap font-extrabold text-white"
+              style={{ fontSize: "clamp(2rem, 9vw, 7rem)", lineHeight: 1 }}
+            >
+              ITS BLOBBIE
             </h1>
             <h6 className="mx-auto mt-6 max-w-2xl text-pretty text-base text-cream-dim sm:text-lg">
               A transparent Web3 reward ecosystem powered by the $BLOBBIE BEP-20
               token. Join the Daily Rewards Draw, earn Airdrop Points, and explore
-              a growing Playground — verifiable and built for the long term.
+              a growing ecosystem — verifiable and built for the long term.
             </h6>
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href={ROUTES.playground} className="btn-primary w-full sm:w-auto">
-                Enter Playground
-              </Link>
-              <Link href={ROUTES.dailyDraw} className="btn-ghost w-full sm:w-auto">
-                View Daily Rewards Draw
-              </Link>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Active module — Daily Rewards Draw (full-size, transparent) */}
+      {/* Active module — Daily Rewards Draw (full-size, transparent image box) */}
       <ActiveSection
         index="01"
         eyebrow="Active Product"
@@ -55,6 +49,7 @@ export default function HomePage() {
         description="A transparent 24-hour on-chain rewards round. 1 ticket = $1 in $BLOBBIE. A round closes at 300 participants or after 24 hours — guaranteed to run daily, with results designed to be on-chain verifiable."
         href={ROUTES.dailyDraw}
         cta="Open Daily Rewards Draw"
+        image="/sections/daily-draw.svg"
         stats={[
           { label: "Round window", value: "24h" },
           { label: "Capacity", value: "300" },
@@ -62,7 +57,7 @@ export default function HomePage() {
         ]}
       />
 
-      {/* Active module — Airdrop Hub (full-size, transparent) */}
+      {/* Active module — Airdrop Hub (full-size, transparent image box) */}
       <ActiveSection
         index="02"
         eyebrow="Active Beta Module"
@@ -70,6 +65,7 @@ export default function HomePage() {
         description="Complete beta actions to earn Airdrop Points. Points track contribution — they do not guarantee token rewards. Final allocation is admin-reviewed and anti-sybil checked."
         href={ROUTES.airdrop}
         cta="Open Airdrop Hub"
+        image="/sections/airdrop.svg"
         align="right"
         stats={[
           { label: "Tasks", value: "9" },
@@ -77,6 +73,9 @@ export default function HomePage() {
           { label: "Leaderboard", value: "Live" },
         ]}
       />
+
+      {/* Mini-games — three coming soon boxes with editable transparent images */}
+      <GamesSection />
 
       {/* Coming Soon — Jackpot only (transparent background) */}
       <section className="container-px py-16">
@@ -97,17 +96,6 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <p className="mt-6 text-center text-sm not-italic text-cream-dim">
-          More games and modules live in the{" "}
-          <Link href={ROUTES.playground} className="text-accent-lime hover:underline">
-            Playground
-          </Link>{" "}
-          and on the{" "}
-          <Link href={ROUTES.dailyDraw} className="text-accent-lime hover:underline">
-            Daily Rewards Draw
-          </Link>{" "}
-          page.
-        </p>
       </section>
     </PageShell>
   );
@@ -120,6 +108,7 @@ function ActiveSection({
   description,
   href,
   cta,
+  image,
   stats,
   align = "left",
 }: {
@@ -129,6 +118,7 @@ function ActiveSection({
   description: string;
   href: string;
   cta: string;
+  image: string;
   stats: { label: string; value: string }[];
   align?: "left" | "right";
 }) {
@@ -162,12 +152,18 @@ function ActiveSection({
           </div>
         </div>
 
-        {/* Transparent panel with key stats */}
-        <div className="rounded-3xl border-2 border-cream/15 bg-transparent p-8">
-          <div className="grid grid-cols-3 gap-4">
+        {/*
+          Box with transparent image background — edit the file in
+          /public/sections (or drop a PNG with the same name) to change the art.
+        */}
+        <div
+          className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-[length:70%] bg-[center_30%] bg-no-repeat p-6"
+          style={{ backgroundImage: `url(${image})` }}
+        >
+          <div className="grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/50 p-4 backdrop-blur">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
-                <p className="font-display text-3xl not-italic text-cream sm:text-4xl">
+                <p className="font-display text-2xl not-italic text-cream sm:text-3xl">
                   {s.value}
                 </p>
                 <p className="mt-1 text-xs not-italic text-cream-dim">{s.label}</p>

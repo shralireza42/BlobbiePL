@@ -3,9 +3,9 @@ import { GAME_CARDS } from "@/lib/routes";
 import { ComingSoonBadge } from "./ui";
 
 const ACCENT_RING: Record<string, string> = {
-  lime: "group-hover:border-accent-lime/50",
-  green: "group-hover:border-accent-green/50",
-  cream: "group-hover:border-cream/50",
+  lime: "hover:border-accent-lime/60",
+  green: "hover:border-accent-green/60",
+  cream: "hover:border-cream/60",
 };
 
 export function GamesSection() {
@@ -17,7 +17,7 @@ export function GamesSection() {
             Arcade
           </p>
           <h2 className="mt-2 text-3xl font-display not-italic sm:text-4xl">
-            Games — Coming Soon
+            Mini-Games — Coming Soon
           </h2>
           <h6 className="mt-2 max-w-xl text-cream-dim">
             Three Blobbie mini-games are on the way, each with on-chain scores and
@@ -32,21 +32,21 @@ export function GamesSection() {
           <Link
             key={game.href}
             href={game.href}
-            className={`group card overflow-hidden border-cream/10 transition ${ACCENT_RING[game.accent]}`}
+            className={`group card overflow-hidden border-cream/15 bg-transparent transition ${ACCENT_RING[game.accent]}`}
           >
-            <div className="relative aspect-[3/2] w-full overflow-hidden">
-              {/* Swappable preview image — replace files in /public/games */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={game.image}
-                alt={game.title}
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-              />
+            {/*
+              Transparent image background — edit /public/games/*.svg (or drop a
+              PNG with the same name) to change the artwork.
+            */}
+            <div
+              className="relative aspect-[3/2] w-full bg-contain bg-center bg-no-repeat transition duration-500 group-hover:scale-[1.03]"
+              style={{ backgroundImage: `url(${game.image})` }}
+            >
               <span className="absolute left-3 top-3">
                 <ComingSoonBadge />
               </span>
             </div>
-            <div className="p-5">
+            <div className="border-t border-cream/10 p-5">
               <h3 className="text-xl font-display not-italic">{game.title}</h3>
               <h6 className="mt-1 text-sm text-cream-dim">{game.description}</h6>
             </div>

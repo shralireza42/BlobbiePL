@@ -8,7 +8,6 @@ import { WalletButton } from "./wallet-button";
 import { ROUTES } from "@/lib/routes";
 
 const NAV_LINKS = [
-  { href: ROUTES.playground, label: "Playground" },
   { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
   { href: ROUTES.airdrop, label: "Airdrop Hub" },
   { href: ROUTES.verify, label: "Verify" },
@@ -26,10 +25,10 @@ export function SiteNav() {
 
   return (
     <header className="sticky top-0 z-40 px-3 pt-3 sm:px-5 sm:pt-4">
-      <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 rounded-3xl border-2 border-ink bg-paper px-3 shadow-sticker sm:px-5">
+      <nav className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between gap-3 rounded-3xl border-2 border-ink bg-paper px-4 shadow-sticker sm:px-6">
         {/* Left: logo + nav */}
         <div className="flex items-center gap-6">
-          <Logo tone="ink" />
+          <Logo tone="ink" size={56} />
           <div className="hidden items-center gap-1 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = pathname === link.href;

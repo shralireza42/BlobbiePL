@@ -1,22 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" role="img" aria-label="Blobbie Stack">
-  <defs>
-    <linearGradient id="stackbg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#26272e"/>
-      <stop offset="1" stop-color="#1c1d22"/>
-    </linearGradient>
-  </defs>
-  <rect width="600" height="400" fill="url(#stackbg)"/>
-  <g>
-    <rect x="220" y="300" width="160" height="40" rx="8" fill="#e8edda"/>
-    <rect x="235" y="258" width="140" height="40" rx="8" fill="#c8f169"/>
-    <rect x="250" y="216" width="120" height="40" rx="8" fill="#7bd88f"/>
-    <rect x="240" y="174" width="110" height="40" rx="8" fill="#e8edda"/>
+  <!-- Transparent background — edit this file or replace with your own image -->
+  <g stroke="#0b0b0b" stroke-width="5" stroke-linejoin="round">
+    <rect x="220" y="300" width="170" height="42" rx="10" fill="#e8edda"/>
+    <rect x="236" y="256" width="148" height="42" rx="10" fill="#e2fea5"/>
+    <rect x="252" y="212" width="126" height="42" rx="10" fill="#79cc9e"/>
+    <rect x="240" y="168" width="116" height="42" rx="10" fill="#e8edda"/>
   </g>
-  <g>
-    <rect x="265" y="120" width="60" height="48" rx="12" fill="#c8f169"/>
-    <circle cx="282" cy="142" r="6" fill="#020202"/>
-    <circle cx="308" cy="142" r="6" fill="#020202"/>
-    <path d="M280 154 q15 12 30 0" stroke="#020202" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <g stroke="#0b0b0b" stroke-width="5" stroke-linejoin="round">
+    <rect x="266" y="112" width="64" height="50" rx="14" fill="#e2fea5"/>
+    <circle cx="284" cy="136" r="7" fill="#0b0b0b"/>
+    <circle cx="312" cy="136" r="7" fill="#0b0b0b"/>
+    <path d="M282 148 q16 12 32 0" stroke="#0b0b0b" stroke-width="5" fill="none" stroke-linecap="round"/>
   </g>
-  <text x="40" y="70" font-family="Arial Black, sans-serif" font-size="44" fill="#e8edda" font-weight="900">STACK</text>
 </svg>

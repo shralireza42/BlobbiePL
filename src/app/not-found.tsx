@@ -16,8 +16,8 @@ export default function NotFound() {
             <Link href={ROUTES.home} className="btn-primary">
               Home
             </Link>
-            <Link href={ROUTES.playground} className="btn-ghost">
-              Playground
+            <Link href={ROUTES.dailyDraw} className="btn-ghost">
+              Daily Rewards Draw
             </Link>
           </div>
         </div>

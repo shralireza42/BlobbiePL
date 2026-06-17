@@ -105,9 +105,9 @@ export function DashboardClient() {
               desc="Complete tasks & earn points"
             />
             <ActionLink
-              href={ROUTES.playground}
-              title="Playground"
-              desc="Explore all modules"
+              href={ROUTES.verify}
+              title="Verify Results"
+              desc="Look up any round's winners"
             />
             <ActionLink
               href={ROUTES.dailyDraw}
