@@ -84,7 +84,7 @@ export default function HomePage() {
           (or drop a PNG with the same name).
         */}
         <div
-          className="relative overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-[length:auto_85%] bg-[right_1rem_center] bg-no-repeat p-8 sm:p-12"
+          className="relative min-h-[260px] overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-cover bg-center bg-no-repeat p-8 sm:p-12"
           style={{ backgroundImage: "url(/sections/jackpot.svg)" }}
         >
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
@@ -164,7 +164,7 @@ function ActiveSection({
           /public/sections (or drop a PNG with the same name) to change the art.
         */}
         <div
-          className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-[length:70%] bg-[center_30%] bg-no-repeat p-6"
+          className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-cover bg-center bg-no-repeat p-6"
           style={{ backgroundImage: `url(${image})` }}
         >
           <div className="grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/50 p-4 backdrop-blur">
