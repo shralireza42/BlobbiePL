@@ -7,6 +7,7 @@ import { useBlobbieBalance } from "@/hooks/useBlobbieBalance";
 import { getJson } from "@/lib/client-api";
 import { formatNumber, formatUsd, shortenAddress } from "@/lib/format";
 import { WalletButton } from "@/components/wallet-button";
+import { ProfileCard } from "@/components/dashboard/profile-card";
 import { Skeleton } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
 
@@ -55,6 +56,8 @@ export function DashboardClient() {
 
   return (
     <div className="space-y-8">
+      {address && <ProfileCard wallet={address} />}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card label="Wallet" value={shortenAddress(address, 5)} mono />
         <Card

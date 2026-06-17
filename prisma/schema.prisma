@@ -18,6 +18,8 @@ model User {
   id            String   @id @default(cuid())
   wallet        String   @unique
   ensName       String?
+  displayName   String?
+  avatarUrl     String?  @db.Text
   ipHash        String?
   deviceHash    String?
   firstSeenAt   DateTime @default(now())

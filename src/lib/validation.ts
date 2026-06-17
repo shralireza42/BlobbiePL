@@ -43,6 +43,29 @@ export const chatMessageSchema = z.object({
   body: z.string().trim().min(1, "Message is empty").max(280, "Max 280 characters"),
 });
 
+const avatarSchema = z
+  .string()
+  .max(300_000, "Image is too large")
+  .refine(
+    (v) =>
+      v === "" ||
+      /^data:image\/(png|jpeg|jpg|webp|gif);base64,/.test(v) ||
+      /^https?:\/\/.+/i.test(v),
+    "Avatar must be an image upload or an http(s) URL",
+  );
+
+export const profileUpdateSchema = z.object({
+  displayName: z
+    .string()
+    .trim()
+    .max(32, "Max 32 characters")
+    .regex(/^[\p{L}\p{N} _.\-]*$/u, "Only letters, numbers, spaces and _ . -")
+    .optional(),
+  avatarUrl: avatarSchema.optional(),
+});
+
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+
 export const adminConfigSchema = z.object({
   enableMockMode: z.boolean().optional(),
   enableTicketPurchase: z.boolean().optional(),
