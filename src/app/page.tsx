@@ -77,11 +77,18 @@ export default function HomePage() {
       {/* Mini-games — three coming soon boxes with editable transparent images */}
       <GamesSection />
 
-      {/* Coming Soon — Jackpot only (transparent background) */}
+      {/* Coming Soon — Jackpot only (transparent, editable image background) */}
       <section className="container-px py-16">
-        <div className="rounded-3xl border-2 border-cream/15 bg-transparent p-8 sm:p-12">
+        {/*
+          Background art is editable: replace /public/sections/jackpot.svg
+          (or drop a PNG with the same name).
+        */}
+        <div
+          className="relative overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-[length:auto_85%] bg-[right_1rem_center] bg-no-repeat p-8 sm:p-12"
+          style={{ backgroundImage: "url(/sections/jackpot.svg)" }}
+        >
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            <div className="max-w-xl">
+            <div className="max-w-lg">
               <ComingSoonBadge />
               <h2 className="mt-3 text-3xl font-display not-italic sm:text-4xl">
                 {JACKPOT_CARD.title}

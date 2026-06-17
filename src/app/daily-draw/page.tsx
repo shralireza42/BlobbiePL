@@ -7,6 +7,7 @@ import { PrizeDistribution } from "@/components/daily-draw/prize-distribution";
 import { DrawRules } from "@/components/daily-draw/rules";
 import { Transparency } from "@/components/daily-draw/transparency";
 import { Results } from "@/components/daily-draw/results";
+import { GlobalChat } from "@/components/daily-draw/global-chat";
 import { GamesSection } from "@/components/games-section";
 import { PlaygroundCard } from "@/components/playground-card";
 import { AutoTask } from "@/hooks/useAutoTask";
@@ -39,6 +40,18 @@ export default function DailyDrawPage() {
 
         <div className="mt-8">
           <DrawConsole />
+        </div>
+
+        {/* Community chat fills the space between the round and prize sections */}
+        <div className="mt-10">
+          <SectionHeading
+            eyebrow="Community"
+            title="Blobbie Global Chat"
+            subtitle="Chat with other players while the round is live."
+          />
+          <div className="mt-6">
+            <GlobalChat />
+          </div>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">

@@ -48,6 +48,10 @@ const STATUS_STYLES: Record<string, string> = {
   COMPLETED: "border-cream/15 bg-cream/5 text-cream-soft",
 };
 
+function ticketStorageKey(wallet: string | null, round: number) {
+  return `blobbie:tickets:${wallet ?? "anon"}:${round}`;
+}
+
 export function DrawConsole() {
   const { address, isConnected, wrongNetwork, session } = useWalletSession();
   const { configured: tokenConfigured, balance } = useBlobbieBalance(address);
@@ -58,14 +62,58 @@ export function DrawConsole() {
     refetchInterval: 15_000,
   });
 
-  if (isLoading || !data) {
+  // Locally accumulated tickets for the current round. In Beta Mock Mode the
+  // backend simulates purchases, so we reflect the user's own tickets (and
+  // their participation) in the UI here. Persisted so it survives refetch.
+  const [localTickets, setLocalTickets] = useState(0);
+  const roundNumber = data?.round.roundNumber ?? null;
+
+  useEffect(() => {
+    if (roundNumber == null || typeof window === "undefined") return;
+    const raw = window.localStorage.getItem(
+      ticketStorageKey(session.wallet, roundNumber),
+    );
+    setLocalTickets(raw ? Number(raw) || 0 : 0);
+  }, [roundNumber, session.wallet]);
+
+  const addLocalTickets = (count: number) => {
+    if (roundNumber == null) return;
+    setLocalTickets((prev) => {
+      const next = prev + count;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          ticketStorageKey(session.wallet, roundNumber),
+          String(next),
+        );
+      }
+      return next;
+    });
+  };
+
+  const mergedData: CurrentResponse | null = useMemo(() => {
+    if (!data) return null;
+    if (localTickets <= 0) return data;
+    const alreadyCounted = data.userTickets > 0;
+    const userTickets = data.userTickets + localTickets;
+    return {
+      ...data,
+      userTickets,
+      round: {
+        ...data.round,
+        participants: data.round.participants + (alreadyCounted ? 0 : 1),
+        totalTickets: data.round.totalTickets + localTickets,
+      },
+    };
+  }, [data, localTickets]);
+
+  if (isLoading || !data || !mergedData) {
     return <ConsoleSkeleton />;
   }
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
-        <RoundCard data={data} />
+        <RoundCard data={mergedData} />
       </div>
       <div className="space-y-6">
         <WalletPanel
@@ -77,9 +125,12 @@ export function DrawConsole() {
           balance={balance}
         />
         <PurchasePanel
-          data={data}
+          data={mergedData}
           canBuy={isConnected && !wrongNetwork && session.authenticated}
-          onPurchased={() => refetch()}
+          onPurchased={(count) => {
+            addLocalTickets(count);
+            refetch();
+          }}
         />
       </div>
     </div>
@@ -252,7 +303,7 @@ function PurchasePanel({
 }: {
   data: CurrentResponse;
   canBuy: boolean;
-  onPurchased: () => void;
+  onPurchased: (count: number) => void;
 }) {
   const [count, setCount] = useState(1);
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
@@ -310,7 +361,7 @@ function PurchasePanel({
       hash: t.hash,
       message: (t.message ?? "Tickets purchased.") + extra,
     });
-    onPurchased();
+    onPurchased(count);
   }
 
   return (

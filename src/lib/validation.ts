@@ -39,6 +39,10 @@ export const claimPrizeSchema = z.object({
   roundId: z.number().int().positive(),
 });
 
+export const chatMessageSchema = z.object({
+  body: z.string().trim().min(1, "Message is empty").max(280, "Max 280 characters"),
+});
+
 export const adminConfigSchema = z.object({
   enableMockMode: z.boolean().optional(),
   enableTicketPurchase: z.boolean().optional(),

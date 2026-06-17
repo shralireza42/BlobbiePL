@@ -342,6 +342,16 @@ model AppConfig {
   @@index([key])
 }
 
+model ChatMessage {
+  id        String   @id @default(cuid())
+  wallet    String
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([wallet])
+}
+
 model RateLimitHit {
   id        String   @id @default(cuid())
   bucket    String

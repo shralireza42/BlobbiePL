@@ -18,7 +18,16 @@ export function Logo({
   size?: number;
 }) {
   const [src, setSrc] = useState("/logo.png");
-  const wordmark = tone === "ink" ? "text-black" : "text-cream";
+  // Inline color/size win over the global `.font-display` color rule.
+  // $BLOBBIE: Dela Gothic One regular, 30px, full black (cream on dark footer).
+  const wordmarkStyle = {
+    fontFamily: "var(--font-display)",
+    fontWeight: 400 as const,
+    fontStyle: "normal" as const,
+    fontSize: 30,
+    lineHeight: 1,
+    color: tone === "ink" ? "#000000" : "#e8edda",
+  };
 
   return (
     <Link href={href} className="group flex items-center gap-3">
@@ -36,9 +45,7 @@ export function Logo({
           className="h-full w-full object-cover"
         />
       </span>
-      <span
-        className={`font-display text-2xl font-extrabold not-italic tracking-tight ${wordmark}`}
-      >
+      <span className="tracking-tight" style={wordmarkStyle}>
         $BLOBBIE
       </span>
     </Link>
