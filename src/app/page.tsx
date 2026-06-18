@@ -83,11 +83,19 @@ export default function HomePage() {
           Background art is editable: replace /public/sections/jackpot.svg
           (or drop a PNG with the same name).
         */}
-        <div
-          className="relative min-h-[260px] overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-cover bg-center bg-no-repeat p-8 sm:p-12"
-          style={{ backgroundImage: "url(/sections/jackpot.svg)" }}
-        >
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="relative min-h-[280px] overflow-hidden rounded-3xl border-2 border-cream/15 p-8 sm:p-12">
+          {/* Image fills the frame regardless of its aspect ratio. Replace
+              /public/sections/jackpot.svg (or drop a PNG with the same name). */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/sections/jackpot.svg"
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Scrim keeps the text readable over any image */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg/85 via-bg/45 to-transparent" />
+          <div className="relative z-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div className="max-w-lg">
               <ComingSoonBadge />
               <h2 className="mt-3 text-3xl font-display not-italic sm:text-4xl">
@@ -160,14 +168,18 @@ function ActiveSection({
         </div>
 
         {/*
-          Box with transparent image background — edit the file in
-          /public/sections (or drop a PNG with the same name) to change the art.
+          Box with image background — edit the file in /public/sections (or drop
+          a PNG with the same name). The <img> fills the frame at any aspect.
         */}
-        <div
-          className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 bg-transparent bg-cover bg-center bg-no-repeat p-6"
-          style={{ backgroundImage: `url(${image})` }}
-        >
-          <div className="grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/50 p-4 backdrop-blur">
+        <div className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 p-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="relative z-10 grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/60 p-4 backdrop-blur">
             {stats.map((s) => (
               <div key={s.label} className="text-center">
                 <p className="font-display text-2xl not-italic text-cream sm:text-3xl">
