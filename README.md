@@ -5,9 +5,11 @@ The Playground Beta ships two active products — the **Daily Rewards Draw** and
 **Airdrop Hub** — plus a set of polished *Coming Soon* modules, an admin console,
 and a clean provider pattern that swaps between **mock** and **real** contracts.
 
-> **New here? Follow the step-by-step guide:** [`docs/SETUP.md`](./docs/SETUP.md)
-> — a complete part-by-part walkthrough from zero to launch on localhost,
-> including full **X (Twitter)** and **Telegram** setup tutorials.
+> **Guides:**
+> - 🖥️ Run locally (0 → launch): [`docs/SETUP.md`](./docs/SETUP.md) — includes
+>   full **X (Twitter)** and **Telegram** setup tutorials.
+> - 🚀 Deploy online step by step: [`docs/DEPLOY.md`](./docs/DEPLOY.md) — Vercel +
+>   managed Postgres (and a Docker/VPS alternative), with production X/Telegram.
 
 > Language rule: the product is always called the **“Daily Rewards Draw.”** The
 > word “lottery” is never used in UI, routes, labels, or copy.
