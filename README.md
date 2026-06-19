@@ -5,6 +5,10 @@ The Playground Beta ships two active products — the **Daily Rewards Draw** and
 **Airdrop Hub** — plus a set of polished *Coming Soon* modules, an admin console,
 and a clean provider pattern that swaps between **mock** and **real** contracts.
 
+> **New here? Follow the step-by-step guide:** [`docs/SETUP.md`](./docs/SETUP.md)
+> — a complete part-by-part walkthrough from zero to launch on localhost,
+> including full **X (Twitter)** and **Telegram** setup tutorials.
+
 > Language rule: the product is always called the **“Daily Rewards Draw.”** The
 > word “lottery” is never used in UI, routes, labels, or copy.
 
