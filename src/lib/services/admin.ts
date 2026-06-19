@@ -24,6 +24,7 @@ export async function getAdminOverview() {
       sanctions: [],
       features: await getFeatures(),
       referrals: { totalReferrals: 0, topReferrers: [] },
+      manageUsers: [],
     };
   }
 
@@ -92,6 +93,52 @@ export async function getAdminOverview() {
   const appConfig: Record<string, string> = {};
   for (const row of appConfigRows) appConfig[row.key] = row.value;
 
+  // Rich user management table: name, wallet, points, current-round tickets,
+  // level override, eligibility, and site-ban status.
+  const latestRound = await prisma.drawRound.findFirst({
+    orderBy: { roundNumber: "desc" },
+    select: { id: true, roundNumber: true },
+  });
+  const [manageRaw, roundEntries, activeBans] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { lastSeenAt: "desc" },
+      take: 100,
+      select: {
+        wallet: true,
+        displayName: true,
+        levelOverride: true,
+        lastSeenAt: true,
+        airdropUser: { select: { totalPoints: true, eligibility: true } },
+      },
+    }),
+    latestRound
+      ? prisma.drawEntry.findMany({
+          where: { roundId: latestRound.id },
+          select: { wallet: true, ticketCount: true },
+        })
+      : Promise.resolve([] as { wallet: string; ticketCount: number }[]),
+    prisma.sanction.findMany({
+      where: {
+        scope: "SITE_BAN",
+        liftedAt: null,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+      select: { wallet: true },
+    }),
+  ]);
+  const ticketMap = new Map(roundEntries.map((e) => [e.wallet, e.ticketCount]));
+  const bannedSet = new Set(activeBans.map((b) => b.wallet));
+  const manageUsers = manageRaw.map((u) => ({
+    wallet: u.wallet,
+    displayName: u.displayName,
+    points: u.airdropUser?.totalPoints ?? 0,
+    tickets: ticketMap.get(u.wallet) ?? 0,
+    levelOverride: u.levelOverride,
+    eligibility: u.airdropUser?.eligibility ?? "ELIGIBLE",
+    banned: bannedSet.has(u.wallet),
+    lastSeenAt: u.lastSeenAt,
+  }));
+
   const activeSince = new Date(Date.now() - ACTIVE_WINDOW_MS);
   const [activeUsers, activeCount, staff, sanctions, features, referrals] =
     await Promise.all([
@@ -129,6 +176,7 @@ export async function getAdminOverview() {
     sanctions,
     features,
     referrals,
+    manageUsers,
   };
 }
 

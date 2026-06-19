@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { isMockMode } from "@/lib/contracts";
 import { computeOdds } from "@/lib/prizes";
+import { ROUND_CAPACITY } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +20,9 @@ export async function GET() {
       ? await getUserTicketsForCurrentRound(session.wallet)
       : 0;
 
-    // realTickets = eligible tickets sold (capped at capacity in the service).
-    const odds = computeOdds(round.totalTickets, userTickets);
+    // Odds & winnings are always shown for a full 300-ticket round (potential),
+    // regardless of how many tickets have actually sold.
+    const odds = computeOdds(ROUND_CAPACITY, userTickets);
 
     return ok({
       round,

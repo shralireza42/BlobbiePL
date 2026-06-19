@@ -183,6 +183,19 @@ export async function claimTask(
 
   const lowered = wallet.toLowerCase();
 
+  // Verify action-based tasks actually happened (no free claims).
+  if (taskKey === "buy_ticket") {
+    const tickets = await prisma.drawEntry.count({ where: { wallet: lowered } });
+    if (tickets === 0) {
+      return {
+        ok: false,
+        awarded: 0,
+        totalPoints: 0,
+        message: "Buy a Daily Rewards Draw ticket first to earn this.",
+      };
+    }
+  }
+
   return prisma.$transaction(async (tx) => {
     const campaign = await tx.airdropCampaign.findUnique({
       where: { slug: DEFAULT_CAMPAIGN_SLUG },

@@ -10,6 +10,7 @@ export type ChatMessageView = {
   body: string;
   level: number;
   role: StaffRole | null;
+  name: string | null;
   createdAt: number;
 };
 
@@ -77,7 +78,10 @@ export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
         orderBy: { createdAt: "desc" },
         take: limit,
       });
-      const roles = await rolesFor(rows.map((r) => r.wallet));
+      const [roles, names] = await Promise.all([
+        rolesFor(rows.map((r) => r.wallet)),
+        namesFor(rows.map((r) => r.wallet)),
+      ]);
       return rows
         .map((r) => ({
           id: r.id,
@@ -85,6 +89,7 @@ export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
           body: r.body,
           level: r.level,
           role: roles.get(r.wallet.toLowerCase()) ?? null,
+          name: names.get(r.wallet.toLowerCase()) ?? null,
           createdAt: r.createdAt.getTime(),
         }))
         .reverse();
@@ -96,6 +101,23 @@ export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
   return buffer
     .slice(-limit)
     .map((m) => ({ ...m, role: roles.get(m.wallet.toLowerCase()) ?? null }));
+}
+
+/** Resolve display names for a set of wallets. */
+async function namesFor(wallets: string[]): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  if (!hasDatabase || wallets.length === 0) return map;
+  try {
+    const lowered = [...new Set(wallets.map((w) => w.toLowerCase()))];
+    const users = await prisma.user.findMany({
+      where: { wallet: { in: lowered }, displayName: { not: null } },
+      select: { wallet: true, displayName: true },
+    });
+    for (const u of users) if (u.displayName) map.set(u.wallet, u.displayName);
+  } catch {
+    /* ignore */
+  }
+  return map;
 }
 
 export async function addMessage(
@@ -117,6 +139,7 @@ export async function addMessage(
         body: row.body,
         level: row.level,
         role: null,
+        name: null,
         createdAt: row.createdAt.getTime(),
       };
     } catch {
@@ -130,6 +153,7 @@ export async function addMessage(
     body: clean,
     level,
     role: null,
+    name: null,
     createdAt: Date.now(),
   };
   buffer.push(msg);

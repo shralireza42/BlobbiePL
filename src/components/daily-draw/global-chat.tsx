@@ -13,6 +13,7 @@ type ChatMessage = {
   body: string;
   level: number;
   role: string | null;
+  name: string | null;
   createdAt: number;
 };
 
@@ -186,8 +187,8 @@ function ChatBubble({
       </span>
       <div className="max-w-[78%]">
         <div className="flex flex-wrap items-center gap-2 text-[11px] not-italic text-cream-dim">
-          <span className="font-mono">
-            {mine ? "You" : shortenAddress(message.wallet, 4)}
+          <span className={message.name ? "font-bold text-cream" : "font-mono"}>
+            {message.name ?? (mine ? "You" : shortenAddress(message.wallet, 4))}
           </span>
           {role && (
             <span className={`rounded-full px-1.5 text-[10px] font-bold ${ROLE_TAG[role] ?? "bg-cream/15 text-cream"}`}>

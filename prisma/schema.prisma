@@ -19,6 +19,7 @@ model User {
   wallet        String   @unique
   ensName       String?
   displayName   String?
+  displayNameUpdatedAt DateTime?
   avatarUrl     String?  @db.Text
   referralCode  String?  @unique
   referredBy    String? // referrer wallet

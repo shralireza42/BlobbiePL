@@ -176,10 +176,19 @@ function TaskList({
   );
 }
 
+// Tasks that complete automatically when the user performs the action
+// (connect / visit the page / buy a ticket) — not free-claimable from here.
+const AUTO_KEYS = new Set([
+  "connect_wallet",
+  "join_playground",
+  "view_daily_draw",
+]);
+
 function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
+  const isAuto = AUTO_KEYS.has(task.key);
   const disabled =
     loading || task.completed || task.status !== "ACTIVE" || task.pending;
 
@@ -225,9 +234,15 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
           <span className="chip border-gold/30 bg-gold/10 text-gold">
             Pending review
           </span>
+        ) : task.status !== "ACTIVE" ? (
+          <span className="chip border-cream/15 bg-cream/5 text-cream-dim">Soon</span>
+        ) : isAuto ? (
+          <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
+            Auto · do the action
+          </span>
         ) : (
           <button className="btn-ghost px-4 py-2" disabled={disabled} onClick={claim}>
-            {loading ? "…" : task.status === "ACTIVE" ? "Claim" : "Soon"}
+            {loading ? "…" : "Claim"}
           </button>
         )}
       </div>
