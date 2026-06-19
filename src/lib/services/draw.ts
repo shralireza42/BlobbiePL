@@ -112,9 +112,50 @@ export async function getRoundWinners(roundId: number): Promise<Winner[]> {
 }
 
 export async function getRecentResults(limit = 3) {
+  // DB lifecycle: return the most recent settled rounds (those with winners),
+  // newest first — this includes a round the moment it closes.
+  if (hasDatabase) {
+    try {
+      const rounds = await prisma.drawRound.findMany({
+        where: { winners: { some: {} } },
+        orderBy: { roundNumber: "desc" },
+        take: limit,
+        include: { winners: { orderBy: { rank: "asc" } } },
+      });
+      if (rounds.length > 0) {
+        return rounds.map((r) => ({
+          round: {
+            roundId: r.roundNumber,
+            roundNumber: r.roundNumber,
+            status: r.status as RoundInfo["status"],
+            capacity: r.capacity,
+            participants: r.uniqueUsers,
+            totalTickets: r.totalTickets,
+            supplementTickets: r.supplementTickets,
+            startTime: r.startTime.getTime(),
+            endTime: r.endTime.getTime(),
+            poolUsd: 300,
+            mockMode: r.mockMode,
+          } as RoundInfo,
+          winners: r.winners.map((w) => ({
+            rank: w.rank,
+            wallet: w.wallet,
+            tier: w.tier as Winner["tier"],
+            usdAmount: w.usdAmount,
+            blobbieAmount: w.blobbieAmount,
+            claimStatus: w.claimStatus as Winner["claimStatus"],
+            txHash: w.claimTxHash,
+          })),
+        }));
+      }
+    } catch {
+      // fall through to mock
+    }
+  }
+
   const current = await getCurrentRound();
   const results: { round: RoundInfo; winners: Winner[] }[] = [];
-  for (let id = current.roundNumber - 1; id >= 1 && results.length < limit; id--) {
+  for (let id = current.roundNumber; id >= 1 && results.length < limit; id--) {
     const info = await getDrawProvider().getRoundInfo(id);
     if (!info) continue;
     const winners = await getRoundWinners(id);

@@ -3,7 +3,6 @@ import { PageShell } from "@/components/page-shell";
 import { SectionHeading } from "@/components/ui";
 import { AirdropConsole } from "@/components/airdrop/airdrop-console";
 import { AutoTask } from "@/hooks/useAutoTask";
-import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Airdrop Hub",
@@ -22,11 +21,6 @@ export default function AirdropPage() {
             title="Airdrop Hub"
             subtitle="Earn Airdrop Points for contributing to the beta. Points do not guarantee token rewards."
           />
-          {config.isMockMode && (
-            <span className="chip border-gold/30 bg-gold/10 text-gold">
-              Beta Mock Mode
-            </span>
-          )}
         </div>
 
         <div className="mt-8">

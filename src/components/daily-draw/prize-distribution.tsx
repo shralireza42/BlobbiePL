@@ -51,7 +51,7 @@ export function PrizeDistribution() {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Allocation label="Winner Payout" value={POOL_ALLOCATION.winnerPayout} highlight />
         <Allocation label="Free Daily Entries" value={POOL_ALLOCATION.freeDailyEntries} />
-        <Allocation label="Jackpot" value={POOL_ALLOCATION.jackpot} />
+        <Allocation label="Vault Burst" value={POOL_ALLOCATION.jackpot} />
         <Allocation label="Burn / Treasury" value={POOL_ALLOCATION.burnTreasury} />
       </div>
       <p className="mt-3 text-xs text-cream-dim">

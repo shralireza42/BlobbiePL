@@ -45,6 +45,7 @@ type CurrentResponse = {
   price: { usd: number; isMock: boolean; source: string };
   userTickets: number;
   odds: Odds;
+  topWinner: { wallet: string; usdAmount: number } | null;
   isMockMode: boolean;
   ticketPurchaseEnabled: boolean;
   tokenConfigured: boolean;
@@ -128,7 +129,11 @@ function RoundCard({ data }: { data: CurrentResponse }) {
       </div>
 
       {round.status === "AWAITING_DRAW" && (
-        <DrawingBanner cooldownEndsAt={round.cooldownEndsAt} seed={round.randomSeed} />
+        <DrawingBanner
+          cooldownEndsAt={round.cooldownEndsAt}
+          seed={round.randomSeed}
+          topWinner={data.topWinner}
+        />
       )}
 
       <div className="mt-6">
@@ -194,9 +199,11 @@ function RoundCard({ data }: { data: CurrentResponse }) {
 function DrawingBanner({
   cooldownEndsAt,
   seed,
+  topWinner,
 }: {
   cooldownEndsAt?: number | null;
   seed?: string | null;
+  topWinner?: { wallet: string; usdAmount: number } | null;
 }) {
   const { remaining } = useCountdown(cooldownEndsAt ?? null);
   return (
@@ -205,6 +212,15 @@ function DrawingBanner({
         🎲 Drawing winners… next round opens in{" "}
         <span className="font-mono">{formatCountdown(remaining)}</span>
       </p>
+      {topWinner && (
+        <p className="mt-2 text-sm not-italic text-cream">
+          🏆 Top winner:{" "}
+          <span className="font-mono text-accent-lime">
+            {shortenAddress(topWinner.wallet, 5)}
+          </span>{" "}
+          — {formatUsd(topWinner.usdAmount)}
+        </p>
+      )}
       <p className="mt-1 text-xs not-italic text-cream-dim">
         Purchases are paused during the 3-minute draw window.
         {seed && (
@@ -490,7 +506,7 @@ function PurchasePanel({
           ? balance === null
             ? "Loading $BLOBBIE balance…"
             : `Use my $BLOBBIE — ${formatNumber(balance, 0)} ≈ ${affordable} ticket${affordable === 1 ? "" : "s"}`
-          : `Use my $BLOBBIE (Beta) — max ${Math.min(affordable, maxAllowed)} ticket${Math.min(affordable, maxAllowed) === 1 ? "" : "s"}`}
+          : `Use my $BLOBBIE — max ${Math.min(affordable, maxAllowed)} ticket${Math.min(affordable, maxAllowed) === 1 ? "" : "s"}`}
       </button>
       {!tokenConfigured && (
         <p className="mt-1 text-[11px] not-italic text-cream-dim">
