@@ -29,6 +29,16 @@ async function postJson(url: string, body?: unknown) {
   return res.json();
 }
 
+/**
+ * Module-level guard shared by every useWalletSession instance. Without this,
+ * each mounted component would fire its own signature request, which makes
+ * WalletConnect wallets (e.g. Trust) loop on the signing screen.
+ */
+const signInGuard: { inFlight: boolean; attempted: Set<string> } = {
+  inFlight: false,
+  attempted: new Set(),
+};
+
 export function useWalletSession() {
   const { address, isConnected, connector } = useAccount();
   const { connectors, connectAsync, isPending: isConnecting } = useConnect();
@@ -91,31 +101,46 @@ export function useWalletSession() {
     }
   }, [switchChainAsync]);
 
-  const signIn = useCallback(async () => {
-    if (!address) return;
-    setIsSigningIn(true);
-    setError(null);
-    try {
-      const nonceRes = await postJson("/api/auth/nonce", { wallet: address });
-      if (!nonceRes.ok) throw new Error(nonceRes.error ?? "Failed to get nonce");
-      const message: string = nonceRes.data.message;
-      const signature = await signMessageAsync({ message });
-      const verifyRes = await postJson("/api/auth/verify", {
-        wallet: address,
-        message,
-        signature,
-      });
-      if (!verifyRes.ok)
-        throw new Error(verifyRes.error ?? "Signature verification failed");
-      await refreshSession();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Sign-in failed");
-    } finally {
-      setIsSigningIn(false);
-    }
-  }, [address, signMessageAsync, refreshSession]);
+  const signIn = useCallback(
+    async (opts?: { force?: boolean }) => {
+      if (!address) return;
+      const key = address.toLowerCase();
+      // Only one signature request at a time, and only one auto-attempt per
+      // address (manual retries pass force:true).
+      if (signInGuard.inFlight) return;
+      if (!opts?.force && signInGuard.attempted.has(key)) return;
+
+      signInGuard.inFlight = true;
+      setIsSigningIn(true);
+      setError(null);
+      try {
+        const nonceRes = await postJson("/api/auth/nonce", { wallet: address });
+        if (!nonceRes.ok) throw new Error(nonceRes.error ?? "Failed to get nonce");
+        const message: string = nonceRes.data.message;
+        const signature = await signMessageAsync({ message });
+        const verifyRes = await postJson("/api/auth/verify", {
+          wallet: address,
+          message,
+          signature,
+        });
+        if (!verifyRes.ok)
+          throw new Error(verifyRes.error ?? "Signature verification failed");
+        await refreshSession();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Sign-in failed");
+      } finally {
+        // Mark attempted so we don't auto-loop the signing prompt; the user can
+        // press "Verify" to retry manually.
+        signInGuard.attempted.add(key);
+        signInGuard.inFlight = false;
+        setIsSigningIn(false);
+      }
+    },
+    [address, signMessageAsync, refreshSession],
+  );
 
   const signOut = useCallback(async () => {
+    if (address) signInGuard.attempted.delete(address.toLowerCase());
     await postJson("/api/auth/logout");
     await disconnectAsync();
     setSession({
@@ -126,7 +151,7 @@ export function useWalletSession() {
       permissions: [],
       sanctions: { siteBanned: false, chatBlocked: false },
     });
-  }, [disconnectAsync]);
+  }, [disconnectAsync, address]);
 
   // Auto sign-in only AFTER we've confirmed there is no valid existing session.
   // This prevents a signature prompt firing on every page navigation when the

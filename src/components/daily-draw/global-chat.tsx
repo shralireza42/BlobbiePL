@@ -37,7 +37,7 @@ export function GlobalChat() {
   const canModerate = session.permissions.includes("CHAT_MODERATE");
 
   async function moderate(action: string, payload: Record<string, unknown>) {
-    await postJson("/api/chat/moderate", { action, ...payload });
+    return postJson("/api/chat/moderate", { action, ...payload });
   }
 
   const { data, refetch } = useQuery({
@@ -121,8 +121,9 @@ export function GlobalChat() {
               }
               canModerate={canModerate}
               onModerate={async (action, payload) => {
-                await moderate(action, payload);
+                const res = await moderate(action, payload);
                 refetch();
+                return res as { ok: boolean; error?: string };
               }}
             />
           ))
@@ -163,7 +164,10 @@ function ChatBubble({
   message: ChatMessage;
   mine: boolean;
   canModerate: boolean;
-  onModerate: (action: string, payload: Record<string, unknown>) => void;
+  onModerate: (
+    action: string,
+    payload: Record<string, unknown>,
+  ) => Promise<{ ok: boolean; error?: string }>;
 }) {
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
@@ -195,13 +199,7 @@ function ChatBubble({
           </span>
           <span>·</span>
           <span>{time}</span>
-          {canModerate && (
-            <span className="hidden gap-1.5 group-hover:inline-flex">
-              <button className="text-rose-300 hover:underline" onClick={() => onModerate("delete", { messageId: message.id })}>del</button>
-              <button className="text-gold hover:underline" onClick={() => onModerate("mute", { wallet: message.wallet, durationMinutes: 60 })}>mute</button>
-              <button className="text-rose-300 hover:underline" onClick={() => onModerate("ban", { wallet: message.wallet })}>ban</button>
-            </span>
-          )}
+          {canModerate && <ModMenu message={message} onModerate={onModerate} />}
         </div>
         <div
           className={`mt-1 inline-block break-words rounded-2xl border px-3 py-2 text-sm not-italic ${
@@ -214,5 +212,117 @@ function ChatBubble({
         </div>
       </div>
     </div>
+  );
+}
+
+const DURATIONS: { label: string; minutes: number | null }[] = [
+  { label: "10 min", minutes: 10 },
+  { label: "1 hour", minutes: 60 },
+  { label: "1 day", minutes: 1440 },
+  { label: "7 days", minutes: 10080 },
+  { label: "Permanent", minutes: null },
+];
+
+function ModMenu({
+  message,
+  onModerate,
+}: {
+  message: ChatMessage;
+  onModerate: (
+    action: string,
+    payload: Record<string, unknown>,
+  ) => Promise<{ ok: boolean; error?: string }>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"root" | "mute" | "ban">("root");
+  const [status, setStatus] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function run(action: string, payload: Record<string, unknown>) {
+    setBusy(true);
+    const res = await onModerate(action, payload);
+    setBusy(false);
+    setStatus(res.ok ? "Done ✓" : res.error ?? "Failed");
+    setTimeout(() => {
+      setStatus(null);
+      setOpen(false);
+      setMode("root");
+    }, 1200);
+  }
+
+  return (
+    <span className="relative inline-flex not-italic">
+      <button
+        className="rounded px-1 text-cream-dim hover:text-cream"
+        onClick={() => {
+          setOpen((o) => !o);
+          setMode("root");
+        }}
+        title="Moderate"
+      >
+        ⚙
+      </button>
+      {open && (
+        <span className="absolute right-0 top-5 z-50 w-44 rounded-xl border border-cream/15 bg-bg-elevated p-1.5 text-left shadow-glow">
+          {status ? (
+            <span className="block px-2 py-1.5 text-[11px] text-accent-lime">{status}</span>
+          ) : mode === "root" ? (
+            <>
+              <ModItem disabled={busy} onClick={() => run("delete", { messageId: message.id })}>
+                Delete message
+              </ModItem>
+              <ModItem disabled={busy} onClick={() => setMode("mute")}>Mute user…</ModItem>
+              <ModItem disabled={busy} onClick={() => setMode("ban")}>Ban from chat…</ModItem>
+              <ModItem disabled={busy} onClick={() => run("unmute", { wallet: message.wallet })}>
+                Unmute
+              </ModItem>
+              <ModItem disabled={busy} onClick={() => run("unban", { wallet: message.wallet })}>
+                Unban
+              </ModItem>
+            </>
+          ) : (
+            <>
+              <span className="block px-2 py-1 text-[10px] uppercase tracking-wider text-cream-dim">
+                {mode === "mute" ? "Mute for" : "Ban for"}
+              </span>
+              {DURATIONS.map((d) => (
+                <ModItem
+                  key={d.label}
+                  disabled={busy}
+                  onClick={() =>
+                    run(mode, {
+                      wallet: message.wallet,
+                      ...(d.minutes ? { durationMinutes: d.minutes } : {}),
+                    })
+                  }
+                >
+                  {d.label}
+                </ModItem>
+              ))}
+            </>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ModItem({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      className="block w-full rounded-lg px-2 py-1.5 text-left text-[12px] text-cream-soft hover:bg-cream/10 disabled:opacity-50"
+    >
+      {children}
+    </button>
   );
 }

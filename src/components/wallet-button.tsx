@@ -14,6 +14,8 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
     wrongNetwork,
     switchNetwork,
     isSwitching,
+    signIn,
+    isSigningIn,
     signOut,
     session,
   } = useWalletSession();
@@ -61,6 +63,20 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
         disabled={isSwitching}
       >
         {isSwitching ? "Switching…" : "Switch Network"}
+      </button>
+    );
+  }
+
+  // Connected but not verified — explicit, single-tap verify (avoids the
+  // WalletConnect/Trust auto-signature loop).
+  if (!session.authenticated) {
+    return (
+      <button
+        className="btn-accent"
+        onClick={() => signIn({ force: true })}
+        disabled={isSigningIn}
+      >
+        {isSigningIn ? "Check wallet…" : "Verify wallet"}
       </button>
     );
   }
