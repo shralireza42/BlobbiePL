@@ -43,36 +43,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Active module — Daily Rewards Draw (full-size, transparent image box) */}
-      <ActiveSection
-        index="01"
-        eyebrow="Active Product"
-        title="Daily Rewards Draw"
-        description="A transparent 24-hour on-chain rewards round. 1 ticket = $1 in $BLOBBIE. A round closes at 300 participants or after 24 hours — guaranteed to run daily, with results designed to be on-chain verifiable."
-        href={ROUTES.dailyDraw}
-        cta="Open Daily Rewards Draw"
-        image="/sections/daily-draw.svg"
-        stats={[
-          { label: "Round window", value: "24h" },
-          { label: "Capacity", value: "300" },
-          { label: "Winners / round", value: "150" },
-        ]}
-      />
-
       {/* Active module — Airdrop Hub (full-size, transparent image box) */}
       <ActiveSection
-        index="02"
+        index="01"
         eyebrow="Active Beta Module"
         title="Airdrop Hub"
         description="Complete beta actions to earn Airdrop Points. Points track contribution — they do not guarantee token rewards. Final allocation is admin-reviewed and anti-sybil checked."
         href={ROUTES.airdrop}
         cta="Open Airdrop Hub"
         image="/sections/airdrop.svg"
-        align="right"
         stats={[
           { label: "Tasks", value: "9" },
           { label: "Daily streak", value: "Yes" },
           { label: "Leaderboard", value: "Live" },
+        ]}
+      />
+
+      {/* Active module — Daily Draw (full-size, transparent image box) */}
+      <ActiveSection
+        index="02"
+        eyebrow="Active Product"
+        title="Daily Draw"
+        description="A transparent 24-hour on-chain rewards round. 1 ticket = $1 in $BLOBBIE. A round closes at 300 tickets or after 24 hours — guaranteed to run daily, with results designed to be on-chain verifiable."
+        href={ROUTES.dailyDraw}
+        cta="Open Daily Draw"
+        image="/sections/daily-draw.svg"
+        align="right"
+        stats={[
+          { label: "Round window", value: "24h" },
+          { label: "Capacity", value: "300" },
+          { label: "Winners / round", value: "150" },
         ]}
       />
 
@@ -93,7 +93,7 @@ export default async function HomePage() {
             src="/sections/jackpot.svg"
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain p-4"
           />
           {/* Scrim keeps the text readable over any image */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg/85 via-bg/45 to-transparent" />
@@ -179,7 +179,7 @@ function ActiveSection({
             src={image}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain p-4"
           />
           <div className="relative z-10 grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/60 p-4 backdrop-blur">
             {stats.map((s) => (

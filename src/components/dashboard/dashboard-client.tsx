@@ -13,12 +13,12 @@ import { ReferralPanel } from "@/components/referral-panel";
 import { Skeleton } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
 
-// Free Entries, Jackpot and Staking are surfaced only on the Playground page.
+// Referrals is live (see the Referral panel); only future modules here.
 const COMING_SOON = [
   { label: "Blobbie Dash", href: ROUTES.dash },
   { label: "Blobbie Blast", href: ROUTES.blast },
   { label: "Blobbie Stack", href: ROUTES.stack },
-  { label: "Referrals", href: ROUTES.referrals },
+  { label: "Staking", href: ROUTES.staking },
 ];
 
 export function DashboardClient() {

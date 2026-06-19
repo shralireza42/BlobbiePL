@@ -8,7 +8,7 @@ import { WalletButton } from "./wallet-button";
 import { ROUTES } from "@/lib/routes";
 
 const NAV_LINKS = [
-  { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
+  { href: ROUTES.dailyDraw, label: "Daily Draw" },
   { href: ROUTES.airdrop, label: "Airdrop Hub" },
   { href: ROUTES.verify, label: "Verify" },
 ];
