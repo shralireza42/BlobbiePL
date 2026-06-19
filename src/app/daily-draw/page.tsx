@@ -14,10 +14,18 @@ import { DRAW_COMING_SOON_CARDS, ROUTES } from "@/lib/routes";
 import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Daily Rewards Draw",
+  title: "Daily Draw",
   description:
-    "Join the Blobbie Daily Rewards Draw — a transparent 24-hour on-chain rewards round on BNB Chain. 1 ticket = $1 in $BLOBBIE.",
+    "Join the Blobbie Daily Draw — a transparent 24-hour on-chain rewards round on BNB Chain. 1 ticket = $1 in $BLOBBIE.",
 };
+
+const HOW_TO_PLAY = [
+  { step: "1", title: "Connect & verify", body: "Connect MetaMask / Trust / WalletConnect on BNB Chain and sign once to verify." },
+  { step: "2", title: "Buy tickets", body: "1 ticket = $1 in $BLOBBIE. Up to 50 per round (1 ticket = 1 entry)." },
+  { step: "3", title: "Round closes", body: "When 300 tickets sell or 24h passes, the round closes and winners are drawn." },
+  { step: "4", title: "Random & fair", body: "Winners are picked with a verifiable random seed (Chainlink VRF when live)." },
+  { step: "5", title: "Claim rewards", body: "If you win, your prize shows in results — claim it to your wallet." },
+];
 
 export default function DailyDrawPage() {
   return (
@@ -27,14 +35,30 @@ export default function DailyDrawPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeading
             eyebrow="Active Product"
-            title="Daily Rewards Draw"
-            subtitle="A transparent 24-hour rewards round. A round closes at 300 participants or after 24 hours — guaranteed to run daily."
+            title="Daily Draw"
+            subtitle="A transparent 24-hour rewards round. A round closes at 300 tickets or after 24 hours — guaranteed to run daily."
           />
           {config.isMockMode && (
             <span className="chip border-accent-lime/40 bg-accent-lime/10 text-accent-lime">
               Beta Mock Mode
             </span>
           )}
+        </div>
+
+        {/* How to play: connect → buy → draw → claim */}
+        <div className="mt-8 card p-6">
+          <h3 className="font-display not-italic text-lg">How to play</h3>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {HOW_TO_PLAY.map((s) => (
+              <div key={s.step} className="rounded-2xl border border-cream/10 bg-cream/5 p-4">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime font-display text-sm not-italic text-ink">
+                  {s.step}
+                </span>
+                <p className="mt-2 font-display not-italic text-sm text-cream">{s.title}</p>
+                <p className="mt-1 text-xs not-italic text-cream-dim">{s.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8">
