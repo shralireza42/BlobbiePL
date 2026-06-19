@@ -31,8 +31,9 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const input = profileUpdateSchema.parse(body);
-    const profile = await updateProfile(session.wallet, input);
-    return ok({ profile });
+    const result = await updateProfile(session.wallet, input);
+    if (!result.ok) return fail(result.error ?? "Could not update profile.", 409);
+    return ok({ profile: result.profile });
   } catch (err) {
     return handleError(err);
   }

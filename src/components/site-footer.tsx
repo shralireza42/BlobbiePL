@@ -18,6 +18,7 @@ export function SiteFooter() {
           links={[
             { href: ROUTES.dailyDraw, label: "Daily Rewards Draw" },
             { href: ROUTES.airdrop, label: "Airdrop Hub" },
+            { href: ROUTES.referrals, label: "Referrals" },
             { href: ROUTES.dashboard, label: "Dashboard" },
             { href: ROUTES.verify, label: "Verify Results" },
           ]}
@@ -28,7 +29,7 @@ export function SiteFooter() {
             { href: ROUTES.dash, label: "Blobbie Dash" },
             { href: ROUTES.blast, label: "Blobbie Blast" },
             { href: ROUTES.stack, label: "Blobbie Stack" },
-            { href: ROUTES.referrals, label: "Referrals" },
+            { href: ROUTES.staking, label: "Staking" },
           ]}
         />
         <div className="space-y-3 text-sm">

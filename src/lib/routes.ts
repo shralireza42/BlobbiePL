@@ -120,9 +120,9 @@ export const JACKPOT_CARD: PlaygroundCard = {
   icon: "vault",
 };
 
-/** Coming Soon modules surfaced on the Daily Rewards Draw page (not Jackpot). */
+/** Coming Soon modules surfaced on the Daily Rewards Draw page (Referrals is
+ * now live, so it's excluded). */
 export const DRAW_COMING_SOON_CARDS: PlaygroundCard[] = [
-  REFERRALS_CARD,
   FREE_ENTRIES_CARD,
   STAKING_CARD,
 ];

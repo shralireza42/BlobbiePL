@@ -67,20 +67,6 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
     );
   }
 
-  // Connected but not verified — explicit, single-tap verify (avoids the
-  // WalletConnect/Trust auto-signature loop).
-  if (!session.authenticated) {
-    return (
-      <button
-        className="btn-accent"
-        onClick={() => signIn({ force: true })}
-        disabled={isSigningIn}
-      >
-        {isSigningIn ? "Check wallet…" : "Verify wallet"}
-      </button>
-    );
-  }
-
   return (
     <div className="relative">
       <button
@@ -106,7 +92,13 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
         <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-cream/10 bg-bg-card p-2 shadow-glow">
           <p className="truncate px-3 py-2 text-xs text-cream-dim">{address}</p>
           {!session.authenticated && (
-            <p className="px-3 py-1 text-[11px] text-gold">Sign message to verify</p>
+            <button
+              onClick={() => signIn({ force: true })}
+              disabled={isSigningIn}
+              className="mb-1 w-full rounded-lg bg-accent-lime/15 px-3 py-2 text-left text-sm text-accent-lime hover:bg-accent-lime/25 disabled:opacity-50"
+            >
+              {isSigningIn ? "Check your wallet…" : "Verify wallet"}
+            </button>
           )}
           <button
             onClick={() => {

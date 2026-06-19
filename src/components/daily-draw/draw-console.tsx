@@ -168,7 +168,7 @@ function RoundCard({ data }: { data: CurrentResponse }) {
         <Metric label="Closes In" value={formatCountdown(remaining)} mono />
         <Metric label="Your Tickets" value={String(userTickets)} />
         <Metric label="Players" value={formatNumber(round.participants, 0)} />
-        <Metric label="Prize Scale" value={`${Math.round(odds.scalePct)}%`} />
+        <Metric label="Pool" value={formatUsd(round.poolUsd)} />
       </div>
 
       <UserOdds odds={odds} />
@@ -246,9 +246,9 @@ function UserOdds({ odds }: { odds: Odds }) {
         </div>
       )}
       <p className="mt-3 text-xs text-cream-dim">
-        Winners are drawn randomly from real tickets only. Prizes pay{" "}
-        {Math.round(odds.scalePct)}% of the full 300-ticket amounts at the current
-        eligible tickets. Est. winnings is your expected return across the draw.
+        Shown for a full 300-ticket round. Winners are drawn randomly from real
+        tickets only; if a round closes with fewer tickets, actual prizes scale
+        with the real tickets sold.
       </p>
     </div>
   );
@@ -372,10 +372,11 @@ function PurchasePanel({
   const maxAllowed = Math.max(0, Math.min(userRemaining, roundRemaining));
 
   // How many tickets the user's $BLOBBIE balance can cover (1 ticket = $1).
+  // In Beta Mock Mode (no token configured) we let them fill up to the cap.
   const affordable =
     tokenConfigured && balance !== null && data.price.usd > 0
       ? Math.floor(balance * data.price.usd)
-      : 0;
+      : maxAllowed;
 
   const { data: quote } = useQuery({
     queryKey: ["draw-quote", count],
@@ -480,16 +481,21 @@ function PurchasePanel({
         </button>
       </div>
 
-      {tokenConfigured && (
-        <button
-          className="btn-ghost mt-2 w-full py-2 text-sm disabled:opacity-50"
-          disabled={affordable < 1 || maxAllowed < 1}
-          onClick={() => setCount(Math.max(1, Math.min(affordable, maxAllowed)))}
-        >
-          {balance === null
+      <button
+        className="btn-ghost mt-2 w-full py-2 text-sm disabled:opacity-50"
+        disabled={maxAllowed < 1 || Math.min(affordable, maxAllowed) < 1}
+        onClick={() => setCount(Math.max(1, Math.min(affordable, maxAllowed)))}
+      >
+        {tokenConfigured
+          ? balance === null
             ? "Loading $BLOBBIE balance…"
-            : `Use my $BLOBBIE — ${formatNumber(balance, 0)} ≈ ${affordable} ticket${affordable === 1 ? "" : "s"}`}
-        </button>
+            : `Use my $BLOBBIE — ${formatNumber(balance, 0)} ≈ ${affordable} ticket${affordable === 1 ? "" : "s"}`
+          : `Use my $BLOBBIE (Beta) — max ${Math.min(affordable, maxAllowed)} ticket${Math.min(affordable, maxAllowed) === 1 ? "" : "s"}`}
+      </button>
+      {!tokenConfigured && (
+        <p className="mt-1 text-[11px] not-italic text-cream-dim">
+          Token not configured — $BLOBBIE purchases are simulated in Beta Mock Mode.
+        </p>
       )}
 
       <div className="mt-4 space-y-2 rounded-xl border border-cream/10 bg-cream/5 p-4 text-sm">

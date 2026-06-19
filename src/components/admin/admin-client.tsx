@@ -67,6 +67,15 @@ type Overview = {
     totalReferrals: number;
     topReferrers: { wallet: string; count: number; points: number }[];
   };
+  manageUsers: {
+    wallet: string;
+    displayName: string | null;
+    points: number;
+    tickets: number;
+    levelOverride: number | null;
+    eligibility: string;
+    banned: boolean;
+  }[];
   me: {
     wallet: string;
     role: string | null;
@@ -183,6 +192,15 @@ export function AdminClient() {
       )}
 
       <DrawActivity activity={data.drawActivity} />
+
+      {can(data, "VIEW_USERS") && (
+        <ManageUsers
+          users={data.manageUsers}
+          canBan={can(data, "SITE_BAN")}
+          canLevel={can(data, "MANAGE_ROLES")}
+          onChange={refetch}
+        />
+      )}
 
       {can(data, "VIEW_USERS") && (
         <ActiveUsers users={data.activeUsers} canBan={can(data, "SITE_BAN")} onChange={refetch} />
@@ -485,6 +503,59 @@ function BanButtons({ wallet, onChange }: { wallet: string; onChange: () => void
         Unban
       </button>
     </div>
+  );
+}
+
+function ManageUsers({
+  users,
+  canBan,
+  canLevel,
+  onChange,
+}: {
+  users: Overview["manageUsers"];
+  canBan?: boolean;
+  canLevel?: boolean;
+  onChange: () => void;
+}) {
+  async function setLevel(wallet: string, level: number | null) {
+    await postJson("/api/admin/level", { wallet, level });
+    onChange();
+  }
+  return (
+    <Section title={`Manage Users (${users.length})`}>
+      {users.length === 0 ? (
+        <Empty>No users yet.</Empty>
+      ) : (
+        <Table
+          headers={["Username", "Wallet", "Points", "Tickets", "Level", "Status", "Actions"]}
+          rows={users.map((u) => [
+            <span key="n">{u.displayName ?? <span className="text-cream-dim">—</span>}</span>,
+            <span key="w" className="font-mono text-xs">{shortenAddress(u.wallet, 5)}</span>,
+            <span key="p">{u.points}</span>,
+            <span key="t">{u.tickets}</span>,
+            canLevel ? (
+              <select
+                key="l"
+                className="rounded-lg border border-cream/15 bg-bg-soft px-1.5 py-1 text-xs not-italic"
+                value={u.levelOverride ?? ""}
+                onChange={(e) => setLevel(u.wallet, e.target.value === "" ? null : Number(e.target.value))}
+              >
+                <option value="">auto</option>
+                {Array.from({ length: 11 }, (_, i) => (
+                  <option key={i} value={String(i)}>{i}</option>
+                ))}
+              </select>
+            ) : (
+              <span key="l">{u.levelOverride ?? "auto"}</span>
+            ),
+            <span key="s" className={u.banned ? "text-rose-300" : "text-emerald-300"}>
+              {u.banned ? "Banned" : u.eligibility}
+            </span>,
+            canBan ? <BanButtons key="b" wallet={u.wallet} onChange={onChange} /> : <span key="b">—</span>,
+          ])}
+        />
+      )}
+    </Section>
   );
 }
 
