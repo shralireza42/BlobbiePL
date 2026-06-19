@@ -9,6 +9,7 @@ import { shortenAddress } from "@/lib/format";
 import { WalletButton } from "@/components/wallet-button";
 import { Disclaimer, Skeleton } from "@/components/ui";
 import { SocialTasks } from "@/components/airdrop/social-tasks";
+import { ReferralPanel } from "@/components/referral-panel";
 import { AIRDROP_DISCLAIMER } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 
@@ -119,6 +120,8 @@ export function AirdropConsole() {
       )}
 
       {profile.connected && <SocialTasks onChange={() => refetch()} />}
+
+      {profile.connected && <ReferralPanel />}
 
       <Leaderboard />
 

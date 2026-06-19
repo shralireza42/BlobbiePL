@@ -30,6 +30,8 @@ export const buyTicketsSchema = z.object({
     .int()
     .min(1)
     .max(MAX_TICKETS_PER_TX),
+  // When true, the user is paying with their own $BLOBBIE balance.
+  useBalance: z.boolean().optional(),
   roundId: z.number().int().positive().optional(),
   // Real tx hash if a wallet broadcast one. Mock mode must omit this.
   txHash: hexSchema.optional(),

@@ -6,10 +6,18 @@
 export const ROUND_CAPACITY = 300;
 export const ROUND_DURATION_MS = 24 * 60 * 60 * 1000;
 export const CLOSING_SOON_THRESHOLD_MS = 60 * 60 * 1000; // last hour
+/** Cooldown between a round closing (drawing winners) and the next round. */
+export const DRAW_COOLDOWN_MS = 3 * 60 * 1000;
 
 /** 1 Ticket = $1 USD equivalent in $BLOBBIE. */
 export const TICKET_USD_VALUE = 1;
-export const MAX_TICKETS_PER_TX = 100;
+export const MAX_TICKETS_PER_TX = 300;
+/** Per-round per-user ticket cap. Owners can buy the whole round (300). */
+export const MAX_TICKETS_PER_USER = 50;
+export const MAX_TICKETS_PER_OWNER = ROUND_CAPACITY;
+
+/** Referral rewards (points) for the referrer and the referred friend. */
+export const REFERRAL_POINTS = { referrer: 100, referee: 50 } as const;
 
 /** Prize distribution (USD-denominated, paid in $BLOBBIE when live). */
 export const PRIZE_DISTRIBUTION = {

@@ -74,9 +74,15 @@ export function WalletButton({ compact = false }: { compact?: boolean }) {
       >
         <span className="h-2 w-2 rounded-full bg-emerald-500" />
         {shortenAddress(address)}
-        {session.isAdmin && !compact && (
-          <span className="ml-1 rounded bg-ink px-1.5 py-0.5 text-[10px] text-paper">
-            ADMIN
+        {session.role && !compact && (
+          <span
+            className={`ml-1 rounded px-1.5 py-0.5 text-[10px] ${
+              session.role === "OWNER"
+                ? "bg-gold text-ink"
+                : "bg-ink text-paper"
+            }`}
+          >
+            {session.role}
           </span>
         )}
       </button>

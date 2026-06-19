@@ -20,6 +20,9 @@ model User {
   ensName       String?
   displayName   String?
   avatarUrl     String?  @db.Text
+  referralCode  String?  @unique
+  referredBy    String? // referrer wallet
+  levelOverride Int? // admin-set level (overrides points-based level)
   ipHash        String?
   deviceHash    String?
   firstSeenAt   DateTime @default(now())
@@ -43,6 +46,59 @@ model User {
 // ---------------------------------------------------------------------------
 // Social accounts + social task state (X / Telegram)
 // ---------------------------------------------------------------------------
+
+enum StaffRole {
+  OWNER
+  MANAGER
+  MODERATOR
+  SENIOR
+}
+
+model Staff {
+  id        String    @id @default(cuid())
+  wallet    String    @unique
+  role      StaffRole
+  addedBy   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([role])
+}
+
+enum SanctionScope {
+  SITE_BAN
+  CHAT_BAN
+  CHAT_MUTE
+}
+
+model Sanction {
+  id        String        @id @default(cuid())
+  wallet    String
+  scope     SanctionScope
+  reason    String?
+  expiresAt DateTime? // null = permanent
+  liftedAt  DateTime?
+  createdBy String
+  createdAt DateTime      @default(now())
+
+  @@index([wallet])
+  @@index([scope])
+  @@index([liftedAt])
+}
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerWallet String
+  refereeWallet String   @unique
+  code          String
+  referrerPoints Int     @default(0)
+  refereePoints  Int     @default(0)
+  source        String   @default("link") // "link" | "admin"
+  createdAt     DateTime @default(now())
+
+  @@index([referrerWallet])
+  @@index([createdAt])
+}
 
 enum SocialProvider {
   X
@@ -116,6 +172,7 @@ model DrawRound {
   startTime        DateTime    @default(now())
   endTime          DateTime
   drawnAt          DateTime?
+  cooldownEndsAt   DateTime?
   vrfRequestId     String?
   randomSeed       String?
   txHash           String?
@@ -406,6 +463,8 @@ model ChatMessage {
   wallet    String
   body      String
   level     Int      @default(0)
+  deleted   Boolean  @default(false)
+  deletedBy String?
   createdAt DateTime @default(now())
 
   @@index([createdAt])

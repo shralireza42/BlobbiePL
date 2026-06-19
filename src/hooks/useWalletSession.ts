@@ -15,6 +15,9 @@ type SessionState = {
   authenticated: boolean;
   wallet: string | null;
   isAdmin: boolean;
+  role: string | null;
+  permissions: string[];
+  sanctions: { siteBanned: boolean; chatBlocked: boolean };
 };
 
 async function postJson(url: string, body?: unknown) {
@@ -38,6 +41,9 @@ export function useWalletSession() {
     authenticated: false,
     wallet: null,
     isAdmin: false,
+    role: null,
+    permissions: [],
+    sanctions: { siteBanned: false, chatBlocked: false },
   });
   const [sessionChecked, setSessionChecked] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -112,7 +118,14 @@ export function useWalletSession() {
   const signOut = useCallback(async () => {
     await postJson("/api/auth/logout");
     await disconnectAsync();
-    setSession({ authenticated: false, wallet: null, isAdmin: false });
+    setSession({
+      authenticated: false,
+      wallet: null,
+      isAdmin: false,
+      role: null,
+      permissions: [],
+      sanctions: { siteBanned: false, chatBlocked: false },
+    });
   }, [disconnectAsync]);
 
   // Auto sign-in only AFTER we've confirmed there is no valid existing session.

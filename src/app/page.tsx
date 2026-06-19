@@ -4,8 +4,10 @@ import { ActiveBadge, ComingSoonBadge } from "@/components/ui";
 import { GamesSection } from "@/components/games-section";
 import { JACKPOT_CARD, ROUTES } from "@/lib/routes";
 import { config } from "@/lib/config";
+import { getFeatures } from "@/lib/services/features";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const features = await getFeatures();
   return (
     <PageShell>
       {/* Hero */}
@@ -75,7 +77,7 @@ export default function HomePage() {
       />
 
       {/* Mini-games — three coming soon boxes with editable transparent images */}
-      <GamesSection />
+      {features.minigamesEnabled && <GamesSection />}
 
       {/* Coming Soon — Jackpot only (transparent, editable image background) */}
       <section className="container-px py-16">
