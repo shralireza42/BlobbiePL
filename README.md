@@ -65,7 +65,7 @@ cp env.example .env
 
 # 3. (Optional) Spin up Postgres + run migrations + seed
 docker compose up -d db          # or use your own Postgres
-npx prisma migrate dev --name init
+npm run prisma:migrate -- --name init
 npm run db:seed
 
 # 4. Run the dev server
@@ -86,12 +86,20 @@ npm run lint          # next lint
 npm run build         # prisma generate + next build
 npm run start         # production server (after build)
 
-# Database
-npm run prisma:migrate   # create/apply dev migration
-npm run prisma:deploy    # apply migrations in prod
-npm run prisma:studio    # inspect data
-npm run db:seed          # seed airdrop campaign + tasks
+# Database (these load .env AND .env.local automatically)
+npm run prisma:migrate -- --name init   # create/apply dev migration
+npm run prisma:deploy                    # apply migrations in prod
+npm run prisma:studio                    # inspect data
+npm run db:push                          # push schema without a migration
+npm run db:seed                          # seed airdrop campaign + tasks
 ```
+
+> **`Environment variable not found: DATABASE_URL`?** The Prisma CLI only
+> auto-loads `.env` — it does **not** read Next.js's `.env.local`. Use the
+> `npm run prisma:*` scripts above (they load `.env` and `.env.local` via
+> `scripts/with-env.mjs`), or put `DATABASE_URL` in `.env`. Running
+> `npx prisma migrate dev` directly only works if `DATABASE_URL` is in `.env`
+> or exported in your shell.
 
 ---
 
