@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Blobbie Level 3">
+  <!-- Editable Blobbie level character. Swap freely. -->
+  <circle cx="60" cy="60" r="54" fill="#7cc4f2" stroke="#0b0b0b" stroke-width="6"/>
+  <g stroke="#0b0b0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 30 C40 30 30 46 30 62 C30 84 44 98 60 98 C76 98 90 84 90 62 C90 46 80 30 60 30 Z" fill="#f3c6a3"/>
+    <circle cx="50" cy="62" r="3.5" fill="#0b0b0b" stroke="none"/>
+    <circle cx="70" cy="62" r="3.5" fill="#0b0b0b" stroke="none"/>
+    <path d="M60 72 C50 72 43 76 41 82 C47 88 54 82 60 78 C66 82 73 88 79 82 C77 76 70 72 60 72 Z" fill="#9e3b2e"/>
+  </g>
+  <!-- round glasses -->
+  <g stroke="#0b0b0b" stroke-width="3" fill="none">
+    <circle cx="50" cy="62" r="9"/>
+    <circle cx="70" cy="62" r="9"/>
+    <line x1="59" y1="62" x2="61" y2="62"/>
+  </g>
+  <g><circle cx="97" cy="97" r="16" fill="#0b0b0b"/><text x="97" y="102" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="13" fill="#fff" font-weight="900">3</text></g>
+</svg>

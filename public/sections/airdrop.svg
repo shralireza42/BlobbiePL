@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" width="480" height="360" role="img" aria-label="Airdrop Hub">
+  <!-- Transparent background  edit this file or replace with your own image (PNG/SVG) -->
+  <g fill="none" stroke="#e8edda" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Parachute canopy -->
+    <path d="M150 150 a90 90 0 0 1 180 0 Z"/>
+    <path d="M150 150 q45 40 45 0 q45 40 45 0 q45 40 45 0"/>
+    <!-- Lines to package -->
+    <line x1="150" y1="150" x2="222" y2="214"/>
+    <line x1="240" y1="150" x2="240" y2="214"/>
+    <line x1="330" y1="150" x2="258" y2="214"/>
+    <!-- Package -->
+    <rect x="214" y="214" width="52" height="48" rx="8"/>
+    <line x1="240" y1="214" x2="240" y2="262"/>
+  </g>
+  <g fill="#e2fea5" fill-opacity="0.9">
+    <circle cx="360" cy="250" r="6"/>
+    <circle cx="110" cy="120" r="5"/>
+    <circle cx="390" cy="120" r="4"/>
+  </g>
+  <text x="226" y="246" font-family="Arial Black, sans-serif" font-size="22" fill="#e2fea5" fill-opacity="0.95" font-weight="900"></text>
+</svg>

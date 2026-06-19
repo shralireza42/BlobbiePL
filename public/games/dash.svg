@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" role="img" aria-label="Blobbie Dash">
+  <!-- Transparent background — edit this file or replace with your own image -->
+  <g stroke="#e8edda" stroke-opacity="0.18" stroke-width="3">
+    <line x1="0" y1="320" x2="600" y2="320"/>
+    <line x1="120" y1="120" x2="60" y2="400"/>
+    <line x1="300" y1="120" x2="260" y2="400"/>
+    <line x1="480" y1="120" x2="460" y2="400"/>
+  </g>
+  <g>
+    <ellipse cx="250" cy="320" rx="70" ry="16" fill="#020202" fill-opacity="0.35"/>
+    <circle cx="250" cy="262" r="56" fill="#e2fea5" stroke="#0b0b0b" stroke-width="5"/>
+    <circle cx="232" cy="250" r="9" fill="#0b0b0b"/>
+    <circle cx="266" cy="250" r="9" fill="#0b0b0b"/>
+    <path d="M230 280 q20 18 40 0" stroke="#0b0b0b" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+  <g fill="#e8edda" fill-opacity="0.9">
+    <rect x="420" y="250" width="26" height="70" rx="8"/>
+    <rect x="500" y="210" width="26" height="110" rx="8"/>
+  </g>
+</svg>

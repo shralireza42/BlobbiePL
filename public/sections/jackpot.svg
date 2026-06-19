@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" width="480" height="360" role="img" aria-label="Blobbie Vault Burst">
+  <!-- Transparent background  edit this file or replace with your own image (PNG/SVG) -->
+  <g fill="none" stroke="#e8edda" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Vault door -->
+    <rect x="150" y="120" width="170" height="150" rx="16"/>
+    <circle cx="235" cy="195" r="42"/>
+    <circle cx="235" cy="195" r="14"/>
+    <g stroke-width="4">
+      <line x1="235" y1="153" x2="235" y2="135"/>
+      <line x1="235" y1="237" x2="235" y2="255"/>
+      <line x1="193" y1="195" x2="175" y2="195"/>
+      <line x1="277" y1="195" x2="295" y2="195"/>
+    </g>
+  </g>
+  <!-- Bursting coins -->
+  <g fill="#e2fea5" fill-opacity="0.92" stroke="#0b0b0b" stroke-width="3">
+    <circle cx="110" cy="110" r="20"/>
+    <circle cx="360" cy="120" r="16"/>
+    <circle cx="340" cy="250" r="22"/>
+    <circle cx="120" cy="250" r="14"/>
+  </g>
+  <g fill="#0b0b0b" font-family="Arial Black, sans-serif" font-weight="900">
+    <text x="101" y="118" font-size="20">B</text>
+    <text x="332" y="258" font-size="22">B</text>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="Blobbie">
+  <!-- Disc frame -->
+  <circle cx="120" cy="120" r="116" fill="#f8ffe8" stroke="#0b0b0b" stroke-width="8"/>
+  <g stroke="#0b0b0b" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Head + jowls -->
+    <path d="M120 36 C76 36 50 70 50 110 C50 158 72 204 120 204 C168 204 190 158 190 110 C190 70 164 36 120 36 Z" fill="#f3c6a3"/>
+    <!-- Brow ridge -->
+    <path d="M70 96 C84 86 104 86 116 94" fill="none"/>
+    <path d="M170 96 C156 86 136 86 124 94" fill="none"/>
+    <!-- Eyes (half-closed, grumpy) -->
+    <path d="M74 108 C82 100 104 100 112 110 C104 118 82 120 74 112 Z" fill="#ffffff"/>
+    <path d="M128 110 C136 100 158 100 166 108 C158 120 136 118 128 112 Z" fill="#ffffff"/>
+    <!-- Heavy upper lids -->
+    <path d="M74 108 C82 100 104 100 112 110" fill="none" stroke-width="7"/>
+    <path d="M128 110 C136 100 158 100 166 108" fill="none" stroke-width="7"/>
+    <!-- Pupils looking down -->
+    <circle cx="92" cy="114" r="5" fill="#0b0b0b" stroke="none"/>
+    <circle cx="146" cy="114" r="5" fill="#0b0b0b" stroke="none"/>
+    <!-- Nose -->
+    <path d="M118 116 C112 132 108 144 116 150 C122 154 128 152 130 146" fill="none"/>
+    <!-- Big droopy mustache -->
+    <path d="M120 150
+      C108 150 96 150 84 158
+      C70 166 64 182 78 186
+      C92 190 108 178 120 168
+      C132 178 148 190 162 186
+      C176 182 170 166 156 158
+      C144 150 132 150 120 150 Z" fill="#9e3b2e"/>
+    <!-- Moustache center dip -->
+    <path d="M120 152 C118 158 118 164 120 168" fill="none" stroke-width="4"/>
+    <!-- Cheek moles -->
+    <circle cx="168" cy="146" r="3.5" fill="#0b0b0b" stroke="none"/>
+    <circle cx="176" cy="158" r="3" fill="#0b0b0b" stroke="none"/>
+  </g>
+</svg>

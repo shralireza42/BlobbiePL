@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Normal text: Bricolage Grotesque, Bold Italic, cream on charcoal */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-style: italic;
+  background-color: #1c1d22;
+  color: #e8edda;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Bold / heading text: Dela Gothic One (upright) */
+h1,
+h2,
+h3,
+h4,
+h5,
+.font-display {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: #e8edda;
+}
+
+/* H6 = normal text style per brand spec */
+h6 {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-weight: 700;
+}
+
+@layer components {
+  .container-px {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Brand display text (legacy .neon-text usages render as bright cream) */
+  .neon-text {
+    @apply bg-gradient-to-r from-cream via-accent-lime to-cream bg-clip-text text-transparent;
+  }
+
+  .card {
+    @apply rounded-3xl border border-cream/10 bg-bg-card shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:border-cream/25 hover:-translate-y-0.5;
+  }
+
+  /* Buttons: pill "sticker" — pale fill, black text, black border, hard shadow */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border-2 border-ink px-6 py-3 text-sm font-extrabold not-italic transition-all duration-150 active:translate-x-[2px] active:translate-y-[3px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50;
+    font-family: var(--font-display);
+  }
+
+  .btn-primary {
+    @apply btn bg-butter text-ink shadow-sticker hover:-translate-y-0.5;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent-lime text-ink shadow-sticker hover:-translate-y-0.5;
+  }
+
+  /* Ghost on dark backgrounds: cream outline + cream text (no black) */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border-2 border-cream/40 bg-transparent px-6 py-3 text-sm font-extrabold not-italic text-cream transition-all duration-150 hover:border-cream hover:bg-cream/5 disabled:cursor-not-allowed disabled:opacity-50;
+    font-family: var(--font-display);
+  }
+
+  /* Ink button: black sticker with cream text (e.g. hamburger / icon buttons) */
+  .btn-ink {
+    @apply inline-flex items-center justify-center rounded-pill border-2 border-ink bg-ink text-paper transition-all duration-150 hover:brightness-110;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill border px-3 py-1 text-xs font-bold not-italic;
+    font-family: var(--font-sans);
+  }
+
+  .stat-label {
+    @apply text-xs uppercase not-italic tracking-wider text-cream-dim;
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-cream/15 bg-bg-soft px-4 py-3 text-sm not-italic text-cream outline-none transition focus:border-cream/50 focus:ring-2 focus:ring-cream/15;
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-2xl bg-cream/5;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-cream/10 to-transparent;
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 237, 218, 0.25);
+  border-radius: 9999px;
+}
