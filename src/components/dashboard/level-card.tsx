@@ -84,7 +84,7 @@ export function LevelCard() {
       <div className="mt-6">
         <p className="stat-label">Character ladder</p>
         <div className="mt-2 flex flex-wrap gap-2">
-          {Array.from({ length: MAX_LEVEL + 1 }, (_, lvl) => {
+          {Array.from({ length: MAX_LEVEL }, (_, i) => i + 1).map((lvl) => {
             const reached = lvl <= data.level;
             return (
               <span
