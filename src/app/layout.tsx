@@ -52,6 +52,8 @@ export const metadata: Metadata = {
     description: "Daily Rewards Draw + Airdrop Hub on BNB Chain.",
   },
   robots: { index: true, follow: true },
+  // Favicon is editable at /public/favicon.svg.
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg", apple: "/favicon.svg" },
 };
 
 export const viewport: Viewport = {

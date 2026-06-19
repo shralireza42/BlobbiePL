@@ -14,9 +14,9 @@ const NAV_LINKS = [
 ];
 
 const SOCIALS = [
-  { label: "Discord", href: "#", icon: DiscordIcon },
-  { label: "Telegram", href: "#", icon: TelegramIcon },
-  { label: "X", href: "#", icon: XIcon },
+  { label: "Discord", href: "https://discord.com/invite/FVKsFSWMq6", icon: DiscordIcon },
+  { label: "Telegram", href: "https://t.me/itsBlobbie", icon: TelegramIcon },
+  { label: "X", href: "https://x.com/xBlobbie", icon: XIcon },
 ];
 
 export function SiteNav() {
@@ -57,8 +57,10 @@ export function SiteNav() {
               <a
                 key={label}
                 href={href}
+                target="_blank"
+                rel="noreferrer"
                 aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-ink transition hover:bg-ink/10"
+                className="flex h-12 w-12 items-center justify-center rounded-full text-ink transition hover:bg-ink/10"
               >
                 <Icon />
               </a>
@@ -109,7 +111,7 @@ export function SiteNav() {
 
 function DiscordIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19.5 5.3A16 16 0 0 0 15.6 4l-.2.4a12 12 0 0 1 3.4 1.7 11 11 0 0 0-9.6 0A12 12 0 0 1 12.6 4l-.2-.4A16 16 0 0 0 4.5 5.3 16.5 16.5 0 0 0 2 16.4a16 16 0 0 0 4.9 2.5l.4-.6a10 10 0 0 1-1.6-.8l.4-.3a11.5 11.5 0 0 0 9.8 0l.4.3a10 10 0 0 1-1.6.8l.4.6A16 16 0 0 0 22 16.4a16.5 16.5 0 0 0-2.5-11.1ZM9 14c-.8 0-1.4-.7-1.4-1.6S8.2 10.8 9 10.8s1.4.7 1.4 1.6S9.8 14 9 14Zm6 0c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6S15.8 14 15 14Z" />
     </svg>
   );
@@ -117,7 +119,7 @@ function DiscordIcon() {
 
 function TelegramIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.8.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2L6.4 13.3l-4.7-1.5c-1-.3-1-1 .2-1.5l18.4-7.1c.9-.3 1.6.2 1.6 1.1Z" />
     </svg>
   );
@@ -125,7 +127,7 @@ function TelegramIcon() {
 
 function XIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M18.2 2H21l-6.6 7.5L22 22h-6.2l-4.8-6.3L5.5 22H2.7l7-8L2 2h6.3l4.4 5.8L18.2 2Zm-2.2 18h1.7L7.9 3.8H6.1L16 20Z" />
     </svg>
   );
