@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "node scripts/with-env.mjs prisma migrate dev",
     "prisma:deploy": "node scripts/with-env.mjs prisma migrate deploy",

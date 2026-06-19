@@ -125,28 +125,8 @@ export const AIRDROP_TASKS = [
     requiresAdmin: true,
     sortOrder: 7,
   },
-  {
-    key: "follow_x",
-    title: "Follow on X",
-    description:
-      "Follow @Blobbie on X. Verified before points are awarded — no fake claims.",
-    points: 40,
-    type: "ONE_TIME",
-    status: "ACTIVE",
-    requiresAdmin: true,
-    sortOrder: 8,
-  },
-  {
-    key: "join_telegram",
-    title: "Join Telegram",
-    description:
-      "Join the Blobbie Telegram. Verified automatically via Telegram before points are awarded.",
-    points: 40,
-    type: "ONE_TIME",
-    status: "ACTIVE",
-    requiresAdmin: true,
-    sortOrder: 9,
-  },
+  // Note: Follow on X and Join Telegram are handled by the dedicated Social
+  // Tasks system (see src/lib/social/* and the Social Tasks UI), not here.
 ] as const;
 
 export type AirdropTaskKey = (typeof AIRDROP_TASKS)[number]["key"];

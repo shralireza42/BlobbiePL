@@ -12,8 +12,10 @@ const AIRDROP_TASKS = [
   { key: "return_daily", title: "Return Daily", description: "Check in once every 24 hours to keep your streak.", points: 20, type: "DAILY", status: "ACTIVE", requiresAdmin: false, sortOrder: 5 },
   { key: "referral", title: "Invite a Friend", description: "Referral rewards arrive with the Referrals module.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 6 },
   { key: "minigames", title: "Play a Mini-Game", description: "Blobbie Dash, Blast & Stack arrive soon.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 7 },
-  { key: "follow_x", title: "Follow on X", description: "Follow @Blobbie on X. Verified before points are awarded — no fake claims.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 8 },
-  { key: "join_telegram", title: "Join Telegram", description: "Join the Blobbie Telegram. Verified automatically via Telegram before points are awarded.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 9 },
+  // Social tasks (verified via X OAuth / Telegram). Points are env-configurable.
+  { key: "follow_x", title: "Follow @xBlobbie on X", description: "Connect your X account and follow @xBlobbie to verify.", points: Number(process.env.AIRDROP_X_FOLLOW_POINTS) || 100, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 20 },
+  { key: "join_telegram", title: "Join the Blobbie Telegram", description: "Connect Telegram and join the official channel to verify.", points: Number(process.env.AIRDROP_TELEGRAM_JOIN_POINTS) || 75, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 21 },
+  { key: "bonus_social", title: "Social Bonus", description: "Complete both social tasks to unlock a one-time bonus.", points: Number(process.env.AIRDROP_BONUS_SOCIAL_POINTS) || 50, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 22 },
 ] as const;
 
 async function main() {

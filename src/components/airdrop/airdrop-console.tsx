@@ -8,7 +8,7 @@ import { getJson, postJson } from "@/lib/client-api";
 import { shortenAddress } from "@/lib/format";
 import { WalletButton } from "@/components/wallet-button";
 import { Disclaimer, Skeleton } from "@/components/ui";
-import { TelegramVerify, telegramWidgetEnabled } from "@/components/airdrop/telegram-verify";
+import { SocialTasks } from "@/components/airdrop/social-tasks";
 import { AIRDROP_DISCLAIMER } from "@/lib/constants";
 import { ROUTES } from "@/lib/routes";
 
@@ -118,6 +118,8 @@ export function AirdropConsole() {
         </>
       )}
 
+      {profile.connected && <SocialTasks onChange={() => refetch()} />}
+
       <Leaderboard />
 
       <div className="card flex flex-wrap items-center justify-between gap-3 p-6">
@@ -171,14 +173,9 @@ function TaskList({
   );
 }
 
-const SOCIAL_TASKS = new Set(["follow_x", "join_telegram"]);
-
 function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-
-  const isSocial = task.status === "ACTIVE" && SOCIAL_TASKS.has(task.key);
-  const showTelegramWidget = task.key === "join_telegram" && telegramWidgetEnabled();
 
   const disabled =
     loading || task.completed || task.status !== "ACTIVE" || task.pending;
@@ -186,22 +183,8 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
   async function claim() {
     setLoading(true);
     setMsg(null);
-    // Social tasks go through verification (never auto-awarded on a click).
-    const endpoint = isSocial ? "/api/airdrop/verify" : "/api/airdrop/claim";
-    const res = await postJson<{ message: string }>(endpoint, {
+    const res = await postJson<{ message: string }>("/api/airdrop/claim", {
       taskKey: task.key,
-    });
-    setLoading(false);
-    setMsg(res.data?.message ?? res.error ?? null);
-    onChange();
-  }
-
-  async function verifyTelegram(data: Record<string, unknown>) {
-    setLoading(true);
-    setMsg(null);
-    const res = await postJson<{ message: string }>("/api/airdrop/verify", {
-      taskKey: "join_telegram",
-      telegram: data,
     });
     setLoading(false);
     setMsg(res.data?.message ?? res.error ?? null);
@@ -216,11 +199,6 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
           {task.type === "DAILY" && (
             <span className="chip border-neon-blue/30 bg-neon-blue/10 text-neon-blue">
               Daily
-            </span>
-          )}
-          {isSocial && (
-            <span className="chip border-neon-blue/30 bg-neon-blue/10 text-neon-blue">
-              Verified
             </span>
           )}
           {task.status === "COMING_SOON" && (
@@ -244,17 +222,9 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
           <span className="chip border-gold/30 bg-gold/10 text-gold">
             Pending review
           </span>
-        ) : showTelegramWidget ? (
-          <TelegramVerify onAuth={verifyTelegram} />
         ) : (
           <button className="btn-ghost px-4 py-2" disabled={disabled} onClick={claim}>
-            {loading
-              ? "…"
-              : task.status !== "ACTIVE"
-                ? "Soon"
-                : isSocial
-                  ? "Verify"
-                  : "Claim"}
+            {loading ? "…" : task.status === "ACTIVE" ? "Claim" : "Soon"}
           </button>
         )}
       </div>

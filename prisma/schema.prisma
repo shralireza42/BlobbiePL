@@ -33,9 +33,64 @@ model User {
   completions    AirdropCompletion[]
   fraudFlags     FraudFlag[]
   activities     ActivityLog[]
+  socialAccounts SocialAccount[]
+  userTasks      UserAirdropTask[]
 
   @@index([wallet])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Social accounts + social task state (X / Telegram)
+// ---------------------------------------------------------------------------
+
+enum SocialProvider {
+  X
+  TELEGRAM
+}
+
+enum SocialTaskStatus {
+  NOT_STARTED
+  CONFIRMED
+  FAILED
+}
+
+model SocialAccount {
+  id                    String         @id @default(cuid())
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+  provider              SocialProvider
+  providerUserId        String
+  username              String?
+  accessTokenEncrypted  String?        @db.Text
+  refreshTokenEncrypted String?        @db.Text
+  connectedAt           DateTime       @default(now())
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  // One account can belong to only one user; one provider per user.
+  @@unique([provider, providerUserId])
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model UserAirdropTask {
+  id            String           @id @default(cuid())
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  task          AirdropTask      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId        String
+  status        SocialTaskStatus @default(NOT_STARTED)
+  confirmedAt   DateTime?
+  failedAt      DateTime?
+  failedReason  String?
+  lastCheckedAt DateTime?
+  checkCount    Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([userId, taskId])
+  @@index([userId])
 }
 
 // ---------------------------------------------------------------------------
@@ -179,6 +234,8 @@ model AirdropTask {
   sortOrder   Int        @default(0)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  userTasks   UserAirdropTask[]
 
   completions AirdropCompletion[]
 

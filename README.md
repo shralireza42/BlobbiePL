@@ -188,19 +188,43 @@ and `src/lib/contracts/abi.ts`:
 - The Daily Rewards Draw page shows each connected wallet its **win chance**,
   **estimated winnings** and **top prize** at the current scale.
 
-## Airdrop task verification (anti-fake)
+## Airdrop Social Tasks (X + Telegram)
 
-Social tasks (Follow on X, Join Telegram) are **never awarded on a click**. They
-require verification:
+A dedicated, verified social-tasks system. Tasks are **never confirmed on a
+click** — points are granted only after real verification, transactionally and
+idempotently, and flow into the shared points system (`AirdropUser.totalPoints`
++ `AirdropPointsLedger`), so levels/leaderboard/dashboard stay consistent.
 
-- **Telegram** — when `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` +
-  `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` are set, the Telegram Login Widget signs the
-  user in and the server verifies the payload **and** group membership
-  (`getChatMember`) before awarding.
-- **X (Twitter)** — when `X_BEARER_TOKEN` + `X_TARGET_USER_ID` are set the server
-  checks the follow via the X API (OAuth follow-check scaffolded).
-- When a provider is **not configured**, the task falls back to **admin review**
-  (pending) — so points can never be claimed for a fake follow/join.
+Rewards (env-configurable): **FOLLOW_X = 100**, **JOIN_TELEGRAM = 75**,
+**BONUS_SOCIAL = 50** (one-time, auto-granted once both are confirmed).
+
+- **X (Twitter)** — official **OAuth 2.0 Authorization Code + PKCE**
+  (`tweet.read users.read follows.read offline.access`). Connect at
+  `GET /api/social/x/connect` → `GET /api/social/x/callback` (stores the X user
+  id + username, tokens AES-256-GCM encrypted at rest). Verify at
+  `POST /api/airdrop/tasks/follow-x/verify` which checks the follow of
+  `@X_BLOBBIE_USERNAME` (resolved via `X_BLOBBIE_USER_ID` or the API).
+- **Telegram** — Telegram Login Widget (server validates the signed hash with
+  `TELEGRAM_BOT_TOKEN`) + membership via `getChatMember` on `TELEGRAM_CHAT_ID`
+  (valid: creator/administrator/member/restricted). Verify at
+  `POST /api/airdrop/tasks/join-telegram/verify`.
+- `GET /api/social/status` powers the UI (connection + per-task status).
+- **Fail-closed:** if credentials are missing, rate-limited or unavailable, the
+  task is **not** confirmed and the UI shows a retry/unavailable message.
+
+**Models:** `SocialAccount` (1 account ↔ 1 user, 1 provider per user, encrypted
+tokens) and `UserAirdropTask` (status/checkCount/failedReason). Uniqueness +
+idempotency are enforced by DB constraints and status checks inside a
+transaction. Pure, unit-tested logic lives in `src/lib/social/pure.ts`
+(`npm test`).
+
+Required env (see `env.example`): `ENABLE_X_VERIFICATION`,
+`ENABLE_TELEGRAM_VERIFICATION`, `X_CLIENT_ID`, `X_CLIENT_SECRET`,
+`X_REDIRECT_URI`, `X_BEARER_TOKEN`, `X_BLOBBIE_USERNAME`, `X_BLOBBIE_USER_ID`,
+`X_API_BASE_URL`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`,
+`TELEGRAM_CHAT_ID`, `TELEGRAM_CHANNEL_URL`, `AIRDROP_X_FOLLOW_POINTS`,
+`AIRDROP_TELEGRAM_JOIN_POINTS`, `AIRDROP_BONUS_SOCIAL_POINTS`,
+optional `SOCIAL_ENCRYPTION_KEY`.
 
 ---
 
