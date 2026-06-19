@@ -7,7 +7,7 @@ import { useBlobbieBalance } from "@/hooks/useBlobbieBalance";
 import { useCountdown } from "@/hooks/useCountdown";
 import { getJson, postJson } from "@/lib/client-api";
 import { formatUsd, formatNumber, formatCountdown, shortenAddress } from "@/lib/format";
-import { ROUND_STATUS_LABELS, MAX_TICKETS_PER_TX } from "@/lib/constants";
+import { ROUND_STATUS_LABELS, MAX_TICKETS_PER_TX, MAX_TICKETS_PER_USER } from "@/lib/constants";
 import { bscScanTx } from "@/lib/config";
 import { WalletButton } from "@/components/wallet-button";
 
@@ -96,6 +96,9 @@ export function DrawConsole() {
         <PurchasePanel
           data={data}
           canBuy={isConnected && !wrongNetwork && session.authenticated}
+          balance={balance}
+          tokenConfigured={tokenConfigured}
+          isOwner={session.role === "OWNER"}
           onPurchased={() => {
             // Server records the entry; refetch to reflect new counts.
             refetch();
@@ -348,13 +351,31 @@ function PurchasePanel({
   data,
   canBuy,
   onPurchased,
+  balance,
+  tokenConfigured,
+  isOwner,
 }: {
   data: CurrentResponse;
   canBuy: boolean;
   onPurchased: (count: number) => void;
+  balance: number | null;
+  tokenConfigured: boolean;
+  isOwner: boolean;
 }) {
   const [count, setCount] = useState(1);
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
+
+  // Per-round caps: 50 tickets/user (300 for owners), and never beyond 300 total.
+  const perUserCap = isOwner ? MAX_TICKETS_PER_TX : MAX_TICKETS_PER_USER;
+  const userRemaining = Math.max(0, perUserCap - data.userTickets);
+  const roundRemaining = Math.max(0, data.round.capacity - data.round.totalTickets);
+  const maxAllowed = Math.max(0, Math.min(userRemaining, roundRemaining));
+
+  // How many tickets the user's $BLOBBIE balance can cover (1 ticket = $1).
+  const affordable =
+    tokenConfigured && balance !== null && data.price.usd > 0
+      ? Math.floor(balance * data.price.usd)
+      : 0;
 
   const { data: quote } = useQuery({
     queryKey: ["draw-quote", count],
@@ -423,8 +444,11 @@ function PurchasePanel({
         </p>
       )}
 
-      <label className="mt-4 block text-xs uppercase tracking-wider text-cream-dim">
-        Ticket quantity
+      <label className="mt-4 flex items-center justify-between text-xs uppercase tracking-wider text-cream-dim">
+        <span>Ticket quantity</span>
+        <span className="not-italic normal-case">
+          Max {maxAllowed} ({isOwner ? "owner" : `${MAX_TICKETS_PER_USER}/round`})
+        </span>
       </label>
       <div className="mt-2 flex items-center gap-2">
         <button
@@ -436,22 +460,37 @@ function PurchasePanel({
         <input
           type="number"
           min={1}
-          max={MAX_TICKETS_PER_TX}
+          max={maxAllowed || 1}
           value={count}
           onChange={(e) =>
             setCount(
-              Math.max(1, Math.min(MAX_TICKETS_PER_TX, Number(e.target.value) || 1)),
+              Math.max(
+                1,
+                Math.min(maxAllowed || 1, Number(e.target.value) || 1),
+              ),
             )
           }
           className="input text-center"
         />
         <button
           className="btn-ghost px-3 py-2"
-          onClick={() => setCount((c) => Math.min(MAX_TICKETS_PER_TX, c + 1))}
+          onClick={() => setCount((c) => Math.min(maxAllowed || 1, c + 1))}
         >
           +
         </button>
       </div>
+
+      {tokenConfigured && (
+        <button
+          className="btn-ghost mt-2 w-full py-2 text-sm disabled:opacity-50"
+          disabled={affordable < 1 || maxAllowed < 1}
+          onClick={() => setCount(Math.max(1, Math.min(affordable, maxAllowed)))}
+        >
+          {balance === null
+            ? "Loading $BLOBBIE balance…"
+            : `Use my $BLOBBIE — ${formatNumber(balance, 0)} ≈ ${affordable} ticket${affordable === 1 ? "" : "s"}`}
+        </button>
+      )}
 
       <div className="mt-4 space-y-2 rounded-xl border border-cream/10 bg-cream/5 p-4 text-sm">
         <Row label="USD equivalent" value={formatUsd(quote?.usd ?? count)} />

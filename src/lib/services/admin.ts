@@ -4,6 +4,7 @@ import { getOrCreateCampaign } from "./airdrop";
 import { listStaff } from "./staff";
 import { listSanctions } from "./moderation";
 import { getFeatures } from "./features";
+import { getReferralAnalytics } from "./referral";
 
 const ACTIVE_WINDOW_MS = 15 * 60 * 1000;
 
@@ -22,6 +23,7 @@ export async function getAdminOverview() {
       staff: [],
       sanctions: [],
       features: await getFeatures(),
+      referrals: { totalReferrals: 0, topReferrers: [] },
     };
   }
 
@@ -91,18 +93,20 @@ export async function getAdminOverview() {
   for (const row of appConfigRows) appConfig[row.key] = row.value;
 
   const activeSince = new Date(Date.now() - ACTIVE_WINDOW_MS);
-  const [activeUsers, activeCount, staff, sanctions, features] = await Promise.all([
-    prisma.user.findMany({
-      where: { lastSeenAt: { gte: activeSince } },
-      orderBy: { lastSeenAt: "desc" },
-      take: 50,
-      select: { wallet: true, lastSeenAt: true, createdAt: true },
-    }),
-    prisma.user.count({ where: { lastSeenAt: { gte: activeSince } } }),
-    listStaff(),
-    listSanctions(100),
-    getFeatures(),
-  ]);
+  const [activeUsers, activeCount, staff, sanctions, features, referrals] =
+    await Promise.all([
+      prisma.user.findMany({
+        where: { lastSeenAt: { gte: activeSince } },
+        orderBy: { lastSeenAt: "desc" },
+        take: 50,
+        select: { wallet: true, lastSeenAt: true, createdAt: true },
+      }),
+      prisma.user.count({ where: { lastSeenAt: { gte: activeSince } } }),
+      listStaff(),
+      listSanctions(100),
+      getFeatures(),
+      getReferralAnalytics(20),
+    ]);
 
   return {
     hasDatabase: true,
@@ -124,6 +128,7 @@ export async function getAdminOverview() {
     staff,
     sanctions,
     features,
+    referrals,
   };
 }
 

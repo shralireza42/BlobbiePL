@@ -133,14 +133,27 @@ export async function recordEntry(args: {
   ticketCount: number;
   txHash?: string | null;
   mockMode: boolean;
+  maxPerUser: number;
 }) {
   if (!hasDatabase) {
     // No database — track in the in-memory mock store so counts update live.
     const round = await getDrawProvider().getCurrentRound();
-    addMockEntry(round.roundNumber, args.wallet, args.ticketCount);
+    const held = getMockUserTickets(round.roundNumber, args.wallet);
+    const userRemaining = Math.max(0, args.maxPerUser - held);
+    if (userRemaining <= 0) {
+      return {
+        recorded: false,
+        accepted: 0,
+        message: `You've reached your ${args.maxPerUser}-ticket limit for this round.`,
+        roundNumber: round.roundNumber,
+      };
+    }
+    const remaining = Math.max(0, round.capacity - round.totalTickets);
+    const accepted = Math.min(args.ticketCount, userRemaining, remaining || args.ticketCount);
+    addMockEntry(round.roundNumber, args.wallet, accepted);
     return {
       recorded: true,
-      accepted: args.ticketCount,
+      accepted,
       message: "Tickets purchased.",
       roundNumber: round.roundNumber,
     };
@@ -148,7 +161,7 @@ export async function recordEntry(args: {
 
   // DB-backed lifecycle: the engine validates the round is open, clamps to the
   // remaining capacity, records the entry, and auto-settles when full.
-  const res = await addTickets(args.wallet, args.ticketCount, args.mockMode);
+  const res = await addTickets(args.wallet, args.ticketCount, args.mockMode, args.maxPerUser);
   return {
     recorded: res.ok,
     accepted: res.accepted,

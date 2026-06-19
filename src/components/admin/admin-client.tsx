@@ -63,6 +63,10 @@ type Overview = {
     minigamesEnabled: boolean;
     ticketPurchaseEnabled: boolean;
   };
+  referrals: {
+    totalReferrals: number;
+    topReferrers: { wallet: string; count: number; points: number }[];
+  };
   me: {
     wallet: string;
     role: string | null;
@@ -148,6 +152,16 @@ export function AdminClient() {
         <StaffPanel
           staff={data.staff}
           grantable={data.me?.grantableRoles ?? []}
+          onChange={refetch}
+        />
+      )}
+
+      {can(data, "MANAGE_ROLES") && <LevelPanel onChange={refetch} />}
+
+      {can(data, "VIEW_USERS") && (
+        <ReferralAdminPanel
+          referrals={data.referrals}
+          canCredit={can(data, "MANAGE_ROLES")}
           onChange={refetch}
         />
       )}
@@ -525,6 +539,90 @@ function Users({
             <span key="c">{new Date(u.createdAt).toLocaleDateString()}</span>,
             <span key="l">{new Date(u.lastSeenAt).toLocaleDateString()}</span>,
             ...(canBan ? [<BanButtons key="b" wallet={u.wallet} onChange={onChange} />] : []),
+          ])}
+        />
+      )}
+    </Section>
+  );
+}
+
+function LevelPanel({ onChange }: { onChange: () => void }) {
+  const [wallet, setWallet] = useState("");
+  const [level, setLevel] = useState("10");
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <Section title="Set User Level">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <input className="input flex-1" placeholder="0x… wallet" value={wallet} onChange={(e) => setWallet(e.target.value)} />
+        <select className="input sm:w-32" value={level} onChange={(e) => setLevel(e.target.value)}>
+          {Array.from({ length: 11 }, (_, i) => (
+            <option key={i} value={String(i)}>Level {i}</option>
+          ))}
+          <option value="">Clear (auto)</option>
+        </select>
+        <button
+          className="btn-accent"
+          onClick={async () => {
+            const res = await postJson("/api/admin/level", {
+              wallet,
+              level: level === "" ? null : Number(level),
+            });
+            setMsg(res.ok ? "Saved." : res.error ?? "Failed");
+            if (res.ok) onChange();
+          }}
+        >
+          Set level
+        </button>
+      </div>
+      {msg && <p className="mt-2 text-xs not-italic text-cream-dim">{msg}</p>}
+      <p className="mt-2 text-xs not-italic text-cream-dim">
+        Overrides the points-based level. Owners are always level 10.
+      </p>
+    </Section>
+  );
+}
+
+function ReferralAdminPanel({
+  referrals,
+  canCredit,
+  onChange,
+}: {
+  referrals: Overview["referrals"];
+  canCredit?: boolean;
+  onChange: () => void;
+}) {
+  const [referrer, setReferrer] = useState("");
+  const [referee, setReferee] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <Section title={`Referrals — ${referrals.totalReferrals} total`}>
+      {canCredit && (
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+          <input className="input flex-1" placeholder="Referrer 0x…" value={referrer} onChange={(e) => setReferrer(e.target.value)} />
+          <input className="input flex-1" placeholder="Friend 0x…" value={referee} onChange={(e) => setReferee(e.target.value)} />
+          <button
+            className="btn-accent"
+            onClick={async () => {
+              const res = await postJson("/api/admin/referral", { referrer, referee });
+              setMsg(res.ok ? "Credited." : res.error ?? "Failed");
+              if (res.ok) { setReferrer(""); setReferee(""); onChange(); }
+            }}
+          >
+            Credit referral
+          </button>
+        </div>
+      )}
+      {msg && <p className="mb-2 text-xs not-italic text-cream-dim">{msg}</p>}
+      {referrals.topReferrers.length === 0 ? (
+        <Empty>No referrals yet.</Empty>
+      ) : (
+        <Table
+          headers={["Rank", "Referrer", "Friends", "Points"]}
+          rows={referrals.topReferrers.map((r, i) => [
+            <span key="r">#{i + 1}</span>,
+            <span key="w" className="font-mono">{shortenAddress(r.wallet, 5)}</span>,
+            <span key="c">{r.count}</span>,
+            <span key="p">{r.points}</span>,
           ])}
         />
       )}

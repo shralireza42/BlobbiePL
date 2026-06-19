@@ -20,6 +20,9 @@ model User {
   ensName       String?
   displayName   String?
   avatarUrl     String?  @db.Text
+  referralCode  String?  @unique
+  referredBy    String? // referrer wallet
+  levelOverride Int? // admin-set level (overrides points-based level)
   ipHash        String?
   deviceHash    String?
   firstSeenAt   DateTime @default(now())
@@ -81,6 +84,20 @@ model Sanction {
   @@index([wallet])
   @@index([scope])
   @@index([liftedAt])
+}
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerWallet String
+  refereeWallet String   @unique
+  code          String
+  referrerPoints Int     @default(0)
+  refereePoints  Int     @default(0)
+  source        String   @default("link") // "link" | "admin"
+  createdAt     DateTime @default(now())
+
+  @@index([referrerWallet])
+  @@index([createdAt])
 }
 
 enum SocialProvider {

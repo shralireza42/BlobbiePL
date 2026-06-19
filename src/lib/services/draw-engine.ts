@@ -278,6 +278,7 @@ export async function addTickets(
   wallet: string,
   count: number,
   mock: boolean,
+  maxPerUser: number,
 ): Promise<{ ok: boolean; message: string; accepted: number; roundNumber?: number }> {
   const lowered = wallet.toLowerCase();
   return prisma.$transaction(async (tx) => {
@@ -289,20 +290,32 @@ export async function addTickets(
     if (remaining <= 0) {
       return { ok: false, message: "This round is full.", accepted: 0 };
     }
-    const accepted = Math.min(count, remaining);
 
     const user = await tx.user.upsert({
       where: { wallet: lowered },
       update: { lastSeenAt: new Date() },
       create: { wallet: lowered },
     });
-    const price = await getBlobbiePrice();
-    const usdValue = accepted * 1;
-    const blobbieSpent = price.usd > 0 ? Math.round(usdValue / price.usd) : 0;
 
     const existing = await tx.drawEntry.findUnique({
       where: { roundId_userId: { roundId: round.id, userId: user.id } },
     });
+
+    // Enforce the per-user round cap (e.g. 50 tickets; 300 for owners).
+    const userHeld = existing?.ticketCount ?? 0;
+    const userRemaining = Math.max(0, maxPerUser - userHeld);
+    if (userRemaining <= 0) {
+      return {
+        ok: false,
+        message: `You've reached your ${maxPerUser}-ticket limit for this round.`,
+        accepted: 0,
+      };
+    }
+
+    const accepted = Math.min(count, remaining, userRemaining);
+    const price = await getBlobbiePrice();
+    const usdValue = accepted * 1;
+    const blobbieSpent = price.usd > 0 ? Math.round(usdValue / price.usd) : 0;
     if (existing) {
       await tx.drawEntry.update({
         where: { id: existing.id },

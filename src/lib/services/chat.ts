@@ -24,16 +24,24 @@ const globalForChat = globalThis as unknown as {
 };
 const buffer = (globalForChat.chatBuffer ??= []);
 
-/** Resolve a wallet's current Blobbie level (points-based, mock fallback). */
+/** Resolve a wallet's current Blobbie level (owner=10, override, then points). */
 export async function resolveLevel(wallet: string): Promise<number> {
   const lowered = wallet.toLowerCase();
+  if (isAdminWallet(lowered)) return 10;
   if (hasDatabase) {
     try {
-      const airdropUser = await prisma.airdropUser.findFirst({
-        where: { wallet: lowered },
-        orderBy: { totalPoints: "desc" },
-        select: { totalPoints: true },
-      });
+      const [airdropUser, user] = await Promise.all([
+        prisma.airdropUser.findFirst({
+          where: { wallet: lowered },
+          orderBy: { totalPoints: "desc" },
+          select: { totalPoints: true },
+        }),
+        prisma.user.findUnique({
+          where: { wallet: lowered },
+          select: { levelOverride: true },
+        }),
+      ]);
+      if (user?.levelOverride != null) return user.levelOverride;
       return levelFromPoints(airdropUser?.totalPoints ?? 0);
     } catch {
       // fall through to mock

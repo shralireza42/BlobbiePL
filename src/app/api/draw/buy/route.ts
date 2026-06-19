@@ -6,7 +6,9 @@ import { recordEntry } from "@/lib/services/draw";
 import { claimTask } from "@/lib/services/airdrop";
 import { isSiteBanned } from "@/lib/services/moderation";
 import { getFeatures } from "@/lib/services/features";
+import { getStaffRole } from "@/lib/services/staff";
 import { config } from "@/lib/config";
+import { MAX_TICKETS_PER_USER, MAX_TICKETS_PER_OWNER } from "@/lib/constants";
 import { rateLimit, clientIdentifier } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
@@ -45,12 +47,17 @@ export async function POST(req: Request) {
 
     const provider = getDrawProvider();
 
+    // Owners may buy the whole round; everyone else is capped at 50 per round.
+    const role = await getStaffRole(session.wallet);
+    const maxPerUser = role === "OWNER" ? MAX_TICKETS_PER_OWNER : MAX_TICKETS_PER_USER;
+
     // Persist the entry first (validates the round is open / not in cooldown).
     const entry = await recordEntry({
       wallet: session.wallet,
       ticketCount: input.ticketCount,
       txHash: mock ? null : input.txHash ?? null,
       mockMode: mock,
+      maxPerUser,
     });
 
     if (entry.recorded === false) {
