@@ -113,16 +113,8 @@ export const AIRDROP_TASKS = [
     requiresAdmin: false,
     sortOrder: 5,
   },
-  {
-    key: "referral",
-    title: "Invite a Friend",
-    description: "Referral rewards arrive with the Referrals module.",
-    points: 0,
-    type: "MANUAL",
-    status: "COMING_SOON",
-    requiresAdmin: true,
-    sortOrder: 6,
-  },
+  // "Invite a Friend" is now a live feature — see the Referrals panel
+  // (src/components/referral-panel.tsx), not a Coming Soon task.
   {
     key: "minigames",
     title: "Play a Mini-Game",
