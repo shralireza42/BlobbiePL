@@ -19,6 +19,7 @@ const RAW = {
   enableTicketPurchase: process.env.NEXT_PUBLIC_ENABLE_TICKET_PURCHASE,
   mockPriceUsd: process.env.NEXT_PUBLIC_MOCK_BLOBBIE_PRICE_USD,
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  telegramBotUsername: process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME,
 };
 
 const chainId = Number(RAW.chainId ?? 97);
@@ -54,6 +55,7 @@ export const config = {
   ticketPurchaseEnabled: RAW.enableTicketPurchase !== "false",
   mockPriceUsd: Number(RAW.mockPriceUsd ?? 0.0025),
   siteUrl: RAW.siteUrl || "http://localhost:3000",
+  telegramBotUsername: RAW.telegramBotUsername || "",
 } as const;
 
 export type AppConfig = typeof config;

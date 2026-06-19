@@ -4,6 +4,7 @@ import { getBlobbiePrice } from "@/lib/price";
 import { getSession } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { isMockMode } from "@/lib/contracts";
+import { computeOdds } from "@/lib/prizes";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +19,14 @@ export async function GET() {
       ? await getUserTicketsForCurrentRound(session.wallet)
       : 0;
 
+    // realTickets = eligible tickets sold (capped at capacity in the service).
+    const odds = computeOdds(round.totalTickets, userTickets);
+
     return ok({
       round,
       price,
       userTickets,
+      odds,
       isMockMode: isMockMode(),
       ticketPurchaseEnabled: config.ticketPurchaseEnabled,
       tokenConfigured: !!config.addresses.token,

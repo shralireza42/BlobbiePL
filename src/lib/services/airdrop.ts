@@ -329,6 +329,120 @@ export async function claimTask(
   });
 }
 
+/**
+ * Award a verifiable task (e.g. social follow/join) AFTER server-side
+ * verification has passed. Safe to call repeatedly — duplicate awards are
+ * prevented by the unique completion constraint and an approved-check.
+ */
+export async function awardVerifiedTask(
+  wallet: string,
+  taskKey: string,
+): Promise<ClaimResult> {
+  if (!hasDatabase) {
+    return {
+      ok: false,
+      awarded: 0,
+      totalPoints: 0,
+      message: "Database not configured — running in Beta Mock Mode.",
+    };
+  }
+  const lowered = wallet.toLowerCase();
+
+  return prisma.$transaction(async (tx) => {
+    const campaign = await tx.airdropCampaign.findUnique({
+      where: { slug: DEFAULT_CAMPAIGN_SLUG },
+    });
+    if (!campaign) throw new Error("Campaign not found");
+    const task = await tx.airdropTask.findUnique({
+      where: { campaignId_key: { campaignId: campaign.id, key: taskKey } },
+    });
+    if (!task) throw new Error("Task not found");
+
+    const user = await tx.user.upsert({
+      where: { wallet: lowered },
+      update: { lastSeenAt: new Date() },
+      create: { wallet: lowered },
+    });
+    const airdropUser = await tx.airdropUser.upsert({
+      where: { campaignId_wallet: { campaignId: campaign.id, wallet: lowered } },
+      update: {},
+      create: { userId: user.id, campaignId: campaign.id, wallet: lowered },
+    });
+
+    const existing = await tx.airdropCompletion.findUnique({
+      where: {
+        taskId_userId_dayBucket: { taskId: task.id, userId: user.id, dayBucket: "" },
+      },
+    });
+    if (existing?.approved) {
+      return {
+        ok: false,
+        awarded: 0,
+        totalPoints: airdropUser.totalPoints,
+        message: "Task already completed.",
+      };
+    }
+
+    if (existing) {
+      await tx.airdropCompletion.update({
+        where: { id: existing.id },
+        data: { approved: true, pointsAwarded: task.points },
+      });
+    } else {
+      await tx.airdropCompletion.create({
+        data: {
+          campaignId: campaign.id,
+          taskId: task.id,
+          userId: user.id,
+          wallet: lowered,
+          pointsAwarded: task.points,
+          dayBucket: null,
+          approved: true,
+        },
+      });
+    }
+
+    const newTotal = airdropUser.totalPoints + task.points;
+    await tx.airdropUser.update({
+      where: { id: airdropUser.id },
+      data: {
+        totalPoints: newTotal,
+        eligibility:
+          airdropUser.eligibility === "PENDING_REVIEW"
+            ? "ELIGIBLE"
+            : airdropUser.eligibility,
+      },
+    });
+    await tx.airdropPointsLedger.create({
+      data: {
+        campaignId: campaign.id,
+        userId: user.id,
+        wallet: lowered,
+        delta: task.points,
+        balanceAfter: newTotal,
+        reason: "TASK_COMPLETION",
+        refType: "verified_task",
+        refId: task.id,
+      },
+    });
+    await tx.activityLog.create({
+      data: {
+        userId: user.id,
+        wallet: lowered,
+        type: "airdrop_verified",
+        message: `Verified task "${task.title}" (+${task.points} pts)`,
+      },
+    });
+
+    return {
+      ok: true,
+      awarded: task.points,
+      totalPoints: newTotal,
+      message: `Verified! +${task.points} Airdrop Points.`,
+    };
+  });
+}
+
 export async function getLeaderboard(limit = 50) {
   if (!hasDatabase) return [];
   try {

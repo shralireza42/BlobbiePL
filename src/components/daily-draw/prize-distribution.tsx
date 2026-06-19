@@ -55,9 +55,11 @@ export function PrizeDistribution() {
         <Allocation label="Burn / Treasury" value={POOL_ALLOCATION.burnTreasury} />
       </div>
       <p className="mt-3 text-xs text-cream-dim">
-        Amounts are USD-denominated and paid in $BLOBBIE when live. Total winner
-        payout {formatUsd(POOL_ALLOCATION.winnerPayout)} across {TOTAL_WINNERS}{" "}
-        winners.
+        Amounts shown are for a full 300-ticket round (total winner payout{" "}
+        {formatUsd(POOL_ALLOCATION.winnerPayout)} across {TOTAL_WINNERS} winners).
+        If a round closes with fewer real tickets, prizes scale to
+        realTickets ÷ 300 and winners are drawn only from real tickets — see
+        “Your Odds &amp; Winnings” above. Paid in $BLOBBIE when live.
       </p>
     </div>
   );

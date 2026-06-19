@@ -24,10 +24,23 @@ type RoundInfo = {
   mockMode: boolean;
 };
 
+type Odds = {
+  ticketsSold: number;
+  capacity: number;
+  supplementTickets: number;
+  scalePct: number;
+  userTickets: number;
+  winChancePct: number;
+  expectedUsd: number;
+  topPrizeUsd: number;
+  scaledWinnerPayoutUsd: number;
+};
+
 type CurrentResponse = {
   round: RoundInfo;
   price: { usd: number; isMock: boolean; source: string };
   userTickets: number;
+  odds: Odds;
   isMockMode: boolean;
   ticketPurchaseEnabled: boolean;
   tokenConfigured: boolean;
@@ -90,9 +103,10 @@ export function DrawConsole() {
 }
 
 function RoundCard({ data }: { data: CurrentResponse }) {
-  const { round, userTickets } = data;
+  const { round, userTickets, odds } = data;
   const { remaining } = useCountdown(round.endTime);
-  const pct = Math.min(100, (round.participants / round.capacity) * 100);
+  // The round fills at 300 TICKETS (1 ticket = 1 entry).
+  const pct = Math.min(100, (round.totalTickets / round.capacity) * 100);
 
   return (
     <div className="card p-6">
@@ -108,10 +122,10 @@ function RoundCard({ data }: { data: CurrentResponse }) {
 
       <div className="mt-6">
         <div className="flex items-end justify-between">
-          <p className="stat-label">Participants</p>
+          <p className="stat-label">Tickets sold</p>
           <p className="text-sm text-cream-soft">
             <span className="text-xl font-bold text-cream">
-              {round.participants}
+              {round.totalTickets}
             </span>
             /{round.capacity}
           </p>
@@ -126,20 +140,27 @@ function RoundCard({ data }: { data: CurrentResponse }) {
             }}
           />
         </div>
-        {round.supplementTickets > 0 && (
-          <p className="mt-2 text-xs text-cream-dim">
-            {round.supplementTickets} supplementary ticket-equivalents top up the
-            pool. They are not eligible to win.
-          </p>
-        )}
+        <p className="mt-2 text-xs text-cream-dim">
+          1 ticket = 1 entry. The round closes when 300 tickets sell or after 24h.
+          {round.supplementTickets > 0 && (
+            <>
+              {" "}If fewer than 300 sell, the operational wallet supplies the
+              remaining {round.supplementTickets} ticket
+              {round.supplementTickets === 1 ? "" : "s"} — these are never
+              eligible to win and prizes scale to the real tickets sold.
+            </>
+          )}
+        </p>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Metric label="Closes In" value={formatCountdown(remaining)} mono />
         <Metric label="Your Tickets" value={String(userTickets)} />
-        <Metric label="Total Tickets" value={formatNumber(round.totalTickets, 0)} />
-        <Metric label="Pool" value={formatUsd(round.poolUsd)} />
+        <Metric label="Players" value={formatNumber(round.participants, 0)} />
+        <Metric label="Prize Scale" value={`${Math.round(odds.scalePct)}%`} />
       </div>
+
+      <UserOdds odds={odds} />
 
       <div className="mt-6 grid grid-cols-2 gap-3 text-xs text-cream-dim">
         <div className="rounded-lg border border-cream/10 bg-cream/5 p-3">
@@ -155,6 +176,42 @@ function RoundCard({ data }: { data: CurrentResponse }) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function UserOdds({ odds }: { odds: Odds }) {
+  const hasTickets = odds.userTickets > 0;
+  return (
+    <div className="mt-6 rounded-2xl border border-gold/30 bg-gold/5 p-5">
+      <div className="flex items-center justify-between">
+        <h4 className="font-display not-italic text-base text-cream">
+          Your Odds &amp; Winnings
+        </h4>
+        <span className="text-xs not-italic text-cream-dim">
+          {odds.ticketsSold} eligible tickets
+        </span>
+      </div>
+      {!hasTickets ? (
+        <p className="mt-2 text-sm text-cream-dim">
+          Buy at least one ticket to see your win chance and estimated winnings.
+        </p>
+      ) : (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Metric label="Win chance" value={`${odds.winChancePct.toFixed(1)}%`} />
+          <Metric label="Est. winnings" value={formatUsd(odds.expectedUsd)} />
+          <Metric label="Top prize" value={formatUsd(odds.topPrizeUsd)} />
+          <Metric
+            label="Scaled pool"
+            value={formatUsd(odds.scaledWinnerPayoutUsd)}
+          />
+        </div>
+      )}
+      <p className="mt-3 text-xs text-cream-dim">
+        Winners are drawn randomly from real tickets only. Prizes pay{" "}
+        {Math.round(odds.scalePct)}% of the full 300-ticket amounts at the current
+        eligible tickets. Est. winnings is your expected return across the draw.
+      </p>
     </div>
   );
 }

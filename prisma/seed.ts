@@ -12,8 +12,8 @@ const AIRDROP_TASKS = [
   { key: "return_daily", title: "Return Daily", description: "Check in once every 24 hours to keep your streak.", points: 20, type: "DAILY", status: "ACTIVE", requiresAdmin: false, sortOrder: 5 },
   { key: "referral", title: "Invite a Friend", description: "Referral rewards arrive with the Referrals module.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 6 },
   { key: "minigames", title: "Play a Mini-Game", description: "Blobbie Dash, Blast & Stack arrive soon.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 7 },
-  { key: "follow_x", title: "Follow on X", description: "Follow @Blobbie on X and claim your points instantly.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: false, sortOrder: 8 },
-  { key: "join_telegram", title: "Join Telegram", description: "Join the Blobbie Telegram and claim your points instantly.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: false, sortOrder: 9 },
+  { key: "follow_x", title: "Follow on X", description: "Follow @Blobbie on X. Verified before points are awarded — no fake claims.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 8 },
+  { key: "join_telegram", title: "Join Telegram", description: "Join the Blobbie Telegram. Verified automatically via Telegram before points are awarded.", points: 40, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: true, sortOrder: 9 },
 ] as const;
 
 async function main() {

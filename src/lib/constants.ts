@@ -128,21 +128,23 @@ export const AIRDROP_TASKS = [
   {
     key: "follow_x",
     title: "Follow on X",
-    description: "Follow @Blobbie on X and claim your points instantly.",
+    description:
+      "Follow @Blobbie on X. Verified before points are awarded — no fake claims.",
     points: 40,
     type: "ONE_TIME",
     status: "ACTIVE",
-    requiresAdmin: false,
+    requiresAdmin: true,
     sortOrder: 8,
   },
   {
     key: "join_telegram",
     title: "Join Telegram",
-    description: "Join the Blobbie Telegram and claim your points instantly.",
+    description:
+      "Join the Blobbie Telegram. Verified automatically via Telegram before points are awarded.",
     points: 40,
     type: "ONE_TIME",
     status: "ACTIVE",
-    requiresAdmin: false,
+    requiresAdmin: true,
     sortOrder: 9,
   },
 ] as const;

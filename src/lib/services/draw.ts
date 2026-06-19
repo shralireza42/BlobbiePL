@@ -64,14 +64,16 @@ export async function getCurrentRound(): Promise<RoundInfo> {
     extraTickets = ex.tickets;
   }
 
-  const participants = Math.min(base.capacity, base.participants + extraUsers);
-  const totalTickets = base.totalTickets + extraTickets;
+  // The round fills at 300 TICKETS (1 ticket = 1 entry), regardless of how many
+  // unique wallets join. Cap real tickets at capacity; supplement the rest.
+  const totalTickets = Math.min(base.capacity, base.totalTickets + extraTickets);
+  const participants = base.participants + extraUsers;
   return {
     ...base,
     participants,
     totalTickets,
     supplementTickets: Math.max(0, base.capacity - totalTickets),
-    status: participants >= base.capacity ? "FILLED" : base.status,
+    status: totalTickets >= base.capacity ? "FILLED" : base.status,
   };
 }
 

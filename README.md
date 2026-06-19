@@ -163,14 +163,36 @@ and `src/lib/contracts/abi.ts`:
 
 ## Round & prize logic
 
-- **Round closes** when 300 unique users join within 24h, **or** after 24h.
-- If fewer than 300 join, the **operational wallet supplements** the pool to a
-  300-ticket equivalent. **Supplementary tickets are never eligible to win.**
+- **1 ticket = 1 entry.** A round fills at **300 tickets** — it does not matter
+  how many unique wallets join (a wallet may hold many tickets/entries).
+- **Round closes** when 300 tickets sell **or** after 24h, then winners are drawn
+  randomly (VRF-compatible when live) and the next round starts.
+- If fewer than 300 real tickets sell, the **operational wallet supplies the
+  remaining tickets** so it's always a 300-ticket round. **Supplementary tickets
+  are never eligible to win**, and **prizes scale to `realTickets ÷ 300`** (only
+  the real revenue is paid out). Winners are drawn only from real tickets.
 - **1 Ticket = $1 USD** equivalent in $BLOBBIE — token amount always derived
   from the price source, never hardcoded 1:1.
-- **Prize distribution:** 1st = $102, 2nd–10th = $4 each, 11th–150th = $1 each
-  (total winner payout $278). Allocations: Free Daily Entries $10, Jackpot $5,
-  Burn/Treasury $7.
+- **Prize distribution (full 300-ticket round):** 1st = $102, 2nd–10th = $4 each,
+  11th–150th = $1 each (winner payout $278). Allocations: Free Daily Entries $10,
+  Jackpot $5, Burn/Treasury $7. At lower real ticket counts every amount scales
+  down by `realTickets ÷ 300`.
+- The Daily Rewards Draw page shows each connected wallet its **win chance**,
+  **estimated winnings** and **top prize** at the current scale.
+
+## Airdrop task verification (anti-fake)
+
+Social tasks (Follow on X, Join Telegram) are **never awarded on a click**. They
+require verification:
+
+- **Telegram** — when `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` +
+  `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` are set, the Telegram Login Widget signs the
+  user in and the server verifies the payload **and** group membership
+  (`getChatMember`) before awarding.
+- **X (Twitter)** — when `X_BEARER_TOKEN` + `X_TARGET_USER_ID` are set the server
+  checks the follow via the X API (OAuth follow-check scaffolded).
+- When a provider is **not configured**, the task falls back to **admin review**
+  (pending) — so points can never be claimed for a fake follow/join.
 
 ---
 

@@ -44,23 +44,27 @@ export function getMockCurrentRound(now = Date.now()): RoundInfo {
 
   const progress = (now - startTime) / ROUND_DURATION_MS; // 0..1
   const rnd = seededRandom(roundNumber);
-  // Simulate growing participation through the window.
+  // The round fills at 300 TICKETS (1 ticket = 1 entry). Simulate tickets
+  // selling through the 24h window.
   const noise = 0.85 + rnd() * 0.3;
-  let participants = Math.min(
+  let totalTickets = Math.min(
     ROUND_CAPACITY,
     Math.floor(progress * ROUND_CAPACITY * noise),
   );
-  participants = Math.max(0, participants);
+  totalTickets = Math.max(0, totalTickets);
 
-  const filled = participants >= ROUND_CAPACITY;
+  const filled = totalTickets >= ROUND_CAPACITY;
   const msRemaining = endTime - now;
 
   let status: RoundStatusUI = "OPEN";
   if (filled) status = "FILLED";
   else if (msRemaining <= CLOSING_SOON_THRESHOLD_MS) status = "CLOSING_SOON";
 
-  // Average ~1.4 tickets per participant in the mock.
-  const totalTickets = Math.floor(participants * (1.2 + rnd() * 0.5));
+  // Unique players ≈ tickets / (1.2–1.7 tickets per wallet). Secondary metric.
+  const participants = Math.max(
+    totalTickets > 0 ? 1 : 0,
+    Math.floor(totalTickets / (1.2 + rnd() * 0.5)),
+  );
   const supplementTickets = Math.max(0, ROUND_CAPACITY - totalTickets);
 
   return {
@@ -93,8 +97,9 @@ export function getMockRoundInfo(
   const startTime = GENESIS + (roundId - 1) * ROUND_DURATION_MS;
   const endTime = startTime + ROUND_DURATION_MS;
   const rnd = seededRandom(roundId);
-  const participants = Math.floor(120 + rnd() * 180);
-  const totalTickets = Math.floor(participants * (1.2 + rnd() * 0.5));
+  // Completed rounds: real tickets sold (often below the 300 cap).
+  const totalTickets = Math.min(ROUND_CAPACITY, Math.floor(150 + rnd() * 200));
+  const participants = Math.max(1, Math.floor(totalTickets / (1.2 + rnd() * 0.5)));
   return {
     roundId,
     roundNumber: roundId,
@@ -118,44 +123,32 @@ export function getMockWinners(roundId: number, priceUsd = 0.0025): Winner[] {
   const info = getMockRoundInfo(roundId);
   if (!info || info.status !== "COMPLETED") return [];
 
+  // Prizes scale to the real tickets sold (supplement tickets aren't eligible).
+  const scale = Math.min(1, info.totalTickets / 300);
+  // Cannot award more winners than eligible tickets.
+  const maxWinners = Math.min(150, info.totalTickets);
+
   const winners: Winner[] = [];
   const tokensFor = (usd: number) =>
     priceUsd > 0 ? (usd / priceUsd).toFixed(0) : "0";
 
-  // 1st place
-  winners.push({
-    rank: 1,
-    wallet: mockWallet(roundId * 1000 + 1),
-    tier: "first",
-    usdAmount: 102,
-    blobbieAmount: tokensFor(102),
-    claimStatus: roundId % 3 === 0 ? "UNCLAIMED" : "CLAIMED",
-    txHash: roundId % 3 === 0 ? null : `0x${"a".repeat(64)}`,
-  });
-  // 2nd-10th
-  for (let i = 2; i <= 10; i++) {
+  const push = (rank: number, tier: Winner["tier"], baseUsd: number) => {
+    const usd = baseUsd * scale;
     winners.push({
-      rank: i,
-      wallet: mockWallet(roundId * 1000 + i),
-      tier: "top10",
-      usdAmount: 4,
-      blobbieAmount: tokensFor(4),
-      claimStatus: i % 2 === 0 ? "CLAIMED" : "UNCLAIMED",
-      txHash: i % 2 === 0 ? `0x${"b".repeat(64)}` : null,
+      rank,
+      wallet: mockWallet(roundId * 1000 + rank),
+      tier,
+      usdAmount: usd,
+      blobbieAmount: tokensFor(usd),
+      claimStatus: rank % 3 === 0 ? "UNCLAIMED" : "CLAIMED",
+      txHash: rank % 3 === 0 ? null : `0x${"a".repeat(64)}`,
     });
-  }
-  // 11th-150th (sample first 20 for display performance)
-  for (let i = 11; i <= 30; i++) {
-    winners.push({
-      rank: i,
-      wallet: mockWallet(roundId * 1000 + i),
-      tier: "top150",
-      usdAmount: 1,
-      blobbieAmount: tokensFor(1),
-      claimStatus: "UNCLAIMED",
-      txHash: null,
-    });
-  }
+  };
+
+  if (maxWinners >= 1) push(1, "first", 102);
+  for (let i = 2; i <= 10 && i <= maxWinners; i++) push(i, "top10", 4);
+  // Sample first 20 of the 11–150 tier for display performance.
+  for (let i = 11; i <= 30 && i <= maxWinners; i++) push(i, "top150", 1);
   return winners;
 }
 
