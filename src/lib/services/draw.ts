@@ -1,9 +1,10 @@
 import "server-only";
 import { prisma, hasDatabase } from "../prisma";
-import { getDrawProvider } from "../contracts";
+import { getDrawProvider, isMockMode } from "../contracts";
 import { getBlobbiePrice } from "../price";
 import type { RoundInfo, Winner } from "../contracts/types";
 import { getMockWinners } from "../contracts/mock-data";
+import { getOrAdvanceRound, addTickets } from "./draw-engine";
 
 /**
  * Draw read/service layer. Prefers the live/DB-backed round when a database is
@@ -39,51 +40,41 @@ function getMockUserTickets(roundNumber: number, wallet: string) {
 }
 
 export async function getCurrentRound(): Promise<RoundInfo> {
-  const base = await getDrawProvider().getCurrentRound();
-  // Real on-chain rounds are authoritative as-is.
-  if (!base.mockMode) return base;
-
-  let extraUsers = 0;
-  let extraTickets = 0;
+  // With a database we run the real round lifecycle (fill → draw → cooldown →
+  // next). Without one we use the deterministic mock + in-memory ticket store.
   if (hasDatabase) {
     try {
-      const row = await prisma.drawRound.findUnique({
-        where: { roundNumber: base.roundNumber },
-        select: { uniqueUsers: true, totalTickets: true },
-      });
-      if (row) {
-        extraUsers = row.uniqueUsers;
-        extraTickets = row.totalTickets;
-      }
+      return await getOrAdvanceRound(isMockMode());
     } catch {
-      /* ignore */
+      // fall through to mock view if the DB is unavailable
     }
-  } else {
-    const ex = getMockExtra(base.roundNumber);
-    extraUsers = ex.users;
-    extraTickets = ex.tickets;
   }
 
-  // The round fills at 300 TICKETS (1 ticket = 1 entry), regardless of how many
-  // unique wallets join. Cap real tickets at capacity; supplement the rest.
-  const totalTickets = Math.min(base.capacity, base.totalTickets + extraTickets);
-  const participants = base.participants + extraUsers;
+  const base = await getDrawProvider().getCurrentRound();
+  if (!base.mockMode) return base;
+
+  const ex = getMockExtra(base.roundNumber);
+  const totalTickets = Math.min(base.capacity, base.totalTickets + ex.tickets);
   return {
     ...base,
-    participants,
+    participants: base.participants + ex.users,
     totalTickets,
     supplementTickets: Math.max(0, base.capacity - totalTickets),
     status: totalTickets >= base.capacity ? "FILLED" : base.status,
+    purchaseOpen: base.status === "OPEN" && totalTickets < base.capacity,
   };
 }
 
 export async function getUserTicketsForCurrentRound(
   wallet: string,
 ): Promise<number> {
-  const round = await getDrawProvider().getCurrentRound();
   const w = wallet.toLowerCase();
-  if (!hasDatabase) return getMockUserTickets(round.roundNumber, w);
+  if (!hasDatabase) {
+    const round = await getDrawProvider().getCurrentRound();
+    return getMockUserTickets(round.roundNumber, w);
+  }
   try {
+    const round = await getCurrentRound();
     const entry = await prisma.drawEntry.findFirst({
       where: { wallet: w, round: { roundNumber: round.roundNumber } },
       select: { ticketCount: true },
@@ -147,92 +138,21 @@ export async function recordEntry(args: {
     // No database — track in the in-memory mock store so counts update live.
     const round = await getDrawProvider().getCurrentRound();
     addMockEntry(round.roundNumber, args.wallet, args.ticketCount);
-    return { recorded: true as const, mock: true as const, roundNumber: round.roundNumber };
+    return {
+      recorded: true,
+      accepted: args.ticketCount,
+      message: "Tickets purchased.",
+      roundNumber: round.roundNumber,
+    };
   }
-  const wallet = args.wallet.toLowerCase();
-  const price = await getBlobbiePrice();
-  const usdValue = args.ticketCount * 1; // 1 ticket = $1
 
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.upsert({
-      where: { wallet },
-      update: { lastSeenAt: new Date() },
-      create: { wallet },
-    });
-
-    const round = await ensureCurrentRound(tx);
-
-    const existing = await tx.drawEntry.findUnique({
-      where: { roundId_userId: { roundId: round.id, userId: user.id } },
-    });
-
-    const blobbieSpent = price.usd > 0
-      ? Math.round((usdValue / price.usd))
-      : 0;
-
-    if (existing) {
-      await tx.drawEntry.update({
-        where: { id: existing.id },
-        data: {
-          ticketCount: existing.ticketCount + args.ticketCount,
-          usdValue: existing.usdValue + usdValue,
-          blobbieSpent: String(Number(existing.blobbieSpent) + blobbieSpent),
-          txHash: args.txHash ?? existing.txHash,
-        },
-      });
-    } else {
-      await tx.drawEntry.create({
-        data: {
-          roundId: round.id,
-          userId: user.id,
-          wallet,
-          ticketCount: args.ticketCount,
-          usdValue,
-          blobbieSpent: String(blobbieSpent),
-          txHash: args.txHash ?? null,
-          mockMode: args.mockMode,
-        },
-      });
-      await tx.drawRound.update({
-        where: { id: round.id },
-        data: { uniqueUsers: { increment: 1 } },
-      });
-    }
-
-    await tx.drawRound.update({
-      where: { id: round.id },
-      data: { totalTickets: { increment: args.ticketCount } },
-    });
-
-    await tx.activityLog.create({
-      data: {
-        userId: user.id,
-        wallet,
-        type: "draw_entry",
-        message: `Bought ${args.ticketCount} ticket(s) in round #${round.roundNumber}`,
-        metadata: { mockMode: args.mockMode, txHash: args.txHash ?? null },
-      },
-    });
-
-    return { recorded: true as const, roundNumber: round.roundNumber };
-  });
-}
-
-type Tx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
-
-async function ensureCurrentRound(tx: Tx) {
-  const info = await getDrawProvider().getCurrentRound();
-  const existing = await tx.drawRound.findUnique({
-    where: { roundNumber: info.roundNumber },
-  });
-  if (existing) return existing;
-  return tx.drawRound.create({
-    data: {
-      roundNumber: info.roundNumber,
-      capacity: info.capacity,
-      startTime: new Date(info.startTime),
-      endTime: new Date(info.endTime),
-      mockMode: info.mockMode,
-    },
-  });
+  // DB-backed lifecycle: the engine validates the round is open, clamps to the
+  // remaining capacity, records the entry, and auto-settles when full.
+  const res = await addTickets(args.wallet, args.ticketCount, args.mockMode);
+  return {
+    recorded: res.ok,
+    accepted: res.accepted,
+    message: res.message,
+    roundNumber: res.roundNumber,
+  };
 }

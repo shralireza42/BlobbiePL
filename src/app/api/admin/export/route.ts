@@ -1,12 +1,12 @@
 import { handleError, fail } from "@/lib/api";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/services/staff";
 import { exportCsv } from "@/lib/services/admin";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    requireAdmin();
+    await requirePermission("EXPORT");
     const url = new URL(req.url);
     const kind = url.searchParams.get("kind") ?? "users";
     if (!["users", "airdrop", "draw"].includes(kind)) {

@@ -16,6 +16,7 @@ type Overview = {
     airdropUsers: number;
     fraudFlags: number;
     pendingCompletions: number;
+    activeUsers: number;
   };
   users: { wallet: string; createdAt: string; lastSeenAt: string }[];
   airdropUsers: {
@@ -45,7 +46,34 @@ type Overview = {
     task: { title: string; points: number; key: string };
   }[];
   appConfig: Record<string, string>;
+  activeUsers: { wallet: string; lastSeenAt: string; createdAt: string }[];
+  staff: { wallet: string; role: string; addedBy: string | null }[];
+  sanctions: {
+    id: string;
+    wallet: string;
+    scope: string;
+    reason: string | null;
+    expiresAt: string | null;
+    liftedAt: string | null;
+    createdAt: string;
+  }[];
+  features: {
+    drawEnabled: boolean;
+    airdropEnabled: boolean;
+    minigamesEnabled: boolean;
+    ticketPurchaseEnabled: boolean;
+  };
+  me: {
+    wallet: string;
+    role: string | null;
+    permissions: string[];
+    grantableRoles: string[];
+  };
 };
+
+function can(data: Overview, perm: string) {
+  return data.me?.permissions?.includes(perm);
+}
 
 export function AdminClient() {
   const { session, isConnected } = useWalletSession();
@@ -89,30 +117,68 @@ export function AdminClient() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="flex items-center justify-between">
+        <p className="text-sm not-italic text-cream-dim">
+          Signed in as{" "}
+          <span className="font-bold text-cream">{data.me?.role ?? "Staff"}</span>
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Users" value={data.counts.users} />
+        <Stat label="Active (15m)" value={data.counts.activeUsers ?? 0} />
         <Stat label="Draw Entries" value={data.counts.entries} />
         <Stat label="Airdrop Users" value={data.counts.airdropUsers} />
         <Stat label="Pending Tasks" value={data.counts.pendingCompletions} />
         <Stat label="Fraud Flags" value={data.counts.fraudFlags} highlight />
       </div>
 
-      <ConfigPanel config={data.appConfig} onSaved={refetch} />
+      {can(data, "MANAGE_FEATURES") && (
+        <FeaturePanel features={data.features} onChange={refetch} />
+      )}
+      {can(data, "RUN_DRAW") && <RunDrawPanel onChange={refetch} />}
 
-      <ExportPanel />
+      {can(data, "MANAGE_CONFIG") && (
+        <ConfigPanel config={data.appConfig} onSaved={refetch} />
+      )}
 
-      <PendingCompletions
-        items={data.pendingCompletions}
-        onChange={refetch}
-      />
+      {can(data, "EXPORT") && <ExportPanel />}
 
-      <AirdropUsers users={data.airdropUsers} onChange={refetch} />
+      {can(data, "MANAGE_ROLES") && (
+        <StaffPanel
+          staff={data.staff}
+          grantable={data.me?.grantableRoles ?? []}
+          onChange={refetch}
+        />
+      )}
+
+      {(can(data, "SITE_BAN") || can(data, "CHAT_MODERATE")) && (
+        <SanctionPanel
+          sanctions={data.sanctions}
+          canSiteBan={can(data, "SITE_BAN")}
+          onChange={refetch}
+        />
+      )}
+
+      {can(data, "REVIEW_AIRDROP") && (
+        <PendingCompletions items={data.pendingCompletions} onChange={refetch} />
+      )}
+
+      {can(data, "REVIEW_AIRDROP") && (
+        <AirdropUsers users={data.airdropUsers} onChange={refetch} />
+      )}
 
       <DrawActivity activity={data.drawActivity} />
 
-      <Users users={data.users} />
+      {can(data, "VIEW_USERS") && (
+        <ActiveUsers users={data.activeUsers} canBan={can(data, "SITE_BAN")} onChange={refetch} />
+      )}
 
-      <FraudFlags flags={data.fraudFlags} />
+      {can(data, "VIEW_USERS") && (
+        <Users users={data.users} canBan={can(data, "SITE_BAN")} onChange={refetch} />
+      )}
+
+      {can(data, "FLAG_FRAUD") && <FraudFlags flags={data.fraudFlags} />}
     </div>
   );
 }
@@ -365,21 +431,282 @@ function DrawActivity({ activity }: { activity: Overview["drawActivity"] }) {
   );
 }
 
-function Users({ users }: { users: Overview["users"] }) {
+async function banWallet(wallet: string, permanent: boolean) {
+  await postJson("/api/admin/sanction", {
+    action: "create",
+    wallet,
+    scope: "SITE_BAN",
+    durationMinutes: permanent ? null : 1440,
+  });
+}
+
+function BanButtons({ wallet, onChange }: { wallet: string; onChange: () => void }) {
   return (
-    <Section title={`Users (${users.length})`}>
+    <div className="flex gap-2">
+      <button
+        className="text-xs text-gold hover:underline"
+        onClick={async () => {
+          await banWallet(wallet, false);
+          onChange();
+        }}
+      >
+        Ban 24h
+      </button>
+      <button
+        className="text-xs text-rose-300 hover:underline"
+        onClick={async () => {
+          await banWallet(wallet, true);
+          onChange();
+        }}
+      >
+        Ban perm
+      </button>
+      <button
+        className="text-xs text-emerald-300 hover:underline"
+        onClick={async () => {
+          await postJson("/api/admin/sanction", { action: "lift", wallet, scope: "SITE_BAN" });
+          onChange();
+        }}
+      >
+        Unban
+      </button>
+    </div>
+  );
+}
+
+function ActiveUsers({
+  users,
+  canBan,
+  onChange,
+}: {
+  users: Overview["activeUsers"];
+  canBan?: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <Section title={`Active Now (${users.length})`}>
+      {users.length === 0 ? (
+        <Empty>No users active in the last 15 minutes.</Empty>
+      ) : (
+        <Table
+          headers={["Wallet", "Last Seen", ...(canBan ? ["Actions"] : [])]}
+          rows={users.map((u) => [
+            <span key="w" className="font-mono">
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-emerald-400" />
+              {shortenAddress(u.wallet, 5)}
+            </span>,
+            <span key="l">{new Date(u.lastSeenAt).toLocaleTimeString()}</span>,
+            ...(canBan ? [<BanButtons key="b" wallet={u.wallet} onChange={onChange} />] : []),
+          ])}
+        />
+      )}
+    </Section>
+  );
+}
+
+function Users({
+  users,
+  canBan,
+  onChange,
+}: {
+  users: Overview["users"];
+  canBan?: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <Section title={`All Users (${users.length})`}>
       {users.length === 0 ? (
         <Empty>No users yet.</Empty>
       ) : (
         <Table
-          headers={["Wallet", "First Seen", "Last Seen"]}
+          headers={["Wallet", "First Seen", "Last Seen", ...(canBan ? ["Actions"] : [])]}
           rows={users.map((u) => [
             <span key="w" className="font-mono">{shortenAddress(u.wallet, 5)}</span>,
             <span key="c">{new Date(u.createdAt).toLocaleDateString()}</span>,
             <span key="l">{new Date(u.lastSeenAt).toLocaleDateString()}</span>,
+            ...(canBan ? [<BanButtons key="b" wallet={u.wallet} onChange={onChange} />] : []),
           ])}
         />
       )}
+    </Section>
+  );
+}
+
+function FeaturePanel({
+  features,
+  onChange,
+}: {
+  features: Overview["features"];
+  onChange: () => void;
+}) {
+  async function toggle(feature: string, enabled: boolean) {
+    await postJson("/api/admin/features", { feature, enabled });
+    onChange();
+  }
+  return (
+    <Section title="Feature Controls">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Toggle label="Daily Rewards Draw" checked={features.drawEnabled} onChange={(v) => toggle("drawEnabled", v)} />
+        <Toggle label="Ticket Purchase" checked={features.ticketPurchaseEnabled} onChange={(v) => toggle("ticketPurchaseEnabled", v)} />
+        <Toggle label="Airdrop Hub" checked={features.airdropEnabled} onChange={(v) => toggle("airdropEnabled", v)} />
+        <Toggle label="Mini-Games" checked={features.minigamesEnabled} onChange={(v) => toggle("minigamesEnabled", v)} />
+      </div>
+    </Section>
+  );
+}
+
+function RunDrawPanel({ onChange }: { onChange: () => void }) {
+  const [msg, setMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  return (
+    <Section title="Draw Controls">
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          className="btn-accent"
+          disabled={loading}
+          onClick={async () => {
+            setLoading(true);
+            const res = await postJson<{ message: string }>("/api/admin/draw/run");
+            setLoading(false);
+            setMsg(res.data?.message ?? res.error ?? null);
+            onChange();
+          }}
+        >
+          {loading ? "Drawing…" : "Force draw current round"}
+        </button>
+        {msg && <span className="text-xs not-italic text-cream-dim">{msg}</span>}
+      </div>
+      <p className="mt-2 text-xs not-italic text-cream-dim">
+        Settles the open round now (picks winners with a verifiable seed) and
+        starts the 3-minute cooldown.
+      </p>
+    </Section>
+  );
+}
+
+function StaffPanel({
+  staff,
+  grantable,
+  onChange,
+}: {
+  staff: Overview["staff"];
+  grantable: string[];
+  onChange: () => void;
+}) {
+  const [wallet, setWallet] = useState("");
+  const [role, setRole] = useState(grantable[0] ?? "SENIOR");
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <Section title={`Staff & Roles (${staff.length})`}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <input className="input flex-1" placeholder="0x… wallet" value={wallet} onChange={(e) => setWallet(e.target.value)} />
+        <select className="input sm:w-44" value={role} onChange={(e) => setRole(e.target.value)}>
+          {grantable.map((r) => (
+            <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        <button
+          className="btn-accent"
+          onClick={async () => {
+            const res = await postJson("/api/admin/staff", { action: "set", wallet, role });
+            setMsg(res.ok ? "Saved." : res.error ?? "Failed");
+            if (res.ok) { setWallet(""); onChange(); }
+          }}
+        >
+          Grant role
+        </button>
+      </div>
+      {msg && <p className="mt-2 text-xs not-italic text-cream-dim">{msg}</p>}
+      <div className="mt-4">
+        {staff.length === 0 ? (
+          <Empty>No staff yet. The env owner wallet is the Owner.</Empty>
+        ) : (
+          <Table
+            headers={["Wallet", "Role", "Actions"]}
+            rows={staff.map((s) => [
+              <span key="w" className="font-mono">{shortenAddress(s.wallet, 5)}</span>,
+              <span key="r">{s.role}</span>,
+              <button
+                key="x"
+                className="text-xs text-rose-300 hover:underline"
+                onClick={async () => {
+                  await postJson("/api/admin/staff", { action: "remove", wallet: s.wallet });
+                  onChange();
+                }}
+              >
+                Remove
+              </button>,
+            ])}
+          />
+        )}
+      </div>
+    </Section>
+  );
+}
+
+function SanctionPanel({
+  sanctions,
+  canSiteBan,
+  onChange,
+}: {
+  sanctions: Overview["sanctions"];
+  canSiteBan?: boolean;
+  onChange: () => void;
+}) {
+  const [wallet, setWallet] = useState("");
+  const [scope, setScope] = useState(canSiteBan ? "SITE_BAN" : "CHAT_MUTE");
+  const [mins, setMins] = useState("");
+  const active = sanctions.filter((s) => !s.liftedAt);
+  return (
+    <Section title={`Sanctions (${active.length} active)`}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <input className="input flex-1" placeholder="0x… wallet" value={wallet} onChange={(e) => setWallet(e.target.value)} />
+        <select className="input sm:w-40" value={scope} onChange={(e) => setScope(e.target.value)}>
+          {canSiteBan && <option value="SITE_BAN">Site ban</option>}
+          <option value="CHAT_BAN">Chat ban</option>
+          <option value="CHAT_MUTE">Chat mute</option>
+        </select>
+        <input className="input sm:w-36" placeholder="Minutes (blank=perm)" value={mins} onChange={(e) => setMins(e.target.value)} />
+        <button
+          className="btn-accent"
+          onClick={async () => {
+            await postJson("/api/admin/sanction", {
+              action: "create",
+              wallet,
+              scope,
+              durationMinutes: mins ? Number(mins) : null,
+            });
+            setWallet("");
+            onChange();
+          }}
+        >
+          Apply
+        </button>
+      </div>
+      <div className="mt-4">
+        {active.length === 0 ? (
+          <Empty>No active sanctions.</Empty>
+        ) : (
+          <Table
+            headers={["Wallet", "Scope", "Expires", "Actions"]}
+            rows={active.map((s) => [
+              <span key="w" className="font-mono">{shortenAddress(s.wallet, 5)}</span>,
+              <span key="s">{s.scope}</span>,
+              <span key="e">{s.expiresAt ? new Date(s.expiresAt).toLocaleString() : "Permanent"}</span>,
+              <button
+                key="l"
+                className="text-xs text-emerald-300 hover:underline"
+                onClick={async () => {
+                  await postJson("/api/admin/sanction", { action: "lift", wallet: s.wallet, scope: s.scope });
+                  onChange();
+                }}
+              >
+                Lift
+              </button>,
+            ])}
+          />
+        )}
+      </div>
     </Section>
   );
 }

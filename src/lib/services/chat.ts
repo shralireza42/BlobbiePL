@@ -1,12 +1,15 @@
 import "server-only";
 import { prisma, hasDatabase } from "../prisma";
 import { levelFromPoints, mockLevelFromWallet } from "../levels";
+import { isAdminWallet } from "../env";
+import type { StaffRole } from "../permissions";
 
 export type ChatMessageView = {
   id: string;
   wallet: string;
   body: string;
   level: number;
+  role: StaffRole | null;
   createdAt: number;
 };
 
@@ -39,19 +42,41 @@ export async function resolveLevel(wallet: string): Promise<number> {
   return mockLevelFromWallet(lowered);
 }
 
+/** Resolve staff roles for a set of wallets (env owners → OWNER). */
+async function rolesFor(wallets: string[]): Promise<Map<string, StaffRole>> {
+  const map = new Map<string, StaffRole>();
+  const lowered = [...new Set(wallets.map((w) => w.toLowerCase()))];
+  for (const w of lowered) if (isAdminWallet(w)) map.set(w, "OWNER");
+  if (hasDatabase && lowered.length) {
+    try {
+      const staff = await prisma.staff.findMany({
+        where: { wallet: { in: lowered } },
+        select: { wallet: true, role: true },
+      });
+      for (const s of staff) if (!map.has(s.wallet)) map.set(s.wallet, s.role as StaffRole);
+    } catch {
+      /* ignore */
+    }
+  }
+  return map;
+}
+
 export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
   if (hasDatabase) {
     try {
       const rows = await prisma.chatMessage.findMany({
+        where: { deleted: false },
         orderBy: { createdAt: "desc" },
         take: limit,
       });
+      const roles = await rolesFor(rows.map((r) => r.wallet));
       return rows
         .map((r) => ({
           id: r.id,
           wallet: r.wallet,
           body: r.body,
           level: r.level,
+          role: roles.get(r.wallet.toLowerCase()) ?? null,
           createdAt: r.createdAt.getTime(),
         }))
         .reverse();
@@ -59,7 +84,10 @@ export async function getMessages(limit = 50): Promise<ChatMessageView[]> {
       // fall through to in-memory
     }
   }
-  return buffer.slice(-limit);
+  const roles = await rolesFor(buffer.map((m) => m.wallet));
+  return buffer
+    .slice(-limit)
+    .map((m) => ({ ...m, role: roles.get(m.wallet.toLowerCase()) ?? null }));
 }
 
 export async function addMessage(
@@ -80,6 +108,7 @@ export async function addMessage(
         wallet: row.wallet,
         body: row.body,
         level: row.level,
+        role: null,
         createdAt: row.createdAt.getTime(),
       };
     } catch {
@@ -92,6 +121,7 @@ export async function addMessage(
     wallet: lowered,
     body: clean,
     level,
+    role: null,
     createdAt: Date.now(),
   };
   buffer.push(msg);

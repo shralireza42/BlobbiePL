@@ -14,6 +14,13 @@ export type RoundInfo = {
   endTime: number; // epoch ms
   poolUsd: number;
   mockMode: boolean;
+  /** When the post-draw cooldown ends (next round opens). */
+  cooldownEndsAt?: number | null;
+  /** True only while status === OPEN (tickets can be bought). */
+  purchaseOpen?: boolean;
+  /** Verifiable randomness for the settled draw. */
+  randomSeed?: string | null;
+  vrfRequestId?: string | null;
 };
 
 export type Winner = {

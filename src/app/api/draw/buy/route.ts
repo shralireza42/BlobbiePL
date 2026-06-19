@@ -4,6 +4,8 @@ import { getSession } from "@/lib/auth";
 import { getDrawProvider, isMockMode } from "@/lib/contracts";
 import { recordEntry } from "@/lib/services/draw";
 import { claimTask } from "@/lib/services/airdrop";
+import { isSiteBanned } from "@/lib/services/moderation";
+import { getFeatures } from "@/lib/services/features";
 import { config } from "@/lib/config";
 import { rateLimit, clientIdentifier } from "@/lib/rate-limit";
 
@@ -19,7 +21,15 @@ export async function POST(req: Request) {
     });
     if (!rl.ok) return rateLimited(rl.resetAt);
 
-    if (!config.ticketPurchaseEnabled) {
+    if (await isSiteBanned(session.wallet)) {
+      return fail("Your account is banned from the site.", 403);
+    }
+
+    const features = await getFeatures();
+    if (!features.drawEnabled) {
+      return fail("The Daily Rewards Draw is temporarily paused.", 403);
+    }
+    if (!config.ticketPurchaseEnabled || !features.ticketPurchaseEnabled) {
       return fail("Ticket purchase is currently disabled.", 403);
     }
 
@@ -34,15 +44,20 @@ export async function POST(req: Request) {
     }
 
     const provider = getDrawProvider();
-    const tx = await provider.buyTickets(input.ticketCount, session.wallet as `0x${string}`);
 
-    // Persist off-chain entry (mock indexing / live indexing parity).
+    // Persist the entry first (validates the round is open / not in cooldown).
     const entry = await recordEntry({
       wallet: session.wallet,
       ticketCount: input.ticketCount,
       txHash: mock ? null : input.txHash ?? null,
       mockMode: mock,
     });
+
+    if (entry.recorded === false) {
+      return fail(entry.message ?? "The draw is closed right now.", 409);
+    }
+
+    const tx = await provider.buyTickets(input.ticketCount, session.wallet as `0x${string}`);
 
     // Daily Draw participation generates airdrop points (server-side only).
     let airdrop: { awarded: number } | null = null;

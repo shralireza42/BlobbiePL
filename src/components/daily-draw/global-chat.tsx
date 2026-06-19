@@ -12,14 +12,33 @@ type ChatMessage = {
   wallet: string;
   body: string;
   level: number;
+  role: string | null;
   createdAt: number;
+};
+
+const ROLE_TAG: Record<string, string> = {
+  OWNER: "bg-gold text-ink",
+  MANAGER: "bg-neon-purple/30 text-neon-purple",
+  MODERATOR: "bg-neon-blue/30 text-neon-blue",
+  SENIOR: "bg-cream/15 text-cream",
+};
+const ROLE_LABEL: Record<string, string> = {
+  OWNER: "Owner",
+  MANAGER: "Manager",
+  MODERATOR: "Moderator",
+  SENIOR: "Senior",
 };
 
 const MAX_LEN = 280;
 
 export function GlobalChat() {
   const { session } = useWalletSession();
-  const canChat = session.authenticated && !!session.wallet;
+  const canChat = session.authenticated && !!session.wallet && !session.sanctions.chatBlocked;
+  const canModerate = session.permissions.includes("CHAT_MODERATE");
+
+  async function moderate(action: string, payload: Record<string, unknown>) {
+    await postJson("/api/chat/moderate", { action, ...payload });
+  }
 
   const { data, refetch } = useQuery({
     queryKey: ["global-chat"],
@@ -100,6 +119,11 @@ export function GlobalChat() {
                 !!session.wallet &&
                 m.wallet.toLowerCase() === session.wallet.toLowerCase()
               }
+              canModerate={canModerate}
+              onModerate={async (action, payload) => {
+                await moderate(action, payload);
+                refetch();
+              }}
             />
           ))
         )}
@@ -130,14 +154,25 @@ export function GlobalChat() {
   );
 }
 
-function ChatBubble({ message, mine }: { message: ChatMessage; mine: boolean }) {
+function ChatBubble({
+  message,
+  mine,
+  canModerate,
+  onModerate,
+}: {
+  message: ChatMessage;
+  mine: boolean;
+  canModerate: boolean;
+  onModerate: (action: string, payload: Record<string, unknown>) => void;
+}) {
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
   const level = message.level ?? 0;
+  const role = message.role;
   return (
-    <div className="flex items-start gap-2.5">
+    <div className="group flex items-start gap-2.5">
       <span
         className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cream/20 bg-paper"
         title={`Level ${level} · ${LEVEL_TITLES[level] ?? ""}`}
@@ -146,15 +181,27 @@ function ChatBubble({ message, mine }: { message: ChatMessage; mine: boolean }) 
         <img src={characterFor(level)} alt={`Level ${level}`} className="h-full w-full object-cover" />
       </span>
       <div className="max-w-[78%]">
-        <div className="flex items-center gap-2 text-[11px] not-italic text-cream-dim">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] not-italic text-cream-dim">
           <span className="font-mono">
             {mine ? "You" : shortenAddress(message.wallet, 4)}
           </span>
+          {role && (
+            <span className={`rounded-full px-1.5 text-[10px] font-bold ${ROLE_TAG[role] ?? "bg-cream/15 text-cream"}`}>
+              {ROLE_LABEL[role] ?? role}
+            </span>
+          )}
           <span className="rounded-full border border-accent-lime/40 bg-accent-lime/10 px-1.5 text-[10px] text-accent-lime">
             Lv {level}
           </span>
           <span>·</span>
           <span>{time}</span>
+          {canModerate && (
+            <span className="hidden gap-1.5 group-hover:inline-flex">
+              <button className="text-rose-300 hover:underline" onClick={() => onModerate("delete", { messageId: message.id })}>del</button>
+              <button className="text-gold hover:underline" onClick={() => onModerate("mute", { wallet: message.wallet, durationMinutes: 60 })}>mute</button>
+              <button className="text-rose-300 hover:underline" onClick={() => onModerate("ban", { wallet: message.wallet })}>ban</button>
+            </span>
+          )}
         </div>
         <div
           className={`mt-1 inline-block break-words rounded-2xl border px-3 py-2 text-sm not-italic ${

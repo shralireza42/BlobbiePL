@@ -1,18 +1,27 @@
 import "server-only";
 import { prisma, hasDatabase } from "../prisma";
 import { getOrCreateCampaign } from "./airdrop";
+import { listStaff } from "./staff";
+import { listSanctions } from "./moderation";
+import { getFeatures } from "./features";
+
+const ACTIVE_WINDOW_MS = 15 * 60 * 1000;
 
 export async function getAdminOverview() {
   if (!hasDatabase) {
     return {
       hasDatabase: false,
-      counts: { users: 0, entries: 0, airdropUsers: 0, fraudFlags: 0, pendingCompletions: 0 },
+      counts: { users: 0, entries: 0, airdropUsers: 0, fraudFlags: 0, pendingCompletions: 0, activeUsers: 0 },
       users: [],
+      activeUsers: [],
       airdropUsers: [],
       drawActivity: [],
       fraudFlags: [],
       pendingCompletions: [],
       appConfig: {},
+      staff: [],
+      sanctions: [],
+      features: await getFeatures(),
     };
   }
 
@@ -81,6 +90,20 @@ export async function getAdminOverview() {
   const appConfig: Record<string, string> = {};
   for (const row of appConfigRows) appConfig[row.key] = row.value;
 
+  const activeSince = new Date(Date.now() - ACTIVE_WINDOW_MS);
+  const [activeUsers, activeCount, staff, sanctions, features] = await Promise.all([
+    prisma.user.findMany({
+      where: { lastSeenAt: { gte: activeSince } },
+      orderBy: { lastSeenAt: "desc" },
+      take: 50,
+      select: { wallet: true, lastSeenAt: true, createdAt: true },
+    }),
+    prisma.user.count({ where: { lastSeenAt: { gte: activeSince } } }),
+    listStaff(),
+    listSanctions(100),
+    getFeatures(),
+  ]);
+
   return {
     hasDatabase: true,
     counts: {
@@ -89,13 +112,18 @@ export async function getAdminOverview() {
       airdropUsers: airdropUsersCount,
       fraudFlags: fraudCount,
       pendingCompletions: pendingCount,
+      activeUsers: activeCount,
     },
     users,
+    activeUsers,
     airdropUsers,
     drawActivity,
     fraudFlags,
     pendingCompletions,
     appConfig,
+    staff,
+    sanctions,
+    features,
   };
 }
 

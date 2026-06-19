@@ -6,6 +6,8 @@
 export const ROUND_CAPACITY = 300;
 export const ROUND_DURATION_MS = 24 * 60 * 60 * 1000;
 export const CLOSING_SOON_THRESHOLD_MS = 60 * 60 * 1000; // last hour
+/** Cooldown between a round closing (drawing winners) and the next round. */
+export const DRAW_COOLDOWN_MS = 3 * 60 * 1000;
 
 /** 1 Ticket = $1 USD equivalent in $BLOBBIE. */
 export const TICKET_USD_VALUE = 1;

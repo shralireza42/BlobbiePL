@@ -22,6 +22,10 @@ type RoundInfo = {
   endTime: number;
   poolUsd: number;
   mockMode: boolean;
+  cooldownEndsAt?: number | null;
+  purchaseOpen?: boolean;
+  randomSeed?: string | null;
+  vrfRequestId?: string | null;
 };
 
 type Odds = {
@@ -120,6 +124,10 @@ function RoundCard({ data }: { data: CurrentResponse }) {
         </span>
       </div>
 
+      {round.status === "AWAITING_DRAW" && (
+        <DrawingBanner cooldownEndsAt={round.cooldownEndsAt} seed={round.randomSeed} />
+      )}
+
       <div className="mt-6">
         <div className="flex items-end justify-between">
           <p className="stat-label">Tickets sold</p>
@@ -176,6 +184,33 @@ function RoundCard({ data }: { data: CurrentResponse }) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DrawingBanner({
+  cooldownEndsAt,
+  seed,
+}: {
+  cooldownEndsAt?: number | null;
+  seed?: string | null;
+}) {
+  const { remaining } = useCountdown(cooldownEndsAt ?? null);
+  return (
+    <div className="mt-4 rounded-2xl border border-accent-lime/40 bg-accent-lime/10 p-4">
+      <p className="font-display not-italic text-cream">
+        🎲 Drawing winners… next round opens in{" "}
+        <span className="font-mono">{formatCountdown(remaining)}</span>
+      </p>
+      <p className="mt-1 text-xs not-italic text-cream-dim">
+        Purchases are paused during the 3-minute draw window.
+        {seed && (
+          <>
+            {" "}Verifiable seed:{" "}
+            <span className="font-mono text-cream-soft">{seed.slice(0, 18)}…</span>
+          </>
+        )}
+      </p>
     </div>
   );
 }
@@ -339,9 +374,11 @@ function PurchasePanel({
     return Number(quote.blobbieWei) / 1e18;
   }, [quote]);
 
+  const roundOpen = data.round.purchaseOpen !== false && data.round.status === "OPEN";
   const purchaseDisabled =
     !canBuy ||
     !data.ticketPurchaseEnabled ||
+    !roundOpen ||
     count < 1 ||
     tx.phase === "approving" ||
     tx.phase === "buying";
@@ -454,6 +491,11 @@ function PurchasePanel({
         {!data.ticketPurchaseEnabled && (
           <p className="text-xs text-gold">
             Ticket purchase is currently disabled by the admin.
+          </p>
+        )}
+        {data.ticketPurchaseEnabled && !roundOpen && (
+          <p className="text-xs text-gold">
+            The round is drawing winners — buying reopens with the next round.
           </p>
         )}
       </div>
