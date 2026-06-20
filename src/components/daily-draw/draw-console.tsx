@@ -83,7 +83,7 @@ export function DrawConsole() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      <div className="lg:col-span-2 space-y-6">
+      <div id="round-section" className="lg:col-span-2 space-y-6 scroll-mt-24">
         <RoundCard data={data} />
       </div>
       <div className="space-y-6">
@@ -104,6 +104,18 @@ export function DrawConsole() {
           onPurchased={() => {
             // Server records the entry; refetch to reflect new counts.
             refetch();
+            // On screens where the round details and the buy panel aren't shown
+            // side by side (below lg), bring the updated round into view.
+            if (
+              typeof window !== "undefined" &&
+              window.matchMedia("(max-width: 1023px)").matches
+            ) {
+              setTimeout(() => {
+                document
+                  .getElementById("round-section")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 150);
+            }
           }}
         />
       </div>
