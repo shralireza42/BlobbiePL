@@ -79,38 +79,39 @@ export default async function HomePage() {
       {/* Mini-games — three coming soon boxes with editable transparent images */}
       {features.minigamesEnabled && <GamesSection />}
 
-      {/* Coming Soon — Jackpot only (transparent, editable image background) */}
+      {/* Coming Soon — Jackpot (same treatment as the active sections: the
+          image sits in its own aspect-matched box so it fully fills the frame
+          and the whole image stays visible with object-cover) */}
       <section className="container-px py-16">
-        {/*
-          Background art is editable: replace /public/sections/jackpot.svg
-          (or drop a PNG with the same name).
-        */}
-        <div className="relative min-h-[280px] overflow-hidden rounded-3xl border-2 border-cream/15 p-8 sm:p-12">
-          {/* Image fills the frame regardless of its aspect ratio. Replace
-              /public/sections/jackpot.svg (or drop a PNG with the same name). */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/sections/jackpot.svg"
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-          />
-          {/* Scrim keeps the text readable over any image */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg/85 via-bg/45 to-transparent" />
-          <div className="relative z-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            <div className="max-w-lg">
-              <ComingSoonBadge />
-              <h2 className="mt-3 text-3xl font-display not-italic sm:text-4xl">
-                {JACKPOT_CARD.title}
-              </h2>
-              <h6 className="mt-2 text-cream-dim">
-                {JACKPOT_CARD.description} Provably fair and VRF-compatible when
-                live.
-              </h6>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div>
+            <ComingSoonBadge />
+            <h2 className="mt-3 text-4xl font-display not-italic sm:text-6xl">
+              {JACKPOT_CARD.title}
+            </h2>
+            <h6 className="mt-5 max-w-xl text-base text-cream-dim sm:text-lg">
+              {JACKPOT_CARD.description} Provably fair and VRF-compatible when
+              live.
+            </h6>
+            <div className="mt-8">
+              <Link href={JACKPOT_CARD.href} className="btn-ghost">
+                Learn more →
+              </Link>
             </div>
-            <Link href={JACKPOT_CARD.href} className="btn-ghost shrink-0">
-              Learn more →
-            </Link>
+          </div>
+
+          {/* The jackpot art is 16:9 (1672×941), so the box is aspect-video:
+              object-cover then fills the frame completely with the whole image
+              visible. If you swap in a square image, change aspect-video to
+              aspect-square to match. Replace /public/sections/jackpot.svg. */}
+          <div className="relative mx-auto flex aspect-video w-full max-w-xl overflow-hidden rounded-3xl border-2 border-cream/15">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/sections/jackpot.svg"
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            />
           </div>
         </div>
       </section>
