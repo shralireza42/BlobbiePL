@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: ROUTES.dailyDraw, label: "Daily Draw" },
   { href: ROUTES.airdrop, label: "Airdrop Hub" },
   { href: ROUTES.verify, label: "Verify Round" },
+  { href: ROUTES.bugBounty, label: "Bug Bounty" },
 ];
 
 const SOCIALS = [
