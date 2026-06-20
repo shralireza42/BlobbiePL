@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useWalletSession } from "@/hooks/useWalletSession";
 import { getJson, postJson } from "@/lib/client-api";
 import { formatUsd } from "@/lib/format";
-import { bscScanTx } from "@/lib/config";
+import { bscScanTx, config } from "@/lib/config";
 import { Skeleton } from "@/components/ui";
 
 type Winning = {
@@ -105,6 +105,24 @@ export function WinningsCard() {
           </table>
         </div>
       )}
+
+      <p className="mt-3 text-xs not-italic text-cream-dim">
+        {config.isMockMode ? (
+          <>
+            <span className="font-semibold text-gold">Beta Mock Mode:</span>{" "}
+            claimed winnings are converted to{" "}
+            <span className="text-cream">Airdrop Points</span> (no real token is
+            transferred during beta). Once live, prizes are paid on-chain in
+            $BLOBBIE.
+          </>
+        ) : (
+          <>
+            Claimed winnings are{" "}
+            <span className="text-cream">transferred automatically</span> in
+            $BLOBBIE to your connected wallet on BNB Chain.
+          </>
+        )}
+      </p>
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import "server-only";
+import type { Prisma } from "@prisma/client";
 import { prisma, hasDatabase } from "../prisma";
 import { getDrawProvider, isMockMode } from "../contracts";
 import { getBlobbiePrice } from "../price";
 import type { RoundInfo, Winner } from "../contracts/types";
 import { getMockWinners } from "../contracts/mock-data";
 import { getOrAdvanceRound, addTickets } from "./draw-engine";
+import { DEFAULT_CAMPAIGN_SLUG, MOCK_WINNINGS_POINTS_PER_USD } from "../constants";
 
 /**
  * Draw read/service layer. Prefers the live/DB-backed round when a database is
@@ -143,11 +145,15 @@ export async function getMyWinnings(wallet: string): Promise<MyWinning[]> {
   }
 }
 
-/** Claim a prize the wallet won (one-time, idempotent). */
+/** Claim a prize the wallet won (one-time, idempotent).
+ *
+ * Beta Mock Mode → the prize is converted to Airdrop Points (no real token
+ * exists yet). Real mode → the $BLOBBIE is transferred to the winner's wallet.
+ */
 export async function claimWinnings(
   wallet: string,
   roundNumber: number,
-): Promise<{ ok: boolean; message: string; usdAmount?: number }> {
+): Promise<{ ok: boolean; message: string; usdAmount?: number; mode?: "mock" | "real" }> {
   if (!hasDatabase) {
     return { ok: false, message: "No on-chain winnings to claim in Beta Mock Mode." };
   }
@@ -162,6 +168,9 @@ export async function claimWinnings(
     if (winner.claimStatus === "CLAIMED") {
       return { ok: false, message: "This prize has already been claimed." };
     }
+
+    const mock = round.mockMode || isMockMode();
+
     await tx.drawWinner.update({
       where: { id: winner.id },
       data: { claimStatus: "CLAIMED", claimedAt: new Date() },
@@ -170,15 +179,69 @@ export async function claimWinnings(
       data: {
         wallet: lowered,
         type: "prize_claim",
-        message: `Claimed prize for round #${roundNumber}`,
-        metadata: { usdAmount: winner.usdAmount },
+        message: `Claimed prize for round #${roundNumber} (${mock ? "mock→points" : "on-chain transfer"})`,
+        metadata: { usdAmount: winner.usdAmount, mock },
       },
     });
+
+    if (mock) {
+      const points = Math.round(winner.usdAmount * MOCK_WINNINGS_POINTS_PER_USD);
+      await grantWinningsPoints(tx, lowered, points, roundNumber);
+      return {
+        ok: true,
+        mode: "mock",
+        message: `Beta Mock Mode: converted $${winner.usdAmount.toFixed(2)} to ${points.toLocaleString()} Airdrop Points.`,
+        usdAmount: winner.usdAmount,
+      };
+    }
+
     return {
       ok: true,
-      message: `Claimed $${winner.usdAmount.toFixed(2)} in $BLOBBIE.`,
+      mode: "real",
+      message: `Transferring $${winner.usdAmount.toFixed(2)} in $BLOBBIE to your wallet.`,
       usdAmount: winner.usdAmount,
     };
+  });
+}
+
+/** Credit converted-winnings points to a wallet's airdrop balance (mock mode). */
+async function grantWinningsPoints(
+  tx: Prisma.TransactionClient,
+  wallet: string,
+  points: number,
+  roundNumber: number,
+) {
+  if (points <= 0) return;
+  const campaign = await tx.airdropCampaign.findUnique({
+    where: { slug: DEFAULT_CAMPAIGN_SLUG },
+  });
+  if (!campaign) return;
+  const user = await tx.user.upsert({
+    where: { wallet },
+    update: {},
+    create: { wallet },
+  });
+  const airdropUser = await tx.airdropUser.upsert({
+    where: { campaignId_wallet: { campaignId: campaign.id, wallet } },
+    update: {},
+    create: { userId: user.id, campaignId: campaign.id, wallet },
+  });
+  const newTotal = airdropUser.totalPoints + points;
+  await tx.airdropUser.update({
+    where: { id: airdropUser.id },
+    data: { totalPoints: newTotal },
+  });
+  await tx.airdropPointsLedger.create({
+    data: {
+      campaignId: campaign.id,
+      userId: user.id,
+      wallet,
+      delta: points,
+      balanceAfter: newTotal,
+      reason: "ADMIN_ADJUSTMENT",
+      refType: "winnings_conversion",
+      refId: String(roundNumber),
+    },
   });
 }
 
