@@ -28,10 +28,12 @@ export async function createTelegramLinkToken(wallet: string): Promise<string | 
 }
 
 /**
- * Consume a /start token. Returns the linked wallet (lowercased) if the token
- * is valid, unused and unexpired; otherwise null. Marks the token used.
+ * Peek at a /start token WITHOUT consuming it. Returns the linked wallet
+ * (lowercased) if the token is valid, unused and unexpired; otherwise null.
+ * Used so we don't burn the token when channel-membership gating fails (the
+ * same link should still work after the user joins the channel and retries).
  */
-export async function consumeTelegramLinkToken(
+export async function peekTelegramLinkToken(
   code: string,
 ): Promise<string | null> {
   if (!hasDatabase || !code) return null;
@@ -39,9 +41,14 @@ export async function consumeTelegramLinkToken(
   if (!token) return null;
   if (token.usedAt) return null;
   if (token.expiresAt.getTime() < Date.now()) return null;
-  await prisma.telegramLinkToken.update({
-    where: { id: token.id },
+  return token.wallet;
+}
+
+/** Mark a /start token as used (single-use). Safe to call once linking succeeds. */
+export async function markTelegramLinkTokenUsed(code: string): Promise<void> {
+  if (!hasDatabase || !code) return;
+  await prisma.telegramLinkToken.updateMany({
+    where: { code, usedAt: null },
     data: { usedAt: new Date() },
   });
-  return token.wallet;
 }

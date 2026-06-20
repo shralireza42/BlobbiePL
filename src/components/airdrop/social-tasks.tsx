@@ -243,7 +243,9 @@ function TelegramTask({ status, onChange }: { status: SocialStatus; onChange: ()
     try {
       const { url } = await getJson<{ url: string }>("/api/social/telegram/start");
       window.open(url, "_blank", "noopener");
-      setMsg("Tap Start in Telegram, then come back — we'll detect it automatically.");
+      setMsg(
+        "Join the channel first, then tap Start in Telegram — we'll detect it automatically.",
+      );
       let tries = 0;
       const iv = setInterval(() => {
         onChange();
