@@ -162,16 +162,28 @@ export async function claimReferral(
 }
 
 export async function getReferralAnalytics(limit = 20) {
-  if (!hasDatabase) return { totalReferrals: 0, topReferrers: [] };
+  if (!hasDatabase) return { totalReferrals: 0, topReferrers: [], recent: [] };
   try {
-    const grouped = await prisma.referral.groupBy({
-      by: ["referrerWallet"],
-      _count: { _all: true },
-      _sum: { referrerPoints: true },
-      orderBy: { _count: { referrerWallet: "desc" } },
-      take: limit,
-    });
-    const total = await prisma.referral.count();
+    const [grouped, total, recent] = await Promise.all([
+      prisma.referral.groupBy({
+        by: ["referrerWallet"],
+        _count: { _all: true },
+        _sum: { referrerPoints: true },
+        orderBy: { _count: { referrerWallet: "desc" } },
+        take: limit,
+      }),
+      prisma.referral.count(),
+      prisma.referral.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          referrerWallet: true,
+          refereeWallet: true,
+          source: true,
+          createdAt: true,
+        },
+      }),
+    ]);
     return {
       totalReferrals: total,
       topReferrers: grouped.map((g) => ({
@@ -179,8 +191,14 @@ export async function getReferralAnalytics(limit = 20) {
         count: g._count._all,
         points: g._sum.referrerPoints ?? 0,
       })),
+      recent: recent.map((r) => ({
+        referrer: r.referrerWallet,
+        referee: r.refereeWallet,
+        source: r.source,
+        createdAt: r.createdAt,
+      })),
     };
   } catch {
-    return { totalReferrals: 0, topReferrers: [] };
+    return { totalReferrals: 0, topReferrers: [], recent: [] };
   }
 }

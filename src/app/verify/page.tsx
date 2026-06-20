@@ -6,7 +6,7 @@ import { VerifyConsole } from "@/components/verify/verify-console";
 import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Verify Results",
+  title: "Verify Round",
   description:
     "Enter any Daily Draw round number to view its participants, status and winners. Results are designed to be on-chain verifiable when live.",
 };

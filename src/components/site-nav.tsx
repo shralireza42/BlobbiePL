@@ -10,7 +10,7 @@ import { ROUTES } from "@/lib/routes";
 const NAV_LINKS = [
   { href: ROUTES.dailyDraw, label: "Daily Draw" },
   { href: ROUTES.airdrop, label: "Airdrop Hub" },
-  { href: ROUTES.verify, label: "Verify" },
+  { href: ROUTES.verify, label: "Verify Round" },
 ];
 
 const SOCIALS = [

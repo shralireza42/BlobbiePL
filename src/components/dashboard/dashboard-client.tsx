@@ -9,6 +9,7 @@ import { formatNumber, formatUsd, shortenAddress } from "@/lib/format";
 import { WalletButton } from "@/components/wallet-button";
 import { ProfileCard } from "@/components/dashboard/profile-card";
 import { LevelCard } from "@/components/dashboard/level-card";
+import { WinningsCard } from "@/components/dashboard/winnings-card";
 import { ReferralPanel } from "@/components/referral-panel";
 import { Skeleton } from "@/components/ui";
 import { ROUTES } from "@/lib/routes";
@@ -61,6 +62,8 @@ export function DashboardClient() {
       {address && <ProfileCard wallet={address} />}
 
       <LevelCard />
+
+      <WinningsCard />
 
       <ReferralPanel />
 

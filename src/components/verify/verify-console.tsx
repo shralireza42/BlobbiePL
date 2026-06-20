@@ -47,20 +47,33 @@ export function VerifyConsole() {
   const [input, setInput] = useState(initial > 0 ? String(initial) : "");
   const [roundId, setRoundId] = useState<number | null>(initial > 0 ? initial : null);
 
-  // Default to the most recent completed round if nothing was requested.
+  // Default to the most recent round that actually has results.
   const { data: latest } = useQuery({
     queryKey: ["verify-latest"],
+    queryFn: () =>
+      getJson<{
+        results: { round: { roundNumber: number } }[];
+      }>("/api/draw/results"),
+    enabled: roundId === null,
+  });
+  const { data: current } = useQuery({
+    queryKey: ["verify-current"],
     queryFn: () => getJson<{ round: { roundNumber: number } }>("/api/draw/current"),
     enabled: roundId === null,
   });
 
   useEffect(() => {
-    if (roundId === null && latest?.round.roundNumber) {
-      const prev = Math.max(1, latest.round.roundNumber - 1);
-      setRoundId(prev);
-      setInput(String(prev));
+    if (roundId !== null) return;
+    const latestSettled = latest?.results?.[0]?.round.roundNumber;
+    const fallback = current?.round.roundNumber
+      ? Math.max(1, current.round.roundNumber - 1)
+      : undefined;
+    const target = latestSettled ?? fallback;
+    if (target) {
+      setRoundId(target);
+      setInput(String(target));
     }
-  }, [latest, roundId]);
+  }, [latest, current, roundId]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["verify-round", roundId],
