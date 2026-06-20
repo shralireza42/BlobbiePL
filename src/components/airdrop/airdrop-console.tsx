@@ -181,7 +181,6 @@ function TaskList({
 const AUTO_KEYS = new Set([
   "connect_wallet",
   "join_playground",
-  "view_daily_draw",
   "top_winner",
 ]);
 
