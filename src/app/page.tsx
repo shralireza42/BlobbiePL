@@ -93,7 +93,7 @@ export default async function HomePage() {
             src="/sections/jackpot.svg"
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-contain p-4"
+            className="pointer-events-none absolute inset-y-0 right-0 h-full w-2/3 object-contain object-right p-4 opacity-90"
           />
           {/* Scrim keeps the text readable over any image */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg/85 via-bg/45 to-transparent" />
@@ -173,13 +173,15 @@ function ActiveSection({
           Box with image background — edit the file in /public/sections (or drop
           a PNG with the same name). The <img> fills the frame at any aspect.
         */}
-        <div className="relative flex min-h-[340px] flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 p-6">
+        <div className="relative flex aspect-[4/3] w-full flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 p-4">
+          {/* Box matches the 4:3 artwork so the full image fits the frame
+              edge-to-edge (no crop, no shrink) responsively. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-contain p-4"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
           />
           <div className="relative z-10 grid grid-cols-3 gap-4 rounded-2xl border border-cream/10 bg-bg/60 p-4 backdrop-blur">
             {stats.map((s) => (
