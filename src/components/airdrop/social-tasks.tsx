@@ -167,9 +167,7 @@ function StatusChip({ state }: { state: TaskView["status"] }) {
         Action needed
       </span>
     );
-  return (
-    <span className="chip border-cream/15 bg-cream/5 text-cream-dim">Not started</span>
-  );
+  return null;
 }
 
 function XTask({ status, onChange }: { status: SocialStatus; onChange: () => void }) {

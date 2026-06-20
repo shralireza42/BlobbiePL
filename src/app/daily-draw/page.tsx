@@ -9,7 +9,6 @@ import { Transparency } from "@/components/daily-draw/transparency";
 import { Results } from "@/components/daily-draw/results";
 import { GlobalChat } from "@/components/daily-draw/global-chat";
 import { PlaygroundCard } from "@/components/playground-card";
-import { AutoTask } from "@/hooks/useAutoTask";
 import { DRAW_COMING_SOON_CARDS, ROUTES } from "@/lib/routes";
 import { config } from "@/lib/config";
 
@@ -30,7 +29,6 @@ const HOW_TO_PLAY = [
 export default function DailyDrawPage() {
   return (
     <PageShell>
-      <AutoTask taskKey="view_daily_draw" />
       <section className="container-px py-12">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeading
