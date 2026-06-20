@@ -26,6 +26,21 @@ const HOW_TO_PLAY = [
   { step: "5", title: "Claim rewards", body: "If you win, your prize shows in results — claim it to your wallet." },
 ];
 
+function StepCard({ step }: { step: (typeof HOW_TO_PLAY)[number] }) {
+  return (
+    <div className="rounded-2xl border border-cream/10 bg-cream/5 p-4">
+      <span
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime font-display text-sm not-italic"
+        style={{ color: "#000000" }}
+      >
+        {step.step}
+      </span>
+      <p className="mt-2 font-display not-italic text-sm text-cream">{step.title}</p>
+      <p className="mt-1 text-xs not-italic text-cream-dim">{step.body}</p>
+    </div>
+  );
+}
+
 export default function DailyDrawPage() {
   return (
     <PageShell>
@@ -43,24 +58,31 @@ export default function DailyDrawPage() {
           )}
         </div>
 
-        {/* How to play: connect → buy → draw → claim */}
-        <div className="mt-8 card p-6">
-          <h3 className="font-display not-italic text-lg">How to play</h3>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {HOW_TO_PLAY.map((s) => (
-              <div key={s.step} className="rounded-2xl border border-cream/10 bg-cream/5 p-4">
-                <span
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime font-display text-sm not-italic"
-                  style={{ color: "#000000" }}
-                >
-                  {s.step}
-                </span>
-                <p className="mt-2 font-display not-italic text-sm text-cream">{s.title}</p>
-                <p className="mt-1 text-xs not-italic text-cream-dim">{s.body}</p>
-              </div>
+        {/* How to play: first step shown; the rest expand on demand. Uses a
+            native <details> so it works without client JS. */}
+        <details className="mt-8 card p-6 [&[open]_.htp-chevron]:rotate-90 [&[open]_.htp-show]:hidden [&:not([open])_.htp-hide]:hidden">
+          <summary className="cursor-pointer list-none">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="font-display not-italic text-lg">How to play</h3>
+              <span className="flex items-center gap-1 text-xs not-italic text-cream-dim">
+                <span className="htp-show">Show all steps</span>
+                <span className="htp-hide">Hide steps</span>
+                <span className="htp-chevron inline-block transition-transform">▸</span>
+              </span>
+            </div>
+            {/* Step 1 — always visible (inside summary so it shows when collapsed) */}
+            <div className="mt-4">
+              <StepCard step={HOW_TO_PLAY[0]} />
+            </div>
+          </summary>
+
+          {/* Steps 2–5 — revealed when expanded */}
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {HOW_TO_PLAY.slice(1).map((s) => (
+              <StepCard key={s.step} step={s} />
             ))}
           </div>
-        </div>
+        </details>
 
         <div className="mt-8">
           <DrawConsole />
