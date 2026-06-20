@@ -113,6 +113,13 @@ export function SocialTasks({ onChange }: { onChange: () => void }) {
         <TelegramTask status={data} onChange={refresh} />
         <BonusTask status={data} />
       </div>
+
+      <p className="mt-4 rounded-lg border border-gold/20 bg-gold/5 p-2.5 text-xs not-italic text-gold">
+        Stay followed &amp; joined to keep your points. Membership is re-checked
+        before the final airdrop — if you unfollow @{data.x.targetUsername} on X
+        or leave the Telegram channel after completing a task, those points
+        (and the social bonus) won&apos;t count toward your full allocation.
+      </p>
     </div>
   );
 }
