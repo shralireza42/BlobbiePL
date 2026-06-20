@@ -77,6 +77,21 @@ type Overview = {
     eligibility: string;
     banned: boolean;
   }[];
+  bugReports: {
+    total: number;
+    open: number;
+    recent: {
+      id: string;
+      title: string;
+      severity: string;
+      category: string;
+      status: string;
+      contact: string | null;
+      rewardWallet: string | null;
+      reporterWallet: string | null;
+      createdAt: string;
+    }[];
+  };
   me: {
     wallet: string;
     role: string | null;
@@ -212,7 +227,58 @@ export function AdminClient() {
       )}
 
       {can(data, "FLAG_FRAUD") && <FraudFlags flags={data.fraudFlags} />}
+
+      {can(data, "VIEW_USERS") && <BugReportsPanel reports={data.bugReports} />}
     </div>
+  );
+}
+
+const SEVERITY_STYLES: Record<string, string> = {
+  CRITICAL: "border-rose-400/40 bg-rose-400/10 text-rose-300",
+  HIGH: "border-orange-400/40 bg-orange-400/10 text-orange-300",
+  MEDIUM: "border-gold/40 bg-gold/10 text-gold",
+  LOW: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300",
+};
+
+function BugReportsPanel({ reports }: { reports: Overview["bugReports"] }) {
+  return (
+    <Section title={`Bug Reports — ${reports.total} total · ${reports.open} open`}>
+      {reports.recent.length === 0 ? (
+        <Empty>No bug reports submitted yet.</Empty>
+      ) : (
+        <div className="space-y-3">
+          {reports.recent.map((r) => (
+            <div
+              key={r.id}
+              className="rounded-xl border border-cream/10 bg-cream/5 p-4"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`chip ${SEVERITY_STYLES[r.severity] ?? ""}`}>
+                  {r.severity}
+                </span>
+                <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
+                  {r.category}
+                </span>
+                <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
+                  {r.status}
+                </span>
+                <span className="text-xs not-italic text-cream-dim">
+                  {new Date(r.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <p className="mt-2 font-medium text-cream">{r.title}</p>
+              <p className="mt-1 text-xs not-italic text-cream-dim">
+                {r.contact ? `Contact: ${r.contact}` : "No contact provided"}
+                {r.rewardWallet ? ` · Reward: ${shortenAddress(r.rewardWallet)}` : ""}
+                {r.reporterWallet
+                  ? ` · Reporter: ${shortenAddress(r.reporterWallet)}`
+                  : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
   );
 }
 

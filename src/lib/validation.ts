@@ -102,6 +102,23 @@ export const fraudFlagSchema = z.object({
   details: z.string().max(1000).optional(),
 });
 
+export const bugReportSchema = z.object({
+  title: z.string().trim().min(6, "Add a short title").max(140, "Max 140 characters"),
+  severity: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"]),
+  category: z.enum(["smart-contract", "web-app", "api", "other"]),
+  description: z
+    .string()
+    .trim()
+    .min(30, "Please describe the issue in more detail")
+    .max(8000, "Max 8000 characters"),
+  steps: z.string().trim().max(8000).optional(),
+  impact: z.string().trim().max(4000).optional(),
+  contact: z.string().trim().max(200).optional(),
+  rewardWallet: z.union([addressSchema, z.literal("")]).optional(),
+});
+
+export type BugReportInput = z.infer<typeof bugReportSchema>;
+
 export type LoginVerifyInput = z.infer<typeof loginVerifySchema>;
 export type TaskClaimInput = z.infer<typeof taskClaimSchema>;
 export type BuyTicketsInput = z.infer<typeof buyTicketsSchema>;
