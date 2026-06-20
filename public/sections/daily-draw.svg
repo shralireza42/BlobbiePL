@@ -1,18 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" width="480" height="360" role="img" aria-label="Daily Rewards Draw">
-  <!-- Transparent background  edit this file or replace with your own image (PNG/SVG) -->
-  <g fill="none" stroke="#e8edda" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <!-- Ticket -->
-    <path d="M120 150 h170 a14 14 0 0 1 14 14 v8 a16 16 0 0 0 0 32 v8 a14 14 0 0 1 -14 14 h-170 a14 14 0 0 1 -14 -14 v-8 a16 16 0 0 0 0 -32 v-8 a14 14 0 0 1 14 -14 Z"/>
-    <line x1="232" y1="150" x2="232" y2="226" stroke-dasharray="6 10"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Daily Draw">
+  <!-- Full-bleed editable artwork — replace this file (or drop a PNG with the same name). -->
+  <defs>
+    <linearGradient id="dd" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#26272e"/>
+      <stop offset="1" stop-color="#16171c"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#dd)"/>
+  <g stroke="#e8edda" stroke-opacity="0.08" stroke-width="3">
+    <line x1="0" y1="360" x2="600" y2="360"/>
+    <line x1="120" y1="0" x2="60" y2="450"/>
+    <line x1="320" y1="0" x2="280" y2="450"/>
+    <line x1="520" y1="0" x2="500" y2="450"/>
   </g>
-  <g fill="#e2fea5" fill-opacity="0.9">
-    <circle cx="170" cy="188" r="10"/>
-    <text x="250" y="196" font-family="Arial Black, sans-serif" font-size="28" fill="#e8edda" font-weight="900">$1</text>
+  <!-- Big ticket -->
+  <g transform="translate(300 235)">
+    <g stroke="#0b0b0b" stroke-width="5" stroke-linejoin="round">
+      <path d="M-190 -70 h360 a22 22 0 0 1 22 22 v18 a26 26 0 0 0 0 52 v18 a22 22 0 0 1 -22 22 h-360 a22 22 0 0 1 -22 -22 v-18 a26 26 0 0 0 0 -52 v-18 a22 22 0 0 1 22 -22 Z" fill="#fcd535"/>
+      <line x1="40" y1="-70" x2="40" y2="70" stroke-dasharray="10 12"/>
+    </g>
+    <circle cx="-120" cy="0" r="26" fill="#16171c"/>
+    <text x="-132" y="12" font-family="Arial Black, sans-serif" font-size="34" fill="#16171c" font-weight="900">$1</text>
+    <text x="80" y="16" font-family="Arial Black, sans-serif" font-size="40" fill="#16171c" font-weight="900">TICKET</text>
   </g>
-  <!-- Floating coins -->
-  <g fill="none" stroke="#e2fea5" stroke-opacity="0.8" stroke-width="3">
-    <circle cx="360" cy="96" r="34"/>
-    <circle cx="96" cy="280" r="22"/>
+  <!-- Coins -->
+  <g fill="#e2fea5" stroke="#0b0b0b" stroke-width="4">
+    <circle cx="90" cy="90" r="34"/>
+    <circle cx="520" cy="110" r="24"/>
+    <circle cx="510" cy="370" r="30"/>
   </g>
-  <text x="348" y="106" font-family="Arial Black, sans-serif" font-size="30" fill="#e2fea5" fill-opacity="0.9" font-weight="900">B</text>
+  <text x="40" y="62" font-family="Arial Black, sans-serif" font-size="40" fill="#e8edda" font-weight="900">DAILY DRAW</text>
 </svg>

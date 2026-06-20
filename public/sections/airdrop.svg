@@ -1,21 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" width="480" height="360" role="img" aria-label="Airdrop Hub">
-  <!-- Transparent background  edit this file or replace with your own image (PNG/SVG) -->
-  <g fill="none" stroke="#e8edda" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-    <!-- Parachute canopy -->
-    <path d="M150 150 a90 90 0 0 1 180 0 Z"/>
-    <path d="M150 150 q45 40 45 0 q45 40 45 0 q45 40 45 0"/>
-    <!-- Lines to package -->
-    <line x1="150" y1="150" x2="222" y2="214"/>
-    <line x1="240" y1="150" x2="240" y2="214"/>
-    <line x1="330" y1="150" x2="258" y2="214"/>
-    <!-- Package -->
-    <rect x="214" y="214" width="52" height="48" rx="8"/>
-    <line x1="240" y1="214" x2="240" y2="262"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Airdrop Hub">
+  <!-- Full-bleed editable artwork — replace this file (or drop a PNG with the same name). -->
+  <defs>
+    <linearGradient id="ad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#26272e"/>
+      <stop offset="1" stop-color="#16171c"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#ad)"/>
+  <g fill="#e8edda" fill-opacity="0.85">
+    <circle cx="90" cy="120" r="4"/>
+    <circle cx="520" cy="90" r="3"/>
+    <circle cx="470" cy="190" r="3"/>
+    <circle cx="120" cy="300" r="3"/>
   </g>
-  <g fill="#e2fea5" fill-opacity="0.9">
-    <circle cx="360" cy="250" r="6"/>
-    <circle cx="110" cy="120" r="5"/>
-    <circle cx="390" cy="120" r="4"/>
+  <!-- Parachute + package -->
+  <g transform="translate(300 250)">
+    <g stroke="#0b0b0b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-150 -40 a150 110 0 0 1 300 0 Z" fill="#e2fea5"/>
+      <path d="M-150 -40 q75 70 75 0 q75 70 75 0 q75 70 75 0" fill="#79cc9e"/>
+      <line x1="-150" y1="-40" x2="-40" y2="70"/>
+      <line x1="0" y1="-40" x2="0" y2="70"/>
+      <line x1="150" y1="-40" x2="40" y2="70"/>
+      <rect x="-46" y="70" width="92" height="80" rx="12" fill="#fcd535"/>
+      <line x1="0" y1="70" x2="0" y2="150"/>
+    </g>
+    <text x="-22" y="128" font-family="Arial Black, sans-serif" font-size="40" fill="#0b0b0b" font-weight="900">★</text>
   </g>
-  <text x="226" y="246" font-family="Arial Black, sans-serif" font-size="22" fill="#e2fea5" fill-opacity="0.95" font-weight="900"></text>
+  <text x="40" y="62" font-family="Arial Black, sans-serif" font-size="40" fill="#e8edda" font-weight="900">AIRDROP</text>
 </svg>
