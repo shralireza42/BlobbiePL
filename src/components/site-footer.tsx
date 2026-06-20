@@ -21,6 +21,7 @@ export function SiteFooter() {
             { href: ROUTES.referrals, label: "Referrals" },
             { href: ROUTES.dashboard, label: "Dashboard" },
             { href: ROUTES.verify, label: "Verify Results" },
+            { href: ROUTES.bugBounty, label: "Bug Bounty" },
           ]}
         />
         <FooterCol

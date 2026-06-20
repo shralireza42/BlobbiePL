@@ -10,6 +10,8 @@ import {
   CLOSING_SOON_THRESHOLD_MS,
   PRIZE_DISTRIBUTION,
   POOL_ALLOCATION,
+  DEFAULT_CAMPAIGN_SLUG,
+  AIRDROP_TASKS,
 } from "../constants";
 import { poolScale } from "../prizes";
 import type { RoundInfo } from "../contracts/types";
@@ -180,12 +182,115 @@ async function settleRound(tx: Tx, roundId: string, mock: boolean) {
     });
   }
 
+  // Award the one-time "Daily Draw Top Winner" airdrop task to 1st place.
+  if (winners.length > 0) {
+    await grantTopWinner(tx, winners[0]);
+  }
+
   await tx.activityLog.create({
     data: {
       wallet: null,
       type: "draw_settled",
       message: `Round #${round.roundNumber} drawn — ${winners.length} winner(s), seed ${seed.slice(0, 10)}…`,
       metadata: { seed, vrfRequestId, realTickets },
+    },
+  });
+}
+
+const TOP_WINNER_TASK = AIRDROP_TASKS.find((t) => t.key === "top_winner");
+
+/**
+ * Grant the one-time top-winner airdrop bonus (10,000 pts) to a round's 1st
+ * place wallet. Idempotent — a wallet receives it only once, ever. Safe no-op
+ * if the airdrop campaign hasn't been initialized yet.
+ */
+async function grantTopWinner(tx: Tx, wallet: string) {
+  if (!TOP_WINNER_TASK) return;
+  const lowered = wallet.toLowerCase();
+
+  const campaign = await tx.airdropCampaign.findUnique({
+    where: { slug: DEFAULT_CAMPAIGN_SLUG },
+  });
+  if (!campaign) return;
+
+  // Ensure the task row exists (campaigns seeded before this task was added).
+  const task = await tx.airdropTask.upsert({
+    where: { campaignId_key: { campaignId: campaign.id, key: TOP_WINNER_TASK.key } },
+    update: {},
+    create: {
+      campaignId: campaign.id,
+      key: TOP_WINNER_TASK.key,
+      title: TOP_WINNER_TASK.title,
+      description: TOP_WINNER_TASK.description,
+      points: TOP_WINNER_TASK.points,
+      type: TOP_WINNER_TASK.type,
+      status: TOP_WINNER_TASK.status,
+      requiresAdmin: TOP_WINNER_TASK.requiresAdmin,
+      sortOrder: TOP_WINNER_TASK.sortOrder,
+    },
+  });
+
+  const user = await tx.user.upsert({
+    where: { wallet: lowered },
+    update: {},
+    create: { wallet: lowered },
+  });
+
+  const existing = await tx.airdropCompletion.findUnique({
+    where: {
+      taskId_userId_dayBucket: { taskId: task.id, userId: user.id, dayBucket: "" },
+    },
+  });
+  if (existing?.approved) return; // already a top winner before — once only
+
+  const airdropUser = await tx.airdropUser.upsert({
+    where: { campaignId_wallet: { campaignId: campaign.id, wallet: lowered } },
+    update: {},
+    create: { userId: user.id, campaignId: campaign.id, wallet: lowered },
+  });
+
+  if (existing) {
+    await tx.airdropCompletion.update({
+      where: { id: existing.id },
+      data: { approved: true, pointsAwarded: task.points },
+    });
+  } else {
+    await tx.airdropCompletion.create({
+      data: {
+        campaignId: campaign.id,
+        taskId: task.id,
+        userId: user.id,
+        wallet: lowered,
+        pointsAwarded: task.points,
+        dayBucket: "",
+        approved: true,
+      },
+    });
+  }
+
+  const newTotal = airdropUser.totalPoints + task.points;
+  await tx.airdropUser.update({
+    where: { id: airdropUser.id },
+    data: { totalPoints: newTotal },
+  });
+  await tx.airdropPointsLedger.create({
+    data: {
+      campaignId: campaign.id,
+      userId: user.id,
+      wallet: lowered,
+      delta: task.points,
+      balanceAfter: newTotal,
+      reason: "TASK_COMPLETION",
+      refType: "top_winner",
+      refId: task.id,
+    },
+  });
+  await tx.activityLog.create({
+    data: {
+      userId: user.id,
+      wallet: lowered,
+      type: "airdrop_top_winner",
+      message: `Daily Draw top-winner bonus (+${task.points} pts)`,
     },
   });
 }

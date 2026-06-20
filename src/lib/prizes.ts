@@ -76,6 +76,15 @@ export function topPrizeUsd(realTickets: number): number {
   return scaledPrize(PRIZE_DISTRIBUTION.first.usdEach, realTickets);
 }
 
+/** Chance a wallet wins the single TOP prize (1st place): tickets / pool. */
+export function topWinnerChancePct(
+  userTickets: number,
+  realTickets: number,
+): number {
+  if (userTickets <= 0 || realTickets <= 0) return 0;
+  return Math.min(100, (Math.min(userTickets, realTickets) / realTickets) * 100);
+}
+
 export type RoundOdds = {
   ticketsSold: number; // real tickets (eligible)
   capacity: number; // 300
@@ -83,6 +92,7 @@ export type RoundOdds = {
   scalePct: number; // 0..100
   userTickets: number;
   winChancePct: number;
+  topWinnerPct: number; // chance to be the #1 (top) winner
   expectedUsd: number;
   topPrizeUsd: number;
   scaledWinnerPayoutUsd: number;
@@ -100,6 +110,7 @@ export function computeOdds(
     scalePct: scale * 100,
     userTickets,
     winChancePct: winChancePct(userTickets, realTickets),
+    topWinnerPct: topWinnerChancePct(userTickets, realTickets),
     expectedUsd: expectedWinningsUsd(userTickets),
     topPrizeUsd: topPrizeUsd(realTickets),
     scaledWinnerPayoutUsd: POOL_ALLOCATION.winnerPayout * scale,

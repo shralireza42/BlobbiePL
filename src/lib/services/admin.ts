@@ -5,6 +5,7 @@ import { listStaff } from "./staff";
 import { listSanctions } from "./moderation";
 import { getFeatures } from "./features";
 import { getReferralAnalytics } from "./referral";
+import { getBugReportSummary } from "./bug-bounty";
 
 const ACTIVE_WINDOW_MS = 15 * 60 * 1000;
 
@@ -25,6 +26,7 @@ export async function getAdminOverview() {
       features: await getFeatures(),
       referrals: { totalReferrals: 0, topReferrers: [], recent: [] },
       manageUsers: [],
+      bugReports: { total: 0, open: 0, recent: [] },
     };
   }
 
@@ -171,7 +173,7 @@ export async function getAdminOverview() {
   }
 
   const activeSince = new Date(Date.now() - ACTIVE_WINDOW_MS);
-  const [activeUsers, activeCount, staff, sanctions, features, referrals] =
+  const [activeUsers, activeCount, staff, sanctions, features, referrals, bugReports] =
     await Promise.all([
       prisma.user.findMany({
         where: { lastSeenAt: { gte: activeSince } },
@@ -184,6 +186,7 @@ export async function getAdminOverview() {
       listSanctions(100),
       getFeatures(),
       getReferralAnalytics(20),
+      getBugReportSummary(25),
     ]);
 
   return {
@@ -208,6 +211,7 @@ export async function getAdminOverview() {
     features,
     referrals,
     manageUsers,
+    bugReports,
   };
 }
 

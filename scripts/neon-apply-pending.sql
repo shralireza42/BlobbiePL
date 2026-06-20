@@ -4,7 +4,8 @@
 -- is idempotent (IF NOT EXISTS / guarded enum creation), so re-running it does
 -- nothing if a change is already applied.
 --
--- Covers: staff & moderation, referrals & levels, and username metadata.
+-- Covers: staff & moderation, referrals & levels, username metadata, and the
+-- bug bounty reports table.
 
 -- ── Enums ────────────────────────────────────────────────────────────────
 DO $$ BEGIN
@@ -13,6 +14,14 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN
   CREATE TYPE "SanctionScope" AS ENUM ('SITE_BAN', 'CHAT_BAN', 'CHAT_MUTE');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "BugSeverity" AS ENUM ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "BugReportStatus" AS ENUM ('NEW', 'TRIAGED', 'ACCEPTED', 'DUPLICATE', 'REJECTED', 'RESOLVED');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- ── New columns ──────────────────────────────────────────────────────────
@@ -72,3 +81,25 @@ CREATE TABLE IF NOT EXISTS "Referral" (
 CREATE UNIQUE INDEX IF NOT EXISTS "Referral_refereeWallet_key" ON "Referral"("refereeWallet");
 CREATE INDEX IF NOT EXISTS "Referral_referrerWallet_idx" ON "Referral"("referrerWallet");
 CREATE INDEX IF NOT EXISTS "Referral_createdAt_idx" ON "Referral"("createdAt");
+
+-- ── Bug Bounty reports ───────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS "BugReport" (
+  "id"             TEXT NOT NULL,
+  "title"          TEXT NOT NULL,
+  "severity"       "BugSeverity" NOT NULL,
+  "category"       TEXT NOT NULL,
+  "description"    TEXT NOT NULL,
+  "steps"          TEXT,
+  "impact"         TEXT,
+  "contact"        TEXT,
+  "reporterWallet" TEXT,
+  "rewardWallet"   TEXT,
+  "status"         "BugReportStatus" NOT NULL DEFAULT 'NEW',
+  "ipHash"         TEXT,
+  "createdAt"      TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt"      TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "BugReport_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "BugReport_status_idx"    ON "BugReport"("status");
+CREATE INDEX IF NOT EXISTS "BugReport_severity_idx"  ON "BugReport"("severity");
+CREATE INDEX IF NOT EXISTS "BugReport_createdAt_idx" ON "BugReport"("createdAt");

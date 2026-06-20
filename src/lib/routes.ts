@@ -8,6 +8,7 @@ export const ROUTES = {
   dashboard: "/dashboard",
   admin: "/admin",
   verify: "/verify",
+  bugBounty: "/bug-bounty",
   // Coming soon
   dash: "/playground/dash",
   blast: "/playground/blast",

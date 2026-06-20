@@ -153,6 +153,9 @@ export async function getAirdropProfile(
   }
 }
 
+/** Tasks granted only by the server (not via the public claim endpoint). */
+const NON_CLAIMABLE_TASKS = new Set<string>(["top_winner"]);
+
 export type ClaimResult = {
   ok: boolean;
   awarded: number;
@@ -182,6 +185,17 @@ export async function claimTask(
   }
 
   const lowered = wallet.toLowerCase();
+
+  // Some tasks are granted automatically by the server (never self-claimable).
+  // e.g. the top-winner bonus is awarded when a Daily Draw round settles.
+  if (NON_CLAIMABLE_TASKS.has(taskKey)) {
+    return {
+      ok: false,
+      awarded: 0,
+      totalPoints: 0,
+      message: "This task is awarded automatically and can't be claimed here.",
+    };
+  }
 
   // Verify action-based tasks actually happened (no free claims).
   if (taskKey === "buy_ticket") {

@@ -35,6 +35,7 @@ type Odds = {
   scalePct: number;
   userTickets: number;
   winChancePct: number;
+  topWinnerPct: number;
   expectedUsd: number;
   topPrizeUsd: number;
   scaledWinnerPayoutUsd: number;
@@ -252,7 +253,10 @@ function UserOdds({ odds }: { odds: Odds }) {
         </p>
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Metric label="Win chance" value={`${odds.winChancePct.toFixed(1)}%`} />
+          <Metric
+            label="Top winner chance"
+            value={`${odds.topWinnerPct.toFixed(1)}%`}
+          />
           <Metric label="Est. winnings" value={formatUsd(odds.expectedUsd)} />
           <Metric label="Top prize" value={formatUsd(odds.topPrizeUsd)} />
           <Metric

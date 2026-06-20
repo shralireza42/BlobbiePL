@@ -10,6 +10,7 @@ const AIRDROP_TASKS = [
   { key: "view_daily_draw", title: "View Daily Rewards Draw", description: "Open the Daily Rewards Draw and review the current round.", points: 30, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: false, sortOrder: 3 },
   { key: "buy_ticket", title: "Buy a Daily Rewards Draw Ticket", description: "Purchase at least one ticket in an open round.", points: 100, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: false, sortOrder: 4 },
   { key: "return_daily", title: "Return Daily", description: "Check in once every 24 hours to keep your streak.", points: 20, type: "DAILY", status: "ACTIVE", requiresAdmin: false, sortOrder: 5 },
+  { key: "top_winner", title: "Daily Draw Top Winner", description: "Finish 1st (top winner) in a Daily Rewards Draw round. Awarded automatically.", points: 10000, type: "ONE_TIME", status: "ACTIVE", requiresAdmin: false, sortOrder: 6 },
   { key: "referral", title: "Invite a Friend", description: "Referral rewards arrive with the Referrals module.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 6 },
   { key: "minigames", title: "Play a Mini-Game", description: "Blobbie Dash, Blast & Stack arrive soon.", points: 0, type: "MANUAL", status: "COMING_SOON", requiresAdmin: true, sortOrder: 7 },
   // Social tasks (verified via X OAuth / Telegram). Points are env-configurable.
