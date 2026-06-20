@@ -483,6 +483,18 @@ model RateLimitHit {
   @@index([windowStart])
 }
 
+model TelegramLinkToken {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  wallet    String
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([wallet])
+  @@index([expiresAt])
+}
+
 enum BugSeverity {
   CRITICAL
   HIGH

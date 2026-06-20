@@ -16,6 +16,33 @@ export type MembershipCheck = {
   status?: string;
 };
 
+/** Send a plain-text message from the bot to a chat/user. Best-effort. */
+export async function sendTelegramMessage(
+  chatId: string | number,
+  text: string,
+): Promise<boolean> {
+  const { botToken } = socialConfig.telegram;
+  if (!botToken) return false;
+  try {
+    const res = await fetch(
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          disable_web_page_preview: true,
+        }),
+      },
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function getChatMemberStatus(
   userId: string | number,
 ): Promise<MembershipCheck> {
