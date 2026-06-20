@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getJson, postJson } from "@/lib/client-api";
 import { Skeleton } from "@/components/ui";
 import { TelegramVerify } from "@/components/airdrop/telegram-verify";
+
+const TELEGRAM_CALLBACK = "/api/social/telegram/callback";
 
 type TaskView = {
   code: "FOLLOW_X" | "JOIN_TELEGRAM" | "BONUS_SOCIAL";
@@ -47,10 +49,42 @@ export function SocialTasks({ onChange }: { onChange: () => void }) {
     refetchInterval: 30_000,
   });
 
+  const [banner, setBanner] = useState<{ kind: "ok" | "err"; text: string } | null>(
+    null,
+  );
+
   const refresh = useCallback(() => {
     refetch();
     onChange();
   }, [refetch, onChange]);
+
+  // Surface the result of the Telegram / X redirect flows (?tg=, ?x=), then
+  // clean the URL so a refresh doesn't repeat the message.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const tg = params.get("tg");
+    const x = params.get("x");
+    if (!tg && !x) return;
+    const tgmsg = params.get("tgmsg");
+    if (tg === "confirmed") {
+      setBanner({ kind: "ok", text: tgmsg ?? "Telegram verified. Points confirmed." });
+    } else if (tg) {
+      setBanner({ kind: "err", text: tgmsg ?? "Telegram verification failed. Try again." });
+    } else if (x === "connected") {
+      setBanner({ kind: "ok", text: "X connected. Follow @xBlobbie, then tap Verify." });
+    } else if (x) {
+      setBanner({ kind: "err", text: "Couldn't connect X. Try again." });
+    }
+    for (const k of ["tg", "tgmsg", "x"]) params.delete(k);
+    const qs = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      window.location.pathname + (qs ? `?${qs}` : ""),
+    );
+    refresh();
+  }, [refresh]);
 
   if (isLoading || !data) return <Skeleton className="h-64 w-full" />;
 
@@ -60,6 +94,17 @@ export function SocialTasks({ onChange }: { onChange: () => void }) {
         <h3 className="text-lg font-display not-italic">Social Tasks</h3>
         <span className="text-xs not-italic text-cream-dim">Verified rewards</span>
       </div>
+      {banner && (
+        <p
+          className={`mt-2 rounded-lg border p-2 text-xs not-italic ${
+            banner.kind === "ok"
+              ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+              : "border-rose-400/30 bg-rose-400/10 text-rose-300"
+          }`}
+        >
+          {banner.text}
+        </p>
+      )}
       {!data.databaseReady && (
         <p className="mt-2 rounded-lg border border-gold/20 bg-gold/5 p-2 text-xs text-gold">
           Beta Mock Mode — connect a database to enable social verification.
@@ -231,7 +276,10 @@ function TelegramTask({ status, onChange }: { status: SocialStatus; onChange: ()
               {loading ? "Verifying…" : "Verify"}
             </button>
           ) : tg.botUsername ? (
-            <TelegramVerify botUsername={tg.botUsername} onAuth={(d) => post(d)} />
+            <TelegramVerify
+              botUsername={tg.botUsername}
+              authUrl={TELEGRAM_CALLBACK}
+            />
           ) : (
             <span className="text-xs not-italic text-cream-dim">Unavailable</span>
           )}
