@@ -111,41 +111,57 @@ export async function getAdminOverview() {
       orderBy: { roundNumber: "desc" },
       select: { id: true, roundNumber: true },
     });
-    const [manageRaw, roundEntries, activeBans] = await Promise.all([
-      prisma.user.findMany({
-        orderBy: { lastSeenAt: "desc" },
-        take: 100,
-        select: {
-          wallet: true,
-          displayName: true,
-          levelOverride: true,
-          lastSeenAt: true,
-          airdropUser: { select: { totalPoints: true, eligibility: true } },
-        },
-      }),
-      latestRound
-        ? prisma.drawEntry.findMany({
-            where: { roundId: latestRound.id },
-            select: { wallet: true, ticketCount: true },
-          })
-        : Promise.resolve([] as { wallet: string; ticketCount: number }[]),
-      prisma.sanction.findMany({
+    // Core query uses only columns present since the baseline schema.
+    const manageRaw = await prisma.user.findMany({
+      orderBy: { lastSeenAt: "desc" },
+      take: 100,
+      select: {
+        wallet: true,
+        displayName: true,
+        lastSeenAt: true,
+        airdropUser: { select: { totalPoints: true, eligibility: true } },
+      },
+    });
+    const roundEntries = latestRound
+      ? await prisma.drawEntry.findMany({
+          where: { roundId: latestRound.id },
+          select: { wallet: true, ticketCount: true },
+        })
+      : [];
+
+    // levelOverride + bans are best-effort (added by later migrations).
+    let levelMap = new Map<string, number | null>();
+    try {
+      const lvls = await prisma.user.findMany({
+        where: { wallet: { in: manageRaw.map((u) => u.wallet) } },
+        select: { wallet: true, levelOverride: true },
+      });
+      levelMap = new Map(lvls.map((l) => [l.wallet, l.levelOverride]));
+    } catch {
+      /* column not migrated yet */
+    }
+    let bannedSet = new Set<string>();
+    try {
+      const activeBans = await prisma.sanction.findMany({
         where: {
           scope: "SITE_BAN",
           liftedAt: null,
           OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
         },
         select: { wallet: true },
-      }),
-    ]);
+      });
+      bannedSet = new Set(activeBans.map((b) => b.wallet));
+    } catch {
+      /* table not migrated yet */
+    }
+
     const ticketMap = new Map(roundEntries.map((e) => [e.wallet, e.ticketCount]));
-    const bannedSet = new Set(activeBans.map((b) => b.wallet));
     manageUsers = manageRaw.map((u) => ({
       wallet: u.wallet,
       displayName: u.displayName,
       points: u.airdropUser?.totalPoints ?? 0,
       tickets: ticketMap.get(u.wallet) ?? 0,
-      levelOverride: u.levelOverride,
+      levelOverride: levelMap.get(u.wallet) ?? null,
       eligibility: u.airdropUser?.eligibility ?? "ELIGIBLE",
       banned: bannedSet.has(u.wallet),
       lastSeenAt: u.lastSeenAt,

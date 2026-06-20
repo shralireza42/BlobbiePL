@@ -51,7 +51,7 @@ export default function DailyDrawPage() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {HOW_TO_PLAY.map((s) => (
               <div key={s.step} className="rounded-2xl border border-cream/10 bg-cream/5 p-4">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime font-display text-sm not-italic text-ink">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime font-display text-sm not-italic text-black">
                   {s.step}
                 </span>
                 <p className="mt-2 font-display not-italic text-sm text-cream">{s.title}</p>

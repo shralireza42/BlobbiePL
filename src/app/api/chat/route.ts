@@ -3,7 +3,8 @@ import { chatMessageSchema } from "@/lib/validation";
 import { getSession } from "@/lib/auth";
 import { getMessages, addMessage } from "@/lib/services/chat";
 import { rateLimit, clientIdentifier } from "@/lib/rate-limit";
-import { isChatBlocked } from "@/lib/services/moderation";
+import { isChatBlocked, createSanction } from "@/lib/services/moderation";
+import { checkSpam, SPAM_PENALTY_MINUTES } from "@/lib/services/chat-antispam";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,29 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const { body: text } = chatMessageSchema.parse(body);
+
+    // Anti-spam: warn → mute (15m) → ban (15m).
+    const spam = checkSpam(session.wallet, text);
+    if (spam.action !== "allow") {
+      if (spam.action === "mute") {
+        await createSanction({
+          wallet: session.wallet,
+          scope: "CHAT_MUTE",
+          reason: "spam",
+          durationMinutes: SPAM_PENALTY_MINUTES,
+          createdBy: "system",
+        });
+      } else if (spam.action === "ban") {
+        await createSanction({
+          wallet: session.wallet,
+          scope: "CHAT_BAN",
+          reason: "spam",
+          durationMinutes: SPAM_PENALTY_MINUTES,
+          createdBy: "system",
+        });
+      }
+      return fail(spam.message ?? "Please don't spam.", 429);
+    }
 
     const message = await addMessage(session.wallet, text);
     void clientIdentifier(req);
