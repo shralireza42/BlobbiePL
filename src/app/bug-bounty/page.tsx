@@ -11,18 +11,11 @@ export const metadata: Metadata = {
 
 const TIERS = [
   {
-    severity: "Critical",
-    reward: "$1,000 – $5,000+",
-    color: "border-rose-400/40 bg-rose-400/10 text-rose-300",
+    severity: "Low",
+    reward: "$100 – $250",
+    color: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300",
     examples:
-      "Direct theft or permanent freezing of user funds, draining the prize pool, minting/inflating $BLOBBIE, signature/auth bypass granting wallet control.",
-  },
-  {
-    severity: "High",
-    reward: "$500 – $1,000",
-    color: "border-orange-400/40 bg-orange-400/10 text-orange-300",
-    examples:
-      "Manipulating draw outcomes or randomness, awarding prizes/points to ineligible wallets, privilege escalation to admin actions, account takeover.",
+      "Reflected XSS requiring heavy interaction, minor information disclosure, missing security headers with realistic impact, open redirects.",
   },
   {
     severity: "Medium",
@@ -32,11 +25,18 @@ const TIERS = [
       "Stored XSS, IDOR exposing other users' data, bypassing rate limits or anti-spam, claiming airdrop points without completing tasks.",
   },
   {
-    severity: "Low",
-    reward: "$100 – $250",
-    color: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300",
+    severity: "High",
+    reward: "$500 – $1,000",
+    color: "border-orange-400/40 bg-orange-400/10 text-orange-300",
     examples:
-      "Reflected XSS requiring heavy interaction, minor information disclosure, missing security headers with realistic impact, open redirects.",
+      "Manipulating draw outcomes or randomness, awarding prizes/points to ineligible wallets, privilege escalation to admin actions, account takeover.",
+  },
+  {
+    severity: "Critical",
+    reward: "$1,000 – $5,000+",
+    color: "border-rose-400/40 bg-rose-400/10 text-rose-300",
+    examples:
+      "Direct theft or permanent freezing of user funds, draining the prize pool, minting/inflating $BLOBBIE, signature/auth bypass granting wallet control.",
   },
 ];
 

@@ -19,6 +19,13 @@ export const MAX_TICKETS_PER_OWNER = ROUND_CAPACITY;
 /** Referral rewards (points) for the referrer and the referred friend. */
 export const REFERRAL_POINTS = { referrer: 100, referee: 50 } as const;
 
+/**
+ * In Beta Mock Mode, claimed prize winnings are converted to Airdrop Points at
+ * this rate (points per $1 of prize). In real mode, winnings are transferred
+ * on-chain in $BLOBBIE instead.
+ */
+export const MOCK_WINNINGS_POINTS_PER_USD = 100;
+
 /** Prize distribution (USD-denominated, paid in $BLOBBIE when live). */
 export const PRIZE_DISTRIBUTION = {
   first: { winners: 1, usdEach: 102, label: "1st Place" },

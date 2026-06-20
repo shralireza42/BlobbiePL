@@ -86,6 +86,9 @@ type Overview = {
       severity: string;
       category: string;
       status: string;
+      description: string;
+      steps: string | null;
+      impact: string | null;
       contact: string | null;
       rewardWallet: string | null;
       reporterWallet: string | null;
@@ -248,37 +251,66 @@ function BugReportsPanel({ reports }: { reports: Overview["bugReports"] }) {
       ) : (
         <div className="space-y-3">
           {reports.recent.map((r) => (
-            <div
+            <details
               key={r.id}
               className="rounded-xl border border-cream/10 bg-cream/5 p-4"
             >
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`chip ${SEVERITY_STYLES[r.severity] ?? ""}`}>
-                  {r.severity}
+              <summary className="cursor-pointer list-none">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`chip ${SEVERITY_STYLES[r.severity] ?? ""}`}>
+                    {r.severity}
+                  </span>
+                  <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
+                    {r.category}
+                  </span>
+                  <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
+                    {r.status}
+                  </span>
+                  <span className="text-xs not-italic text-cream-dim">
+                    {new Date(r.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <p className="mt-2 font-medium text-cream">{r.title}</p>
+                <p className="mt-1 text-xs not-italic text-cream-dim">
+                  {r.contact ? `Contact: ${r.contact}` : "No contact provided"}
+                  {r.rewardWallet
+                    ? ` · Reward: ${shortenAddress(r.rewardWallet)}`
+                    : ""}
+                  {r.reporterWallet
+                    ? ` · Reporter: ${shortenAddress(r.reporterWallet)}`
+                    : ""}
+                </p>
+                <span className="mt-1 inline-block text-xs not-italic text-neon-cyan">
+                  ▸ View full report
                 </span>
-                <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
-                  {r.category}
-                </span>
-                <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
-                  {r.status}
-                </span>
-                <span className="text-xs not-italic text-cream-dim">
-                  {new Date(r.createdAt).toLocaleString()}
-                </span>
+              </summary>
+              <div className="mt-3 space-y-3 border-t border-cream/10 pt-3 text-sm text-cream-soft">
+                <ReportField label="Description" value={r.description} />
+                {r.steps && <ReportField label="Steps to reproduce" value={r.steps} />}
+                {r.impact && <ReportField label="Impact" value={r.impact} />}
+                <div className="grid gap-1 text-xs not-italic text-cream-dim sm:grid-cols-2">
+                  <span>Contact: {r.contact || "—"}</span>
+                  <span>Reward wallet: {r.rewardWallet || "—"}</span>
+                  <span>Reporter wallet: {r.reporterWallet || "—"}</span>
+                  <span>Report ID: {r.id}</span>
+                </div>
               </div>
-              <p className="mt-2 font-medium text-cream">{r.title}</p>
-              <p className="mt-1 text-xs not-italic text-cream-dim">
-                {r.contact ? `Contact: ${r.contact}` : "No contact provided"}
-                {r.rewardWallet ? ` · Reward: ${shortenAddress(r.rewardWallet)}` : ""}
-                {r.reporterWallet
-                  ? ` · Reporter: ${shortenAddress(r.reporterWallet)}`
-                  : ""}
-              </p>
-            </div>
+            </details>
           ))}
         </div>
       )}
     </Section>
+  );
+}
+
+function ReportField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs not-italic uppercase tracking-wider text-cream-dim">
+        {label}
+      </p>
+      <p className="mt-1 whitespace-pre-wrap break-words text-cream-soft">{value}</p>
+    </div>
   );
 }
 

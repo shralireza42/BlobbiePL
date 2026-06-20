@@ -70,6 +70,9 @@ export type BugReportSummary = {
     severity: string;
     category: string;
     status: string;
+    description: string;
+    steps: string | null;
+    impact: string | null;
     contact: string | null;
     rewardWallet: string | null;
     reporterWallet: string | null;
@@ -100,6 +103,9 @@ export async function getBugReportSummary(limit = 25): Promise<BugReportSummary>
         severity: r.severity,
         category: r.category,
         status: r.status,
+        description: r.description,
+        steps: r.steps,
+        impact: r.impact,
         contact: r.contact,
         rewardWallet: r.rewardWallet,
         reporterWallet: r.reporterWallet,
