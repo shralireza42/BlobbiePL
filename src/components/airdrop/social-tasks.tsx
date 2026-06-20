@@ -4,9 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getJson, postJson } from "@/lib/client-api";
 import { Skeleton } from "@/components/ui";
-import { TelegramVerify } from "@/components/airdrop/telegram-verify";
-
-const TELEGRAM_CALLBACK = "/api/social/telegram/callback";
 
 type TaskView = {
   code: "FOLLOW_X" | "JOIN_TELEGRAM" | "BONUS_SOCIAL";
@@ -224,22 +221,47 @@ function XTask({ status, onChange }: { status: SocialStatus; onChange: () => voi
 function TelegramTask({ status, onChange }: { status: SocialStatus; onChange: () => void }) {
   const tg = status.telegram;
   const [loading, setLoading] = useState(false);
+  const [connecting, setConnecting] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const post = useCallback(
-    async (telegram?: Record<string, unknown>) => {
-      setLoading(true);
-      setMsg(null);
-      const res = await postJson<VerifyResponse>(
-        "/api/airdrop/tasks/join-telegram/verify",
-        telegram ? { telegram } : {},
-      );
-      setLoading(false);
-      setMsg(res.data?.task.message ?? res.error ?? null);
-      onChange();
-    },
-    [onChange],
-  );
+  const post = useCallback(async () => {
+    setLoading(true);
+    setMsg(null);
+    const res = await postJson<VerifyResponse>(
+      "/api/airdrop/tasks/join-telegram/verify",
+      {},
+    );
+    setLoading(false);
+    setMsg(res.data?.task.message ?? res.error ?? null);
+    onChange();
+  }, [onChange]);
+
+  // Bot deep-link connect: open t.me/<bot>?start=<code>, then poll for the link.
+  const connect = useCallback(async () => {
+    setConnecting(true);
+    setMsg(null);
+    try {
+      const { url } = await getJson<{ url: string }>("/api/social/telegram/start");
+      window.open(url, "_blank", "noopener");
+      setMsg("Tap Start in Telegram, then come back — we'll detect it automatically.");
+      let tries = 0;
+      const iv = setInterval(() => {
+        onChange();
+        if (++tries >= 20) {
+          clearInterval(iv);
+          setConnecting(false);
+        }
+      }, 3000);
+    } catch (e) {
+      setConnecting(false);
+      setMsg(e instanceof Error ? e.message : "Could not start Telegram connect.");
+    }
+  }, [onChange]);
+
+  // Stop the connect spinner once the account is linked.
+  useEffect(() => {
+    if (tg.connected) setConnecting(false);
+  }, [tg.connected]);
 
   const confirmed = tg.task.status === "confirmed";
   const unavailable = !tg.configured;
@@ -275,13 +297,14 @@ function TelegramTask({ status, onChange }: { status: SocialStatus; onChange: ()
             >
               {loading ? "Verifying…" : "Verify"}
             </button>
-          ) : tg.botUsername ? (
-            <TelegramVerify
-              botUsername={tg.botUsername}
-              authUrl={TELEGRAM_CALLBACK}
-            />
           ) : (
-            <span className="text-xs not-italic text-cream-dim">Unavailable</span>
+            <button
+              className="btn-ghost px-4 py-2"
+              onClick={connect}
+              disabled={connecting}
+            >
+              {connecting ? "Waiting…" : "Connect Telegram"}
+            </button>
           )}
         </div>
       )}

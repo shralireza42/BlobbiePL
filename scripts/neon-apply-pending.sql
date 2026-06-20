@@ -103,3 +103,17 @@ CREATE TABLE IF NOT EXISTS "BugReport" (
 CREATE INDEX IF NOT EXISTS "BugReport_status_idx"    ON "BugReport"("status");
 CREATE INDEX IF NOT EXISTS "BugReport_severity_idx"  ON "BugReport"("severity");
 CREATE INDEX IF NOT EXISTS "BugReport_createdAt_idx" ON "BugReport"("createdAt");
+
+-- ── Telegram bot link tokens (deep-link /start verification) ──────────────
+CREATE TABLE IF NOT EXISTS "TelegramLinkToken" (
+  "id"        TEXT NOT NULL,
+  "code"      TEXT NOT NULL,
+  "wallet"    TEXT NOT NULL,
+  "usedAt"    TIMESTAMP(3),
+  "expiresAt" TIMESTAMP(3) NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "TelegramLinkToken_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "TelegramLinkToken_code_key"      ON "TelegramLinkToken"("code");
+CREATE INDEX        IF NOT EXISTS "TelegramLinkToken_wallet_idx"    ON "TelegramLinkToken"("wallet");
+CREATE INDEX        IF NOT EXISTS "TelegramLinkToken_expiresAt_idx" ON "TelegramLinkToken"("expiresAt");
