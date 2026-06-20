@@ -66,6 +66,7 @@ type Overview = {
   referrals: {
     totalReferrals: number;
     topReferrers: { wallet: string; count: number; points: number }[];
+    recent: { referrer: string; referee: string; source: string; createdAt: string }[];
   };
   manageUsers: {
     wallet: string;
@@ -684,6 +685,7 @@ function ReferralAdminPanel({
         </div>
       )}
       {msg && <p className="mb-2 text-xs not-italic text-cream-dim">{msg}</p>}
+      <p className="mb-2 text-xs not-italic uppercase tracking-wider text-cream-dim">Top referrers</p>
       {referrals.topReferrers.length === 0 ? (
         <Empty>No referrals yet.</Empty>
       ) : (
@@ -696,6 +698,20 @@ function ReferralAdminPanel({
             <span key="p">{r.points}</span>,
           ])}
         />
+      )}
+      {referrals.recent.length > 0 && (
+        <div className="mt-4">
+          <p className="mb-2 text-xs not-italic uppercase tracking-wider text-cream-dim">Recent referrals</p>
+          <Table
+            headers={["Referrer", "Friend", "Source", "When"]}
+            rows={referrals.recent.map((r) => [
+              <span key="a" className="font-mono">{shortenAddress(r.referrer, 5)}</span>,
+              <span key="b" className="font-mono">{shortenAddress(r.referee, 5)}</span>,
+              <span key="s">{r.source}</span>,
+              <span key="d">{new Date(r.createdAt).toLocaleDateString()}</span>,
+            ])}
+          />
+        </div>
       )}
     </Section>
   );

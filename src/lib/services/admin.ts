@@ -23,7 +23,7 @@ export async function getAdminOverview() {
       staff: [],
       sanctions: [],
       features: await getFeatures(),
-      referrals: { totalReferrals: 0, topReferrers: [] },
+      referrals: { totalReferrals: 0, topReferrers: [], recent: [] },
       manageUsers: [],
     };
   }

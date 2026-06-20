@@ -111,6 +111,77 @@ export async function getRoundWinners(roundId: number): Promise<Winner[]> {
   return getMockWinners(roundId, price.usd);
 }
 
+export type MyWinning = {
+  roundNumber: number;
+  rank: number;
+  usdAmount: number;
+  blobbieAmount: string;
+  claimStatus: "UNCLAIMED" | "CLAIMED" | "EXPIRED";
+  txHash: string | null;
+};
+
+/** Prizes the connected wallet has won across rounds. */
+export async function getMyWinnings(wallet: string): Promise<MyWinning[]> {
+  if (!hasDatabase) return [];
+  try {
+    const rows = await prisma.drawWinner.findMany({
+      where: { wallet: wallet.toLowerCase() },
+      include: { round: { select: { roundNumber: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    return rows.map((w) => ({
+      roundNumber: w.round.roundNumber,
+      rank: w.rank,
+      usdAmount: w.usdAmount,
+      blobbieAmount: w.blobbieAmount,
+      claimStatus: w.claimStatus as MyWinning["claimStatus"],
+      txHash: w.claimTxHash,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Claim a prize the wallet won (one-time, idempotent). */
+export async function claimWinnings(
+  wallet: string,
+  roundNumber: number,
+): Promise<{ ok: boolean; message: string; usdAmount?: number }> {
+  if (!hasDatabase) {
+    return { ok: false, message: "No on-chain winnings to claim in Beta Mock Mode." };
+  }
+  const lowered = wallet.toLowerCase();
+  return prisma.$transaction(async (tx) => {
+    const round = await tx.drawRound.findUnique({ where: { roundNumber } });
+    if (!round) return { ok: false, message: "Round not found." };
+    const winner = await tx.drawWinner.findFirst({
+      where: { roundId: round.id, wallet: lowered },
+    });
+    if (!winner) return { ok: false, message: "You didn't win in this round." };
+    if (winner.claimStatus === "CLAIMED") {
+      return { ok: false, message: "This prize has already been claimed." };
+    }
+    await tx.drawWinner.update({
+      where: { id: winner.id },
+      data: { claimStatus: "CLAIMED", claimedAt: new Date() },
+    });
+    await tx.activityLog.create({
+      data: {
+        wallet: lowered,
+        type: "prize_claim",
+        message: `Claimed prize for round #${roundNumber}`,
+        metadata: { usdAmount: winner.usdAmount },
+      },
+    });
+    return {
+      ok: true,
+      message: `Claimed $${winner.usdAmount.toFixed(2)} in $BLOBBIE.`,
+      usdAmount: winner.usdAmount,
+    };
+  });
+}
+
 export async function getRecentResults(limit = 3) {
   // DB lifecycle: return the most recent settled rounds (those with winners),
   // newest first — this includes a round the moment it closes.
