@@ -173,10 +173,12 @@ function ActiveSection({
           Box with image background — edit the file in /public/sections (or drop
           a PNG with the same name). The <img> fills the frame at any aspect.
         */}
-        <div className="relative flex aspect-[16/10] w-full flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 p-4 sm:aspect-[16/9]">
-          {/* Full-bleed art fills the frame (object-cover) — slightly shorter
-              box (16:10 → 16:9) keeps height compact while still covering the
-              whole frame. Replace /public/sections/*. */}
+        <div className="relative mx-auto flex aspect-square w-full max-w-md flex-col justify-end overflow-hidden rounded-3xl border-2 border-cream/15 p-4">
+          {/* The section art is square (1254×1254), so the box is square too:
+              object-cover then fills the frame completely AND shows the whole
+              image with no cropping. max-w-md keeps the height compact. If you
+              swap in a wide image, change aspect-square to match its ratio.
+              Replace /public/sections/*. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
