@@ -182,7 +182,13 @@ const AUTO_KEYS = new Set([
   "connect_wallet",
   "join_playground",
   "view_daily_draw",
+  "top_winner",
 ]);
+
+// Custom "auto" hints per task (otherwise a generic label is shown).
+const AUTO_HINTS: Record<string, string> = {
+  top_winner: "Auto · win 1st place",
+};
 
 function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -238,7 +244,7 @@ function TaskRow({ task, onChange }: { task: Task; onChange: () => void }) {
           <span className="chip border-cream/15 bg-cream/5 text-cream-dim">Soon</span>
         ) : isAuto ? (
           <span className="chip border-cream/15 bg-cream/5 text-cream-dim">
-            Auto · do the action
+            {AUTO_HINTS[task.key] ?? "Auto · do the action"}
           </span>
         ) : (
           <button className="btn-ghost px-4 py-2" disabled={disabled} onClick={claim}>

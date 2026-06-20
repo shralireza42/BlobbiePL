@@ -113,6 +113,17 @@ export const AIRDROP_TASKS = [
     requiresAdmin: false,
     sortOrder: 5,
   },
+  {
+    key: "top_winner",
+    title: "Daily Draw Top Winner",
+    description:
+      "Finish 1st (top winner) in a Daily Rewards Draw round. Awarded automatically.",
+    points: 10000,
+    type: "ONE_TIME",
+    status: "ACTIVE",
+    requiresAdmin: false,
+    sortOrder: 6,
+  },
   // "Invite a Friend" is now a live feature — see the Referrals panel
   // (src/components/referral-panel.tsx), not a Coming Soon task.
   {
