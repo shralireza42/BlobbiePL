@@ -21,7 +21,15 @@ export function rateLimited(resetAt: number) {
 
 export function handleError(err: unknown) {
   if (err instanceof ZodError) {
-    return fail("Validation failed", 422, err.flatten());
+    const flat = err.flatten();
+    // Build a human-readable message from the first few field errors so the
+    // client can show what actually needs fixing (not just "Validation failed").
+    const fieldMsgs = Object.entries(flat.fieldErrors)
+      .flatMap(([field, msgs]) => (msgs ?? []).map((m) => `${field}: ${m}`))
+      .concat(flat.formErrors);
+    const message =
+      fieldMsgs.length > 0 ? fieldMsgs.slice(0, 4).join("; ") : "Validation failed";
+    return fail(message, 422, flat);
   }
   if (err instanceof Error) {
     if (err.message === "UNAUTHORIZED") return fail("Unauthorized", 401);
